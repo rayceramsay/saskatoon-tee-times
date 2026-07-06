@@ -1,0 +1,22 @@
+{
+  "name": "saskatoon-tee-times",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
+  },
+  "devDependencies": {
+    "@stt/prettier-config": "workspace:*",
+    "prettier": "^3.9.4",
+    "turbo": "^2.10.3",
+    "typescript": "6.0.3"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18"
+  }
+}
