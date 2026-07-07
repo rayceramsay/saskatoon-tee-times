@@ -2,5 +2,10 @@
   "name": "@stt/scraper-core",
   "version": "0.0.0",
   "type": "module",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "playwright-core": "^1.61.1",
+    "zod": "^4.4.3"
+  }
 }
