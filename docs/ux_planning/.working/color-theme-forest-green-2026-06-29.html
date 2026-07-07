@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Color theme — Forest green — Saskatoon Tee Times</title>
+    <style>
+      /*
+   * Single source of truth for the accent.
+   * Change --accent (and optionally --accent-dark for hover) to retheme everything.
+   */
+      :root {
+        --accent: #2e6b47; /* forest green — the single brand colour */
+        --accent-dark: #245538; /* hover / pressed */
+        --accent-light: #eaf3ee; /* checkbox bg tint, toggle track */
+
+        --ink: #1b1d1f;
+        --ink-2: #55595e;
+        --ink-3: #8a9097;
+        --line: #e3e6e9;
+        --line-2: #eef0f2;
+        --bg: #f5f6f7;
+        --panel: #ffffff;
+
+        /* freshness states — green reuses accent */
+        --good: var(--accent);
+        --amber: #e09400;
+        --red: #e03030;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+          sans-serif;
+        background: #c8ccd0;
+        padding: 40px 24px 80px;
+        color: var(--ink);
+      }
+
+      h3 {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #777;
+        margin: 0 0 12px;
+      }
+      .section {
+        background: var(--panel);
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        margin-bottom: 28px;
+        max-width: 860px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .row:last-child {
+        margin-bottom: 0;
+      }
+      .label {
+        font-size: 11px;
+        color: var(--ink-3);
+        min-width: 120px;
+      }
+      .divider {
+        border: none;
+        border-top: 1px solid var(--line-2);
+        margin: 20px 0;
+      }
+
+      /* ── Book button ── */
+      .book-btn {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 9px 22px;
+        cursor: pointer;
+      }
+      .book-btn:hover {
+        background: var(--accent-dark);
+      }
+
+      /* ── Holes / Players toggle buttons ── */
+      .tog-group {
+        display: flex;
+        gap: 4px;
+      }
+      .tog {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        border-radius: 7px;
+        padding: 6px 13px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--ink-2);
+        cursor: pointer;
+      }
+      .tog.on {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+
+      /* ── Checkboxes ── */
+      .cb-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--ink-2);
+        cursor: pointer;
+      }
+      .cb-row input[type='checkbox'] {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--accent);
+      }
+
+      /* ── Date picker selected day ── */
+      .cal-mini {
+        display: inline-grid;
+        grid-template-columns: repeat(7, 28px);
+        gap: 2px;
+      }
+      .cal-d {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        border-radius: 6px;
+        color: var(--ink-2);
+        cursor: pointer;
+      }
+      .cal-d:hover {
+        background: var(--line-2);
+      }
+      .cal-d.today {
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+      }
+      .cal-d.past {
+        color: var(--line);
+        cursor: default;
+      }
+      .cal-d.past:hover {
+        background: transparent;
+      }
+      .cal-d.near {
+        color: var(--ink);
+      }
+
+      /* ── Group-by-course toggle switch ── */
+      .switch-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--ink-2);
+      }
+      .switch {
+        width: 38px;
+        height: 22px;
+        border-radius: 11px;
+        position: relative;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .switch.off {
+        background: var(--line);
+      }
+      .switch.on {
+        background: var(--accent);
+      }
+      .knob {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        position: absolute;
+        top: 2px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        transition: left 0.15s;
+      }
+      .switch.off .knob {
+        left: 2px;
+      }
+      .switch.on .knob {
+        left: 18px;
+      }
+
+      /* ── Freshness dots ── */
+      .fdot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .fdot.green {
+        background: var(--accent);
+      }
+      .fdot.amber {
+        background: var(--amber);
+      }
+      .fdot.red {
+        background: var(--red);
+      }
+      .fresh-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+      }
+
+      /* ── Color swatch ── */
+      .swatch {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background: var(--accent);
+        flex-shrink: 0;
+      }
+      .swatch-dark {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background: var(--accent-dark);
+        flex-shrink: 0;
+      }
+      .swatch-light {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background: var(--accent-light);
+        border: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+      .hex {
+        font-size: 11px;
+        color: var(--ink-3);
+        font-family: ui-monospace, monospace;
+        margin-top: 4px;
+      }
+      .swatch-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* ── Mini topbar preview ── */
+      .topbar-preview {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px;
+        height: 44px;
+      }
+      .brand {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .spacer {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- COLOUR SWATCHES -->
+    <div class="section">
+      <h3>Colour palette</h3>
+      <div class="row">
+        <div class="swatch-col">
+          <div class="swatch"></div>
+          <div class="hex">#2e6b47</div>
+          <div class="hex" style="color: var(--ink-2)">accent</div>
+        </div>
+        <div class="swatch-col">
+          <div class="swatch-dark"></div>
+          <div class="hex">#245538</div>
+          <div class="hex" style="color: var(--ink-2)">accent-dark</div>
+        </div>
+        <div class="swatch-col">
+          <div class="swatch-light"></div>
+          <div class="hex">#eaf3ee</div>
+          <div class="hex" style="color: var(--ink-2)">accent-light</div>
+        </div>
+        <div
+          style="width: 1px; background: var(--line); height: 48px; margin: 0 8px"
+        ></div>
+        <div class="swatch-col">
+          <div
+            style="
+              width: 48px;
+              height: 48px;
+              border-radius: 8px;
+              background: var(--amber);
+            "
+          ></div>
+          <div class="hex">#e09400</div>
+          <div class="hex" style="color: var(--ink-2)">amber</div>
+        </div>
+        <div class="swatch-col">
+          <div
+            style="
+              width: 48px;
+              height: 48px;
+              border-radius: 8px;
+              background: var(--red);
+            "
+          ></div>
+          <div class="hex">#e03030</div>
+          <div class="hex" style="color: var(--ink-2)">red</div>
+        </div>
+      </div>
+      <p style="font-size: 11px; color: var(--ink-3); margin-top: 4px">
+        One CSS variable (<code style="font-family: ui-monospace, monospace"
+          >--accent</code
+        >) controls everything below. Swap the hex to retheme.
+      </p>
+    </div>
+
+    <!-- INTERACTIVE ELEMENTS -->
+    <div class="section">
+      <h3>Accent-coloured elements</h3>
+
+      <!-- Book button -->
+      <div class="row">
+        <span class="label">Book button</span>
+        <button class="book-btn">Book</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Holes toggle -->
+      <div class="row">
+        <span class="label">Holes filter</span>
+        <div class="tog-group">
+          <button class="tog">Any</button>
+          <button class="tog">6</button>
+          <button class="tog on">9</button>
+          <button class="tog">12</button>
+          <button class="tog">18</button>
+        </div>
+      </div>
+
+      <!-- Players toggle -->
+      <div class="row">
+        <span class="label">Players filter</span>
+        <div class="tog-group">
+          <button class="tog">Any</button>
+          <button class="tog">1</button>
+          <button class="tog">2</button>
+          <button class="tog on">3</button>
+          <button class="tog">4</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Checkboxes -->
+      <div
+        class="row"
+        style="flex-direction: column; align-items: flex-start; gap: 8px"
+      >
+        <span class="label" style="min-width: unset">Course filter</span>
+        <label class="cb-row"
+          ><input type="checkbox" checked /> Holiday Park Championship</label
+        >
+        <label class="cb-row"><input type="checkbox" checked /> The Willows</label>
+        <label class="cb-row"><input type="checkbox" /> Dakota Dunes Golf Links</label>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Date picker selected day -->
+      <div class="row" style="align-items: flex-start">
+        <span class="label">Calendar selection</span>
+        <div class="cal-mini">
+          <div class="cal-d past">22</div>
+          <div class="cal-d past">23</div>
+          <div class="cal-d past">24</div>
+          <div class="cal-d past">25</div>
+          <div class="cal-d past">26</div>
+          <div class="cal-d past">27</div>
+          <div class="cal-d past">28</div>
+          <div class="cal-d past">29</div>
+          <div class="cal-d today">30</div>
+          <div class="cal-d near">1</div>
+          <div class="cal-d near">2</div>
+          <div class="cal-d near">3</div>
+          <div class="cal-d near">4</div>
+          <div class="cal-d near">5</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Group by course toggle -->
+      <div class="row">
+        <span class="label">Toggle (off → on)</span>
+        <div class="switch-wrap">
+          <div class="switch off"><div class="knob"></div></div>
+          <span>Group by course</span>
+        </div>
+        <div class="switch-wrap" style="margin-left: 24px">
+          <div class="switch on"><div class="knob"></div></div>
+          <span style="color: var(--ink)">Group by course</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Freshness dots -->
+      <div
+        class="row"
+        style="flex-direction: column; align-items: flex-start; gap: 8px"
+      >
+        <span class="label" style="min-width: unset">Freshness states</span>
+        <div class="fresh-row">
+          <span class="fdot green"></span
+          ><span style="color: var(--accent)">Updated 3 min ago</span>
+        </div>
+        <div class="fresh-row">
+          <span class="fdot amber"></span
+          ><span style="color: #a05c00">Updated 28 min ago</span>
+        </div>
+        <div class="fresh-row">
+          <span class="fdot red"></span
+          ><span style="color: #c0392b">Updated 2 hr ago</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOPBAR IN CONTEXT -->
+    <div class="section">
+      <h3>Top bar in context</h3>
+      <div class="topbar-preview">
+        <span class="brand">⛳ Saskatoon Tee Times</span>
+        <span class="spacer"></span>
+        <div class="fresh-row">
+          <span class="fdot green"></span
+          ><span style="color: var(--accent); font-size: 12px">Updated 3 min ago</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

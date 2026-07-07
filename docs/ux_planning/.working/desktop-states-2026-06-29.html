@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Table states — Saskatoon Tee Times</title>
+    <style>
+      :root {
+        --ink: #1b1d1f;
+        --ink-2: #55595e;
+        --ink-3: #8a9097;
+        --line: #e3e6e9;
+        --line-2: #eef0f2;
+        --bg: #f5f6f7;
+        --panel: #ffffff;
+        --btn: #23262a;
+        --good: #2f7d4f;
+        --amber: #a05c00;
+        --red-dot: #e03030;
+        --red-text: #c0392b;
+        --skel: #e8eaec;
+        --skel-shine: #f5f6f7;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+          sans-serif;
+        background: #c8ccd0;
+        padding: 40px 24px 80px;
+        color: var(--ink);
+      }
+
+      .state-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: #666;
+        margin: 0 0 8px;
+      }
+      .state-desc {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 12px;
+      }
+
+      /* mini browser shell — just topbar + listings, no sidebar, to focus on the state */
+      .shell {
+        width: 860px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        background: var(--bg);
+        margin-bottom: 44px;
+      }
+      .topbar {
+        background: var(--panel);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 0 20px;
+        height: 48px;
+      }
+      .brand {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .spacer {
+        flex: 1;
+      }
+      .freshness {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+      }
+      .fdot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .fdot.green {
+        background: var(--good);
+      }
+      .fdot.red {
+        background: var(--red-dot);
+      }
+      .ftext.green {
+        color: var(--good);
+      }
+      .ftext.red {
+        color: var(--red-text);
+      }
+
+      /* 7-col grid */
+      .col-grid {
+        display: grid;
+        grid-template-columns: 84px 1fr 52px 118px 80px 62px 68px;
+        gap: 0;
+      }
+      .list-sticky {
+        position: sticky;
+        top: 0;
+        z-index: 4;
+      }
+      .subcount {
+        background: var(--bg);
+        padding: 6px 16px;
+        font-size: 12px;
+        color: var(--ink-3);
+        border-bottom: 1px solid var(--line-2);
+      }
+      .list-header {
+        background: var(--panel);
+        border-bottom: 1px solid var(--line);
+      }
+      .th {
+        padding: 9px 10px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--ink-3);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border-right: 1px solid var(--line-2);
+      }
+      .th:last-child {
+        border-right: none;
+      }
+
+      /* real data rows (used in stale state) */
+      .trow {
+        align-items: center;
+        background: var(--panel);
+        border-bottom: 1px solid var(--line-2);
+        min-height: 42px;
+      }
+      .td {
+        padding: 10px;
+        font-size: 13px;
+        border-right: 1px solid var(--line-2);
+        align-self: stretch;
+        display: flex;
+        align-items: center;
+      }
+      .td:last-child {
+        border-right: none;
+        padding: 8px 10px;
+      }
+      .td-time {
+        font-size: 14px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .ampm {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--ink-3);
+        margin-left: 2px;
+      }
+      .td-course {
+        font-weight: 600;
+      }
+      .td-routing {
+        color: var(--ink-3);
+        font-size: 12px;
+      }
+      .td-slots {
+        color: var(--ink-2);
+        font-size: 12px;
+      }
+      .td-price {
+        font-weight: 700;
+      }
+      /* NOTE: Book button color predates locked accent. Use colors.accent (#2e6b47) not #23262a — see DESIGN.md */
+      .book-btn {
+        background: var(--btn);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 7px 0;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      /* ── SKELETON ── */
+      @keyframes shimmer {
+        0% {
+          background-position: -600px 0;
+        }
+        100% {
+          background-position: 600px 0;
+        }
+      }
+      .skel-row {
+        align-items: center;
+        background: var(--panel);
+        border-bottom: 1px solid var(--line-2);
+        min-height: 42px;
+      }
+      .skel-cell {
+        padding: 10px;
+        border-right: 1px solid var(--line-2);
+        align-self: stretch;
+        display: flex;
+        align-items: center;
+      }
+      .skel-cell:last-child {
+        border-right: none;
+      }
+      .skel-bar {
+        height: 12px;
+        border-radius: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--skel) 25%,
+          var(--skel-shine) 50%,
+          var(--skel) 75%
+        );
+        background-size: 600px 100%;
+        animation: shimmer 1.4s infinite linear;
+      }
+      .skel-btn {
+        height: 30px;
+        border-radius: 8px;
+        width: 100%;
+        background: linear-gradient(
+          90deg,
+          var(--skel) 25%,
+          var(--skel-shine) 50%,
+          var(--skel) 75%
+        );
+        background-size: 600px 100%;
+        animation: shimmer 1.4s infinite linear;
+      }
+
+      /* ── EMPTY / ERROR centred message ── */
+      .state-body {
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 280px;
+      }
+      .state-card {
+        text-align: center;
+        max-width: 320px;
+      }
+      .state-icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+      }
+      .state-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 6px;
+      }
+      .state-msg {
+        font-size: 13px;
+        color: var(--ink-3);
+        line-height: 1.5;
+        margin-bottom: 18px;
+      }
+      .state-btn {
+        background: var(--btn);
+        color: #fff;
+        border: none;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 10px 24px;
+        cursor: pointer;
+      }
+      .state-link {
+        font-size: 13px;
+        color: var(--ink-2);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════════════════════════════════════
+     STATE 1 — LOADING (skeleton)
+════════════════════════════════════════════ -->
+    <div class="state-label">Loading</div>
+    <div class="state-desc">
+      Date changed → fetch in flight. Previous content replaced with skeleton rows.
+    </div>
+    <div class="shell">
+      <div class="topbar">
+        <span class="brand">⛳ Saskatoon Tee Times</span>
+        <span class="spacer"></span>
+        <div class="freshness">
+          <span class="fdot green"></span
+          ><span class="ftext green" style="color: var(--ink-3)">Updating…</span>
+        </div>
+      </div>
+      <div class="list-sticky">
+        <div class="subcount" style="color: transparent">——</div>
+        <div class="list-header col-grid">
+          <div class="th">Time</div>
+          <div class="th">Course</div>
+          <div class="th">Holes</div>
+          <div class="th">Routing</div>
+          <div class="th">Slots</div>
+          <div class="th">Price</div>
+          <div class="th"></div>
+        </div>
+      </div>
+      <!-- 7 skeleton rows -->
+      <div class="skel-row col-grid">
+        <div class="skel-cell"><div class="skel-bar" style="width: 52px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 72%"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 20px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 80px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 48px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 30px"></div></div>
+        <div class="skel-cell"><div class="skel-btn"></div></div>
+      </div>
+      <div class="skel-row col-grid">
+        <div class="skel-cell"><div class="skel-bar" style="width: 48px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 55%"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 20px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 96px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 48px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 24px"></div></div>
+        <div class="skel-cell"><div class="skel-btn"></div></div>
+      </div>
+      <div class="skel-row col-grid">
+        <div class="skel-cell"><div class="skel-bar" style="width: 44px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 65%"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 20px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 60px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 48px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 30px"></div></div>
+        <div class="skel-cell"><div class="skel-btn"></div></div>
+      </div>
+      <div class="skel-row col-grid">
+        <div class="skel-cell"><div class="skel-bar" style="width: 52px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 80%"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 20px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 72px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 48px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 28px"></div></div>
+        <div class="skel-cell"><div class="skel-btn"></div></div>
+      </div>
+      <div class="skel-row col-grid">
+        <div class="skel-cell"><div class="skel-bar" style="width: 44px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 48%"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 20px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 88px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 48px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 30px"></div></div>
+        <div class="skel-cell"><div class="skel-btn"></div></div>
+      </div>
+      <div class="skel-row col-grid">
+        <div class="skel-cell"><div class="skel-bar" style="width: 52px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 60%"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 20px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 64px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 48px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 24px"></div></div>
+        <div class="skel-cell"><div class="skel-btn"></div></div>
+      </div>
+      <div class="skel-row col-grid">
+        <div class="skel-cell"><div class="skel-bar" style="width: 48px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 70%"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 20px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 80px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 48px"></div></div>
+        <div class="skel-cell"><div class="skel-bar" style="width: 30px"></div></div>
+        <div class="skel-cell"><div class="skel-btn"></div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     STATE 2 — EMPTY
+════════════════════════════════════════════ -->
+    <div class="state-label">Empty</div>
+    <div class="state-desc">
+      No tee times match — either filters are too narrow or no data exists for this
+      date.
+    </div>
+    <div class="shell">
+      <div class="topbar">
+        <span class="brand">⛳ Saskatoon Tee Times</span>
+        <span class="spacer"></span>
+        <div class="freshness">
+          <span class="fdot green"></span
+          ><span class="ftext green">Updated 3 min ago</span>
+        </div>
+      </div>
+      <div class="list-sticky">
+        <div class="subcount">0 tee times · Mon Jun 29</div>
+        <div class="list-header col-grid">
+          <div class="th">Time</div>
+          <div class="th">Course</div>
+          <div class="th">Holes</div>
+          <div class="th">Routing</div>
+          <div class="th">Slots</div>
+          <div class="th">Price</div>
+          <div class="th"></div>
+        </div>
+      </div>
+      <div class="state-body">
+        <div class="state-card">
+          <div class="state-icon">⛳</div>
+          <div class="state-title">No tee times found</div>
+          <div class="state-msg">
+            There's nothing available for this date with your current filters.
+          </div>
+          <button class="state-link">Reset filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     STATE 3 — ERROR
+════════════════════════════════════════════ -->
+    <div class="state-label">Error</div>
+    <div class="state-desc">
+      API call failed — network error, timeout, or server fault.
+    </div>
+    <div class="shell">
+      <div class="topbar">
+        <span class="brand">⛳ Saskatoon Tee Times</span>
+        <span class="spacer"></span>
+        <div class="freshness" style="color: var(--ink-3); font-size: 12px">—</div>
+      </div>
+      <div class="list-sticky">
+        <div class="subcount" style="color: transparent">——</div>
+        <div class="list-header col-grid">
+          <div class="th">Time</div>
+          <div class="th">Course</div>
+          <div class="th">Holes</div>
+          <div class="th">Routing</div>
+          <div class="th">Slots</div>
+          <div class="th">Price</div>
+          <div class="th"></div>
+        </div>
+      </div>
+      <div class="state-body">
+        <div class="state-card">
+          <div class="state-icon">⚠️</div>
+          <div class="state-title">Something went wrong</div>
+          <div class="state-msg">
+            Couldn't load tee times. Check your connection and try again.
+          </div>
+          <button class="state-btn">Try again</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     STATE 4 — STALE BUT LOADED (red dot)
+════════════════════════════════════════════ -->
+    <div class="state-label">Stale but loaded</div>
+    <div class="state-desc">
+      Data is >1 hr old. Table renders normally — red dot in topbar is the only signal.
+    </div>
+    <div class="shell">
+      <div class="topbar">
+        <span class="brand">⛳ Saskatoon Tee Times</span>
+        <span class="spacer"></span>
+        <div class="freshness">
+          <span class="fdot red"></span><span class="ftext red">Updated 2 hr ago</span>
+        </div>
+      </div>
+      <div class="list-sticky">
+        <div class="subcount">38 tee times · all courses · Mon Jun 29</div>
+        <div class="list-header col-grid">
+          <div class="th">Time</div>
+          <div class="th">Course</div>
+          <div class="th">Holes</div>
+          <div class="th">Routing</div>
+          <div class="th">Slots</div>
+          <div class="th">Price</div>
+          <div class="th"></div>
+        </div>
+      </div>
+      <div class="trow col-grid">
+        <div class="td td-time">7:10<span class="ampm">AM</span></div>
+        <div class="td td-course">Holiday Park Championship</div>
+        <div class="td" style="color: var(--ink-2)">18</div>
+        <div class="td td-routing">Front + Back</div>
+        <div class="td td-slots">Up to 4</div>
+        <div class="td td-price">$52</div>
+        <div class="td"><button class="book-btn">Book</button></div>
+      </div>
+      <div class="trow col-grid">
+        <div class="td td-time">7:24<span class="ampm">AM</span></div>
+        <div class="td td-course">The Willows</div>
+        <div class="td" style="color: var(--ink-2)">18</div>
+        <div class="td td-routing">Lakes + Bridges</div>
+        <div class="td td-slots">Up to 4</div>
+        <div class="td td-price">$58</div>
+        <div class="td"><button class="book-btn">Book</button></div>
+      </div>
+      <div class="trow col-grid">
+        <div class="td td-time">8:00<span class="ampm">AM</span></div>
+        <div class="td td-course">Holiday Park Executive 9</div>
+        <div class="td" style="color: var(--ink-2)">9</div>
+        <div class="td td-routing" style="color: var(--line)">—</div>
+        <div class="td td-slots">Up to 4</div>
+        <div class="td td-price">$22</div>
+        <div class="td"><button class="book-btn">Book</button></div>
+      </div>
+      <div class="trow col-grid">
+        <div class="td td-time">8:40<span class="ampm">AM</span></div>
+        <div class="td td-course">Dakota Dunes Golf Links</div>
+        <div class="td" style="color: var(--ink-2)">18</div>
+        <div class="td td-routing">Front + Back</div>
+        <div class="td td-slots">Up to 4</div>
+        <div class="td td-price">$65</div>
+        <div class="td"><button class="book-btn">Book</button></div>
+      </div>
+    </div>
+  </body>
+</html>

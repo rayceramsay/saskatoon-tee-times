@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mobile layout v2 — bottom sheet filters — Saskatoon Tee Times</title>
+    <style>
+      :root {
+        --accent: #2e6b47;
+        --accent-dark: #245538;
+        --accent-light: #eaf3ee;
+        --ink: #1b1d1f;
+        --ink-2: #55595e;
+        --ink-3: #8a9097;
+        --line: #e3e6e9;
+        --line-2: #eef0f2;
+        --bg: #f5f6f7;
+        --panel: #ffffff;
+        --panel-hover: #f9fafb;
+        --status-fresh: #2e6b47;
+        --status-amber: #e09400;
+        --status-amber-text: #a05c00;
+        --status-red: #e03030;
+        --status-red-text: #c0392b;
+        --good: #2f7d4f;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+          sans-serif;
+        background: #c8ccd0;
+        display: flex;
+        justify-content: center;
+        gap: 48px;
+        flex-wrap: wrap;
+        padding: 40px 24px 80px;
+        min-height: 100vh;
+        color: var(--ink);
+        align-items: flex-start;
+      }
+
+      .label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: #666;
+        margin: 0 0 10px;
+        text-align: center;
+      }
+
+      /* phone frame */
+      .phone {
+        width: 390px;
+        border: 10px solid #111;
+        border-radius: 38px;
+        overflow: hidden;
+        background: var(--bg);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+      }
+      .screen {
+        height: 820px;
+        overflow: hidden;
+        background: var(--bg);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* top bar — clean: brand + freshness only */
+      .topbar {
+        background: var(--panel);
+        border-bottom: 1px solid var(--line);
+        padding: 12px 16px 10px;
+        flex-shrink: 0;
+      }
+      .brand {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .freshness {
+        font-size: 11px;
+        color: var(--status-fresh);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 3px;
+      }
+      .fdot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--status-fresh);
+      }
+
+      /* scrollable list area */
+      .list-area {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 72px;
+      }
+      .count {
+        font-size: 12px;
+        color: var(--ink-3);
+        padding: 8px 16px 4px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 46px 1fr 58px;
+        gap: 10px;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line-2);
+        background: var(--panel);
+      }
+      .time {
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.3px;
+      }
+      .ampm {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--ink-2);
+        display: block;
+        margin-top: 3px;
+      }
+      .body {
+        min-width: 0;
+      }
+      .course {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.25;
+      }
+      .l2 {
+        margin-top: 3px;
+        font-size: 12px;
+        color: var(--ink-2);
+        line-height: 1.3;
+      }
+      .l2 .holes {
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .l3 {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--ink-2);
+        line-height: 1.3;
+      }
+      .l3 .price {
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .sep {
+        color: var(--ink-3);
+        margin: 0 4px;
+      }
+      .book {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 600;
+        min-height: 44px;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      /* ── BOTTOM STICKY BAR ── */
+      .bottom-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--panel);
+        border-top: 1px solid var(--line);
+        padding: 10px 16px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 10;
+      }
+      .date-chip {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .date-chip .cal-icon {
+        font-size: 14px;
+      }
+      .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg);
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .filter-badge {
+        background: var(--ink);
+        color: #fff;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 1px 6px;
+      }
+
+      /* ── BOTTOM SHEET (shown open) ── */
+      .sheet-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 20;
+      }
+      .sheet {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--panel);
+        border-radius: 16px 16px 0 0;
+        padding: 0 0 32px;
+        z-index: 21;
+        max-height: 88%;
+        overflow-y: auto;
+      }
+      .sheet-handle {
+        width: 36px;
+        height: 4px;
+        background: var(--line);
+        border-radius: 2px;
+        margin: 10px auto 0;
+      }
+      .sheet-title {
+        font-size: 16px;
+        font-weight: 700;
+        padding: 14px 16px 0;
+      }
+
+      .sh-section {
+        padding: 16px 16px 0;
+      }
+      .sh-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin-bottom: 10px;
+      }
+      .sh-divider {
+        border: none;
+        border-top: 1px solid var(--line-2);
+        margin: 16px 0 0;
+      }
+
+      /* date nav in sheet */
+      .date-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .date-nav .date-str {
+        flex: 1;
+        text-align: center;
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .arr {
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        color: var(--ink-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      /* mini calendar in sheet */
+      .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+        margin-top: 10px;
+      }
+      .cal-dow {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--ink-3);
+        text-align: center;
+        padding: 4px 0;
+      }
+      .cal-d {
+        font-size: 13px;
+        text-align: center;
+        padding: 7px 2px;
+        border-radius: 7px;
+        color: var(--ink-2);
+        cursor: pointer;
+      }
+      .cal-d.today {
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+      }
+      .cal-d.past {
+        color: var(--line);
+        cursor: default;
+      }
+      .cal-d.near {
+        color: var(--ink);
+      }
+
+      /* earliest start slider */
+      .slider-wrap {
+        padding: 4px 0 8px;
+      }
+      .slider-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 8px;
+      }
+      .slider-track {
+        position: relative;
+        height: 4px;
+        background: var(--line-2);
+        border-radius: 2px;
+        margin: 0 6px;
+      }
+      .slider-fill {
+        position: absolute;
+        left: 0;
+        width: 38%;
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+      }
+      .slider-thumb {
+        position: absolute;
+        top: 50%;
+        left: 38%;
+        transform: translate(-50%, -50%);
+        width: 22px;
+        height: 22px;
+        background: var(--panel);
+        border: 2px solid var(--accent);
+        border-radius: 50%;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+      }
+      .slider-range {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 10px;
+        color: var(--ink-3);
+        padding: 0 2px;
+      }
+
+      /* toggle groups */
+      .tog-group {
+        display: flex;
+        gap: 4px;
+      }
+      .tog {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        border-radius: 8px;
+        padding: 7px 0;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-2);
+        cursor: pointer;
+        flex: 1;
+        text-align: center;
+      }
+      .tog.on {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+
+      /* course checkboxes */
+      .cb-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .cb-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        cursor: pointer;
+        color: var(--ink-2);
+      }
+      .cb-row input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+        flex-shrink: 0;
+      }
+
+      /* group-by toggle */
+      .groupby-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        color: var(--ink-2);
+      }
+      .switch {
+        width: 38px;
+        height: 22px;
+        border-radius: 11px;
+        background: var(--line);
+        position: relative;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .switch .knob {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .sh-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+      .s-action {
+        font-size: 12px;
+        color: var(--ink-3);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── STATE 1: Default (list, no sheet) ── -->
+    <div>
+      <div class="label">Default — list view</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="topbar">
+            <div class="brand">⛳ Saskatoon Tee Times</div>
+            <div class="freshness"><span class="fdot"></span> Updated 3 min ago</div>
+          </div>
+          <div class="list-area">
+            <div class="count">38 tee times today · all courses</div>
+            <div class="row">
+              <div class="time">7:10<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">Holiday Park Championship</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Front +
+                  Back
+                </div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$52</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">7:24<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">The Willows</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Lakes +
+                  Bridges
+                </div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$58</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">8:00<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">Holiday Park Executive 9</div>
+                <div class="l2"><span class="holes">9 holes</span></div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$22</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">8:18<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">The Willows</div>
+                <div class="l2">
+                  <span class="holes">9 holes</span><span class="sep">·</span>Xena
+                </div>
+                <div class="l3">
+                  <span>up to 2</span><span class="sep">·</span
+                  ><span class="price">$32</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">8:40<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">Dakota Dunes Golf Links</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Front +
+                  Back
+                </div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$65</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">9:05<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">The Legends Golf Club</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Front +
+                  Back
+                </div>
+                <div class="l3"><span>up to 3</span></div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">9:30<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">Holiday Park Championship</div>
+                <div class="l2">
+                  <span class="holes">9 holes</span><span class="sep">·</span>Back 9
+                </div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$31</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">9:48<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">Wildwood Golf Course</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Front +
+                  Back
+                </div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$58</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+          </div>
+          <!-- bottom bar -->
+          <div class="bottom-bar">
+            <div class="date-chip"><span class="cal-icon">📅</span>Mon, Jun 29</div>
+            <button class="filter-btn">Filters</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STATE 2: Filters sheet open (2 active filters) ── -->
+    <div>
+      <div class="label">Filters sheet open</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="topbar">
+            <div class="brand">⛳ Saskatoon Tee Times</div>
+            <div class="freshness"><span class="fdot"></span> Updated 3 min ago</div>
+          </div>
+
+          <!-- dimmed list beneath -->
+          <div class="list-area" style="filter: brightness(0.7)">
+            <div class="count">38 tee times today</div>
+            <div class="row">
+              <div class="time">7:10<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">Holiday Park Championship</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Front +
+                  Back
+                </div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$52</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">7:24<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">The Willows</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Lakes +
+                  Bridges
+                </div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$58</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+          </div>
+
+          <!-- overlay + sheet -->
+          <div class="sheet-overlay"></div>
+          <div class="sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Filters</div>
+
+            <!-- Date -->
+            <div class="sh-section">
+              <div class="sh-label">Date</div>
+              <div class="date-nav">
+                <button class="arr">‹</button>
+                <span class="date-str">Mon, Jun 29</span>
+                <button class="arr">›</button>
+              </div>
+              <div class="cal-grid">
+                <div class="cal-dow">Su</div>
+                <div class="cal-dow">Mo</div>
+                <div class="cal-dow">Tu</div>
+                <div class="cal-dow">We</div>
+                <div class="cal-dow">Th</div>
+                <div class="cal-dow">Fr</div>
+                <div class="cal-dow">Sa</div>
+                <div class="cal-d empty"></div>
+                <div class="cal-d past">1</div>
+                <div class="cal-d past">2</div>
+                <div class="cal-d past">3</div>
+                <div class="cal-d past">4</div>
+                <div class="cal-d past">5</div>
+                <div class="cal-d past">6</div>
+                <div class="cal-d past">7</div>
+                <div class="cal-d past">8</div>
+                <div class="cal-d past">9</div>
+                <div class="cal-d past">10</div>
+                <div class="cal-d past">11</div>
+                <div class="cal-d past">12</div>
+                <div class="cal-d past">13</div>
+                <div class="cal-d past">14</div>
+                <div class="cal-d past">15</div>
+                <div class="cal-d past">16</div>
+                <div class="cal-d past">17</div>
+                <div class="cal-d past">18</div>
+                <div class="cal-d past">19</div>
+                <div class="cal-d past">20</div>
+                <div class="cal-d past">21</div>
+                <div class="cal-d past">22</div>
+                <div class="cal-d past">23</div>
+                <div class="cal-d past">24</div>
+                <div class="cal-d past">25</div>
+                <div class="cal-d past">26</div>
+                <div class="cal-d past">27</div>
+                <div class="cal-d past">28</div>
+                <div class="cal-d today">29</div>
+                <div class="cal-d near">30</div>
+                <div class="cal-d empty"></div>
+                <div class="cal-d empty"></div>
+                <div class="cal-d empty"></div>
+                <div class="cal-d empty"></div>
+              </div>
+            </div>
+
+            <hr class="sh-divider" />
+
+            <!-- Earliest start slider -->
+            <div class="sh-section">
+              <div class="sh-label">Earliest start</div>
+              <div class="slider-wrap">
+                <div class="slider-label">From 8:00 AM</div>
+                <div class="slider-track">
+                  <div class="slider-fill"></div>
+                  <div class="slider-thumb"></div>
+                </div>
+                <div class="slider-range"><span>5 AM</span><span>9 PM</span></div>
+              </div>
+            </div>
+
+            <hr class="sh-divider" />
+
+            <!-- Course -->
+            <div class="sh-section">
+              <div class="sh-head">
+                <div class="sh-label" style="margin-bottom: 0">Course</div>
+                <span class="s-action">Deselect all</span>
+              </div>
+              <div class="cb-group" style="margin-top: 10px">
+                <label class="cb-row"
+                  ><input type="checkbox" checked /><span
+                    >Holiday Park Championship</span
+                  ></label
+                >
+                <label class="cb-row"
+                  ><input type="checkbox" checked /><span
+                    >Holiday Park Executive 9</span
+                  ></label
+                >
+                <label class="cb-row"
+                  ><input type="checkbox" checked /><span>The Willows</span></label
+                >
+                <label class="cb-row"
+                  ><input type="checkbox" checked /><span
+                    >Wildwood Golf Course</span
+                  ></label
+                >
+                <label class="cb-row"
+                  ><input type="checkbox" checked /><span
+                    >Dakota Dunes Golf Links</span
+                  ></label
+                >
+                <label class="cb-row"
+                  ><input type="checkbox" checked /><span
+                    >The Legends Golf Club</span
+                  ></label
+                >
+                <label class="cb-row"
+                  ><input type="checkbox" checked /><span
+                    >Moon Lake Golf &amp; Country</span
+                  ></label
+                >
+                <label class="cb-row"
+                  ><input type="checkbox" checked /><span
+                    >Greenbryre Golf Club</span
+                  ></label
+                >
+              </div>
+            </div>
+
+            <hr class="sh-divider" />
+
+            <!-- Holes -->
+            <div class="sh-section">
+              <div class="sh-label">Holes</div>
+              <div class="tog-group">
+                <button class="tog on">Any</button>
+                <button class="tog">6</button>
+                <button class="tog">9</button>
+                <button class="tog">12</button>
+                <button class="tog">18</button>
+              </div>
+            </div>
+
+            <hr class="sh-divider" />
+
+            <!-- Players -->
+            <div class="sh-section">
+              <div class="sh-label">Players</div>
+              <div class="tog-group">
+                <button class="tog">Any</button>
+                <button class="tog">1</button>
+                <button class="tog">2</button>
+                <button class="tog on">3</button>
+                <button class="tog">4</button>
+              </div>
+            </div>
+
+            <hr class="sh-divider" />
+
+            <!-- Group by course -->
+            <div class="sh-section">
+              <div class="groupby-row">
+                <span>Group by course</span>
+                <div class="switch"><div class="knob"></div></div>
+              </div>
+            </div>
+          </div>
+          <!-- /sheet -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STATE 3: Active filters (badge on button) ── -->
+    <div>
+      <div class="label">Active filters — badge shown</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="topbar">
+            <div class="brand">⛳ Saskatoon Tee Times</div>
+            <div class="freshness"><span class="fdot"></span> Updated 3 min ago</div>
+          </div>
+          <div class="list-area">
+            <div class="count">6 tee times · From 8 AM · 3 players</div>
+            <div class="row">
+              <div class="time">8:40<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">Dakota Dunes Golf Links</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Front +
+                  Back
+                </div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$65</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">9:05<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">The Legends Golf Club</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Front +
+                  Back
+                </div>
+                <div class="l3"><span>up to 3</span></div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+            <div class="row">
+              <div class="time">9:48<span class="ampm">AM</span></div>
+              <div class="body">
+                <div class="course">Wildwood Golf Course</div>
+                <div class="l2">
+                  <span class="holes">18 holes</span><span class="sep">·</span>Front +
+                  Back
+                </div>
+                <div class="l3">
+                  <span>up to 4</span><span class="sep">·</span
+                  ><span class="price">$58</span>
+                </div>
+              </div>
+              <button class="book">Book</button>
+            </div>
+          </div>
+          <div class="bottom-bar">
+            <div class="date-chip"><span class="cal-icon">📅</span>Mon, Jun 29</div>
+            <button class="filter-btn">
+              Filters <span class="filter-badge">2</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
