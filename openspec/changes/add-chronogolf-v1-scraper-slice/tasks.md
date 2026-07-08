@@ -35,7 +35,7 @@
 
 ## 7. Fixtures, tests & verification
 
-- [ ] 7.1 Capture real Greenbryre responses for one listing across all four group sizes (and both hole variants) on a date; commit as fixtures. Include the provided 1-player/12-hole sample as the single-restriction case
+- [x] 7.1 Capture real Greenbryre responses for one listing across all four group sizes (and both hole variants) on a date; commit as fixtures
 - [ ] 7.2 Fixture test for `parseResponse`: the raw schema parses committed fixtures; a shape mismatch fails validation
 - [ ] 7.3 Fixture test for `mergeListing`: correct non-contiguous `groupSizes` (e.g. `[2,3,4]` for a single-restricted empty tee), fully-booked slots dropped, `startInstant` offset, `holes`/`routing` from listing, `dynamicPrice` present-and-null cases, portal `bookingUrls`
 - [ ] 7.4 Manually run `scrape("greenbryre", <date>)` against the live `.ca` mirror to confirm `fetch` returns the JSON (empirical confirmation of the fetch assumption); log/print the merged result
