@@ -2,15 +2,15 @@
 
 - [x] 1.1 Add `tsconfig.json` to `packages/scraper-core` extending `@stt/typescript-config` (match the base config used by sibling packages)
 - [x] 1.2 Add Vitest as a dev dependency and a `vitest.config.ts` (or equivalent) plus `test`/`check-types`/`lint` scripts in `package.json`
-- [x] 1.3 Create the `src/` layout organized by feature (schema, platform scrapers) and a package entry/`exports` map
+- [x] 1.3 Create the `src/` layout organized by feature (schema, platform scrapers)
 - [x] 1.4 Verify the empty package builds and tests run: `pnpm check-types`, `pnpm lint`, `pnpm test` (no tests yet is fine)
 
 ## 2. Canonical scraped-tee-time schema
 
-- [ ] 2.1 Define `GroupSize` as the closed union `1 | 2 | 3 | 4` (Zod), plus `CourseId` and `PlatformId` types
-- [ ] 2.2 Define `BaseTeeTime` Zod schema: `startInstant`, `courseId`, `courseName`, `holes`, `routing`, `groupSizes`, `bookingUrls` (per-group-size), `scrapedAt`
-- [ ] 2.3 Define `ScrapedTeeTime` extending `BaseTeeTime` with raw `dynamicPrice: number | null`; export inferred TS types
-- [ ] 2.4 Unit-test the schema: a valid record parses; an out-of-range group size fails validation
+- [x] 2.1 Define `GroupSize` as the closed union `1 | 2 | 3 | 4` (Zod), plus `CourseId` and `PlatformId` types
+- [x] 2.2 Define `BaseTeeTime` Zod schema: `startInstant`, `courseId`, `courseName`, `holes`, `routing`, `groupSizes`, `bookingUrls` (per-group-size), `scrapedAt`
+- [x] 2.3 Define `ScrapedTeeTime` extending `BaseTeeTime` with raw `dynamicPrice: number | null`; export inferred TS types
+- [x] 2.4 Unit-test the schema: a valid record parses; an out-of-range group size fails validation
 
 ## 3. BookingPlatformScraper contract
 
