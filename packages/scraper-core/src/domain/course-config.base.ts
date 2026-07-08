@@ -13,4 +13,8 @@ export interface CourseConfig {
   timeZone: string;
   // General booking portal URL for the course.
   bookingPortalUrl: string;
+  // Days ahead of today, inclusive, that are bookable (e.g. 7 means today through today + 7).
+  maxAdvanceDays: number;
+  // Local HH:MM wall-clock time at which the furthest-out date becomes bookable.
+  releaseTime: string;
 }

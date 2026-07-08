@@ -41,3 +41,18 @@ export const ScrapedTeeTime = BaseTeeTime.extend({
 });
 
 export type ScrapedTeeTime = z.infer<typeof ScrapedTeeTime>;
+
+/**
+ * The canonical, public, persisted tee time.
+ *
+ * Extends {@link BaseTeeTime} with the resolved, after-tax per-player price the
+ * dashboard displays. In this slice it is produced as a pass-through of
+ * {@link ScrapedTeeTime}; a later pricing engine will populate `pricePerPlayer`
+ * without changing this shape or the repository that stores it.
+ */
+export const TeeTime = BaseTeeTime.extend({
+  // Resolved after-tax per-player price shown to users; null when no price is available.
+  pricePerPlayer: z.number().nullable(),
+});
+
+export type TeeTime = z.infer<typeof TeeTime>;

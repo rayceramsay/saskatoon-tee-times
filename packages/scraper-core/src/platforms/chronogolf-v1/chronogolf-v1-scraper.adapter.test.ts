@@ -35,6 +35,8 @@ const testConfig: ChronogolfV1CourseConfig = {
   courseName: 'Greenbryre',
   timeZone: 'America/Regina',
   bookingPortalUrl: 'https://greenbryre.com/book-a-tee-time/',
+  maxAdvanceDays: 7,
+  releaseTime: '06:00',
   tld: 'ca',
   clubId: 1743,
   affiliationTypeId: 7689,

@@ -1,15 +1,15 @@
 ## 1. Domain: booking window & bookable dates
 
-- [ ] 1.1 Add `maxAdvanceDays` and `releaseTime` to `CourseConfig` (`course-config.base.ts`)
-- [ ] 1.2 Populate Greenbryre's booking window (`courses/greenbryre.ts`), sourcing real values from the PRD addendum / booking site
-- [ ] 1.3 Implement `bookableDates(config, now)` domain util computing local dates in the course `timeZone`, withholding the furthest date before `releaseTime`
-- [ ] 1.4 Unit-test `bookableDates` at the `releaseTime` boundary and across day rollover
+- [x] 1.1 Add `maxAdvanceDays` and `releaseTime` to `CourseConfig` (`course-config.base.ts`)
+- [x] 1.2 Populate Greenbryre's booking window (`courses/greenbryre.ts`), sourcing real values from the PRD addendum / booking site
+- [x] 1.3 Implement `bookableDates(config, now)` domain util computing local dates in the course `timeZone`, withholding the furthest date before `releaseTime`
+- [x] 1.4 Unit-test `bookableDates` at the `releaseTime` boundary and across day rollover
 
 ## 2. Domain: canonical TeeTime schema & pass-through
 
-- [ ] 2.1 Add `TeeTime` schema (extends `BaseTeeTime` with nullable `pricePerPlayer`) in `tee-time.schema.ts`
-- [ ] 2.2 Implement the `ScrapedTeeTime → TeeTime` pass-through mapper (`pricePerPlayer = dynamicPrice`)
-- [ ] 2.3 Unit-test the pass-through preserves shared fields and maps price (including null)
+- [x] 2.1 Add `TeeTime` schema (extends `BaseTeeTime` with nullable `pricePerPlayer`) in `tee-time.schema.ts`
+- [x] 2.2 Implement the `ScrapedTeeTime → TeeTime` pass-through mapper (`pricePerPlayer = dynamicPrice`)
+- [x] 2.3 Unit-test the pass-through preserves shared fields and maps price (including null)
 
 ## 3. Orchestration
 
