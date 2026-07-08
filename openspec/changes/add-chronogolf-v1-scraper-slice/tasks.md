@@ -1,9 +1,9 @@
 ## 1. Scaffold scraper-core
 
-- [ ] 1.1 Add `tsconfig.json` to `packages/scraper-core` extending `@stt/typescript-config` (match the base config used by sibling packages)
-- [ ] 1.2 Add Vitest as a dev dependency and a `vitest.config.ts` (or equivalent) plus `test`/`check-types`/`lint` scripts in `package.json`
-- [ ] 1.3 Create the `src/` layout organized by feature (schema, platform scrapers) and a package entry/`exports` map
-- [ ] 1.4 Verify the empty package builds and tests run: `pnpm check-types`, `pnpm lint`, `pnpm test` (no tests yet is fine)
+- [x] 1.1 Add `tsconfig.json` to `packages/scraper-core` extending `@stt/typescript-config` (match the base config used by sibling packages)
+- [x] 1.2 Add Vitest as a dev dependency and a `vitest.config.ts` (or equivalent) plus `test`/`check-types`/`lint` scripts in `package.json`
+- [x] 1.3 Create the `src/` layout organized by feature (schema, platform scrapers) and a package entry/`exports` map
+- [x] 1.4 Verify the empty package builds and tests run: `pnpm check-types`, `pnpm lint`, `pnpm test` (no tests yet is fine)
 
 ## 2. Canonical scraped-tee-time schema
 
