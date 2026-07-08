@@ -77,7 +77,12 @@ interface BookingPlatformScraper {
 }
 
 class ChronogolfV1Scraper implements BookingPlatformScraper {
-  constructor(private readonly configs: readonly ChronogolfV1CourseConfig[]) {}
+  // A JsonFetcher transport is injected (see the transport decision below): the
+  // live run refuted plain fetch, so Chronogolf needs a browser-backed fetcher.
+  constructor(
+    private readonly configs: readonly ChronogolfV1CourseConfig[],
+    private readonly fetcher: JsonFetcher
+  ) {}
   readonly platform = 'chronogolf-v1';
   get courses() { return this.configs; } // ChronogolfV1CourseConfig extends CourseBookingConfig
   async scrape(courseId, date) { /* fan out + parse + merge; typed config resolved by id */ }
@@ -188,9 +193,11 @@ The split is the testability story:
 
 Fixtures (captured real responses) are committed and drive the tests, so a course changing its response shape or a semantics shift surfaces as a red test — not silent data loss. CI runs the pure tests only; no live-site calls in CI.
 
-### Naive `fetch`, no rate limiter — but isolated so the seam slots in later
+### Transport is an injected `JsonFetcher`; no rate limiter yet — the seam slots in later
 
-`scrape` calls `fetch` directly against the configured mirror. The per-host rate-limiter/HTTP-client seam is deferred: 12 requests for one course on one date will not trip limits, and building a throttle before observing a real 429 is premature — the value later is the *seam*, not a sophisticated token bucket. Concurrency is decoupled from politeness in the target design (the orchestrator fans out everything; a per-host gateway is the single choke point), so the throttle is a shared dependency, not scraper logic. Keeping `fetch` behind the scraper means introducing an injected HTTP client later is a constructor change, not a rewrite.
+`scrape` does not call `fetch` directly; it delegates byte-fetching to an injected `JsonFetcher` port (`fetchJson(url) → unknown`), keeping the scraper a thin, testable shell agnostic to how the JSON arrives. This slice ships a `PlaywrightJsonFetcher` (see the transport-refutation decision below — plain `fetch` is blocked by Cloudflare). Because the transport is a constructor dependency, `scrape` is unit-testable against a stub fetcher (fed the committed fixtures) with no network, and swapping in a future shared HTTP client / per-host limiter is a wiring change, not a rewrite.
+
+The per-host rate-limiter seam is still deferred: 12 requests for one course on one date will not trip limits, and building a throttle before observing a real 429 is premature — the value later is the *seam*, not a sophisticated token bucket. Concurrency is decoupled from politeness in the target design (the orchestrator fans out everything; a per-host gateway is the single choke point), so the throttle is a shared dependency, not scraper logic.
 
 ### Chronogolf serves identical data under many TLD mirrors — pin the course to one via config
 
@@ -215,13 +222,21 @@ const bestBookingUrl = (...candidates: (string | null | undefined)[]) =>
 
 Because rung 3 always resolves, `bookingUrls` never has a null case (unlike price). Rung 2 (date-filtered portal) is added when deep-linking is tackled.
 
-### Assume Chronogolf-over-`fetch` works; the first live run confirms it
+### Transport: plain `fetch` was refuted by the live run — a headless browser is required
 
-A prior spike drove Chronogolf through a browser for uniform convenience, but plain `fetch` is believed to return the same JSON. Per the user we proceed on ~95% confidence. The first real `scrape` run (task 5.x) is the empirical confirmation. If a browser turns out to be required (bot protection), the fix is isolated to this one class — it would gain a browser-based auth/session step while `parseResponse`/`mergeListing` stay unchanged.
+The original plan proceeded on ~95% confidence that plain `fetch` returns the same JSON the spike got via a browser. **The task-7.4 live run refuted this.** Empirically, against `chronogolf.ca`:
+
+- `curl` with a browser `User-Agent` → `200` JSON (UA filtering only).
+- Node's `fetch` (undici) → `403` HTML **regardless of headers** (even a full browser header set). Cloudflare fingerprints the client at the TLS/HTTP layer, so header spoofing cannot pass it.
+- A headless Chromium (`playwright-core`, already a dependency) doing a same-origin in-page `fetch` after landing on the origin → `200` JSON.
+
+So Chronogolf V1 needs a **browser-backed transport**. The fix landed exactly where the design predicted — only the I/O shell — because `parseResponse`/`mergeListing`/the schema are transport-agnostic and stayed unchanged. Concretely: a `JsonFetcher` port with a `PlaywrightJsonFetcher` implementation (lazily launches one shared headless browser + context, opens a page per fetch, lands on the target origin, runs a same-origin `fetch` from the page, closes the page; `close()` releases the browser). The scraper takes the fetcher as a constructor dependency.
+
+This pulls a browser into Chronogolf earlier than the "build TeeOn's browser step last" sequencing anticipated, but it is the same capability, and it de-risks the browser transport on the simplest (JSON) platform. Amortizing one browser session across many `(course, date)` units — rather than per-`scrape` as shipped here — remains an orchestrator-era concern (cf. TeeOn's single-flighted session).
 
 ## Risks / Trade-offs
 
-- **Chronogolf may require a browser (bot protection)** → Isolated to `ChronogolfV1Scraper`; the first live run confirms or refutes it. If refuted, restructure only the I/O shell; the pure parse/merge and the schema are unaffected.
+- **Chronogolf requires a browser (bot protection)** → **Confirmed** by the task-7.4 live run: undici `fetch` is 403'd by Cloudflare TLS fingerprinting; a headless browser gets 200. Resolved by injecting a `PlaywrightJsonFetcher`. The blast radius was exactly as predicted — only the I/O shell changed; the pure parse/merge and the schema were unaffected. Residual cost: this slice now ships Chromium (via already-installed `playwright-core`) and its live path is not exercised in CI (parse/merge/scraper are fixture-tested against a stub fetcher).
 - **Fixture drift / staleness** → Captured fixtures can go stale vs. the live response shape; accepted for a slice. A failing test on refresh is the *intended* signal, and re-capturing is cheap.
 - **Group-size merge semantics rest on the `out_of_capacity` + per-query `restrictions` reading** → Confirmed from a real 1-player sample and the spike's behavior, but the full picture needs fixtures captured across all four group sizes for at least one listing. If a slot fits only a partial party (e.g. 2 seats left), correctness depends on `out_of_capacity` being relative to the queried size — pinned by the multi-size fixtures.
 - **12 requests per course-date is a lot of fan-out** → Fine for one course with no limiter, but this is exactly why the per-host rate limiter exists in the target design; the fan-out will be throttled once that seam lands.

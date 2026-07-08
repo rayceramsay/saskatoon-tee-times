@@ -7,7 +7,7 @@ The scraper package (`packages/scraper-core`) is greenfield — only dependencie
 - Scaffold `packages/scraper-core` for real: `tsconfig` extending `@stt/typescript-config`, Vitest, a `src/` layout, and package exports.
 - Introduce the canonical scraped-tee-time schema (Zod + inferred types): `GroupSize`, `CourseId`, `PlatformId`, `BaseTeeTime`, and `ScrapedTeeTime`. This is the left side of the schema seam — the finalized `TeeTime` (pricing) is deferred.
 - Define the `BookingPlatformScraper` interface up front (`platform`, `courses`, `scrape(courseId, date)`), even though only one implementation exists yet — it is the north-star contract the orchestrator will consume.
-- Implement `ChronogolfV1Scraper` as the first concrete `BookingPlatformScraper`, configured for a single course (Greenbryre): naive `fetch` of the Chronogolf JSON endpoint, plus a pure `parse` function tested against a captured fixture.
+- Implement `ChronogolfV1Scraper` as the first concrete `BookingPlatformScraper`, configured for a single course (Greenbryre): fetch of the Chronogolf JSON endpoint via an injected `JsonFetcher` transport, plus a pure `parse` function tested against captured fixtures. (The live run refuted plain `fetch` — Cloudflare bot protection — so the transport is a browser-backed `PlaywrightJsonFetcher`; see design.)
 - Resolve `bookingUrls` at rung 3 only (the per-course portal fallback constant); deep-linking is deferred.
 - Capture `dynamicPrice` as the raw number from the response, untouched (no tax normalization, no pricing engine).
 
@@ -26,6 +26,6 @@ None — this is the first capability in the project.
 ## Impact
 
 - **New code:** `packages/scraper-core/src/` (schema, `BookingPlatformScraper` interface, `ChronogolfV1Scraper`, course config, parse function, fixture + tests) and package scaffolding (`tsconfig.json`, Vitest config, exports).
-- **Dependencies:** Uses already-installed `zod`; adds `vitest` as a dev dependency. `cheerio`/`playwright-core` remain unused this slice.
+- **Dependencies:** Uses already-installed `zod` and `playwright-core` (browser transport, forced by Cloudflare bot protection — see design); adds `vitest` as a dev dependency. `cheerio` remains unused this slice.
 - **Downstream:** `apps/scraper-lambda`, `apps/scraper-local`, and `apps/api` are untouched; they consume `scraper-core` in later changes.
 - **External:** Makes live HTTP requests to a Chronogolf mirror during manual/local verification, but not in CI (parse is fixture-tested; no live-site calls in CI).
