@@ -19,9 +19,9 @@
 
 ## 4. Chronogolf V1 config & Greenbryre
 
-- [ ] 4.1 Define `ChronogolfV1Listing` (`chronogolfCourseId`, `nbHoles`, `routing`) and `ChronogolfV1CourseConfig` (extends `CourseBookingConfig` with platform mechanics only: `tld`, `clubId`, `affiliationTypeId`, `listings`)
-- [ ] 4.2 Author the Greenbryre config: base facts (`courseName`, `timeZone: "America/Regina"`, `bookingPortalUrl`) + platform mechanics `tld: "ca"`, `clubId: 1743`, `affiliationTypeId: 7689`, listings `[{2020, 12, []}, {2020, 6, []}, {26895, 6, ["North"]}]`
-- [ ] 4.3 Implement the request-URL builder: `https://www.chronogolf.{tld}/marketplace/clubs/{clubId}/teetimes?date=&course_id=&affiliation_type_ids[]=×N&nb_holes=` (repeat the affiliation param once per player)
+- [x] 4.1 Define `ChronogolfV1Listing` (`chronogolfCourseId`, `nbHoles`, `routing`) and `ChronogolfV1CourseConfig` (extends `CourseBookingConfig` with platform mechanics only: `tld`, `clubId`, `affiliationTypeId`, `listings`)
+- [x] 4.2 Author the Greenbryre config: base facts (`courseName`, `timeZone: "America/Regina"`, `bookingPortalUrl`) + platform mechanics `tld: "ca"`, `clubId: 1743`, `affiliationTypeId: 7689`, listings `[{2020, 12, []}, {2020, 6, []}, {26895, 6, ["North"]}]`
+- [x] 4.3 Implement the request-URL builder: `https://www.chronogolf.{tld}/marketplace/clubs/{clubId}/teetimes?date=&course_id=&affiliation_type_ids[]=×N&nb_holes=` (repeat the affiliation param once per player)
 
 ## 5. Chronogolf V1 parse & merge (pure)
 
