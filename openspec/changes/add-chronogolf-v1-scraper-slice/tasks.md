@@ -36,7 +36,7 @@
 ## 7. Fixtures, tests & verification
 
 - [x] 7.1 Capture real Greenbryre responses for one listing across all four group sizes (and both hole variants) on a date; commit as fixtures
-- [ ] 7.2 Fixture test for `parseResponse`: the raw schema parses committed fixtures; a shape mismatch fails validation
-- [ ] 7.3 Fixture test for `mergeListing`: correct non-contiguous `groupSizes` (e.g. `[2,3,4]` for a single-restricted empty tee), fully-booked slots dropped, `startInstant` offset, `holes`/`routing` from listing, `dynamicPrice` present-and-null cases, portal `bookingUrls`
+- [x] 7.2 Fixture test for `parseResponse`: the raw schema parses committed fixtures; a shape mismatch fails validation
+- [x] 7.3 Fixture test for `mergeListing`: correct non-contiguous `groupSizes` (e.g. `[2,3,4]` for a single-restricted empty tee), fully-booked slots dropped, `startInstant` offset, `holes`/`routing` from listing, `dynamicPrice` present-and-null cases, portal `bookingUrls`
 - [ ] 7.4 Manually run `scrape("greenbryre", <date>)` against the live `.ca` mirror to confirm `fetch` returns the JSON (empirical confirmation of the fetch assumption); log/print the merged result
 - [ ] 7.5 Run `pnpm format`, `pnpm check-types`, `pnpm lint`, `pnpm test` across the workspace and fix any errors
