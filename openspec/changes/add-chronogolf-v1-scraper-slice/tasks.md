@@ -14,8 +14,8 @@
 
 ## 3. BookingPlatformScraper contract
 
-- [ ] 3.1 Define `CourseBookingConfig` base shape — universal course facts: `courseId`, `courseName`, `timeZone` (IANA id used to stamp `startInstant`'s local offset), `bookingPortalUrl` (rung-3 fallback)
-- [ ] 3.2 Define the `BookingPlatformScraper` interface: `platform`, `courses`, `scrape(courseId, date): Promise<ScrapedTeeTime[]>`
+- [x] 3.1 Define `CourseBookingConfig` base shape — universal course facts: `courseId`, `courseName`, `timeZone` (IANA id used to stamp `startInstant`'s local offset), `bookingPortalUrl` (rung-3 fallback)
+- [x] 3.2 Define the `BookingPlatformScraper` interface: `platform`, `courses`, `scrape(courseId, date): Promise<ScrapedTeeTime[]>`
 
 ## 4. Chronogolf V1 config & Greenbryre
 
