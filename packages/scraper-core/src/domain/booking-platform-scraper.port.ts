@@ -1,6 +1,6 @@
-import type { CourseId, PlatformId } from '../schema/identifiers.js';
-import type { ScrapedTeeTime } from '../schema/scraped-tee-time.js';
-import type { CourseBookingConfig } from './course-booking-config.js';
+import type { CourseId, PlatformId } from './primitives.schema.js';
+import type { ScrapedTeeTime } from './tee-time.schema.js';
+import type { CourseConfig } from './course-config.base.js';
 
 /**
  * The contract every platform scraper implements.
@@ -15,7 +15,7 @@ export interface BookingPlatformScraper {
   // Stable identifier for the platform this scraper handles.
   readonly platform: PlatformId;
   // The courses this scraper can serve.
-  readonly courses: readonly CourseBookingConfig[];
+  readonly courses: readonly CourseConfig[];
 
   /**
    * Scrape all tee times for one of this scraper's courses on a given date.

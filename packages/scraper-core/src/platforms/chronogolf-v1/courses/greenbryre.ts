@@ -1,4 +1,4 @@
-import type { ChronogolfV1CourseConfig } from '../chronogolf-v1-config.js';
+import type { ChronogolfV1CourseConfig } from '../chronogolf-v1-course-config.js';
 
 /**
  * Chronogolf V1 booking configuration for Greenbryre Golf Club.

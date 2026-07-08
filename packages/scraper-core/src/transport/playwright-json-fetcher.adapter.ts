@@ -1,5 +1,5 @@
 import { chromium, type Browser, type BrowserContext } from 'playwright-core';
-import type { JsonFetcher } from './json-fetcher.js';
+import type { JsonFetcher } from './json-fetcher.port.js';
 
 /**
  * A {@link JsonFetcher} that fetches through a headless browser.

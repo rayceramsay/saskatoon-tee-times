@@ -34,8 +34,8 @@ Note: This list is preliminary and not exhaustive; I am open to exploring other 
 ## Coding Style
 
 - Use descriptive variable names and filenames over brief ones
-- Use kebab casing for filenames
-- Keep code co-located and organized by feature
+- Use kebab casing and dot-suffixes with type for filenames when appropriate
+- Keep code co-located and organized by feature; code that changes together lives together
 - Limit the number of comments written. Only use comments to explain non-intuitive code
 - Logically organize tests using the Arrange-Act-Assert pattern. DO NOT literally label the sections "Arrange", "Act", and "Assert"
 - Don't use barrel files for a package's external API; manually define the relevant files to export inside the relevant `package.json` `exports` map

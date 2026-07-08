@@ -1,4 +1,4 @@
-import type { CourseBookingConfig } from '../course-booking-config.js';
+import type { CourseConfig } from '../../domain/course-config.base.js';
 
 /**
  * A single bookable product within a Chronogolf V1 course.
@@ -19,10 +19,10 @@ export interface ChronogolfV1Listing {
 /**
  * Configuration for a course booked through Chronogolf V1.
  *
- * Extends the universal {@link CourseBookingConfig} with the platform mechanics
+ * Extends the universal {@link CourseConfig} with the platform mechanics
  * needed to address Chronogolf's V1 API for this course.
  */
-export interface ChronogolfV1CourseConfig extends CourseBookingConfig {
+export interface ChronogolfV1CourseConfig extends CourseConfig {
   // TLD of the Chronogolf mirror to query, e.g. "ca" or "com" — pins the origin.
   tld: string;
   // Chronogolf club id owning the course.

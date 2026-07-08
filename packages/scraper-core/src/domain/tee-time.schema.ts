@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { GroupSize } from './group-size.js';
-import { CourseId } from './identifiers.js';
+import { CourseId, GroupSize } from './primitives.schema.js';
 
 /**
  * Fields common to a tee time at any stage of the ingestion pipeline.

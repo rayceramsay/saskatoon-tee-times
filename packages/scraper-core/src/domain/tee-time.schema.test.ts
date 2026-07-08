@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ScrapedTeeTime } from './scraped-tee-time.js';
+import { ScrapedTeeTime } from './tee-time.schema.js';
 
 describe('ScrapedTeeTime schema', () => {
   const validRecord = {
