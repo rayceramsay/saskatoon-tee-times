@@ -31,7 +31,7 @@
 
 ## 6. Chronogolf V1 scraper (I/O shell)
 
-- [ ] 6.1 Implement `ChronogolfV1Scraper implements BookingPlatformScraper`: private typed configs resolved by `courseId`; `scrape` builds the fan-out matrix (listings × group sizes 1–4), `fetch`es each, then applies `parseResponse` + `mergeListing` per listing and concatenates
+- [x] 6.1 Implement `ChronogolfV1Scraper implements BookingPlatformScraper`: private typed configs resolved by `courseId`; `scrape` builds the fan-out matrix (listings × group sizes 1–4), `fetch`es each, then applies `parseResponse` + `mergeListing` per listing and concatenates
 
 ## 7. Fixtures, tests & verification
 
