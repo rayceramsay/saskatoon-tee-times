@@ -2,7 +2,13 @@ import { z } from 'zod';
 import { GroupSize } from './group-size.js';
 import { CourseId } from './identifiers.js';
 
-/** Fields common to a tee time at any stage of the ingestion pipeline. */
+/**
+ * Fields common to a tee time at any stage of the ingestion pipeline.
+ *
+ * Captures the course, timing, routing, and booking metadata shared by every
+ * pipeline stage so that stage-specific schemas can extend it with only the
+ * fields they add.
+ */
 export const BaseTeeTime = z.object({
   // ISO 8601 instant carrying the course's local UTC offset (never UTC): the
   // calendar date/time is local to the course.
@@ -24,7 +30,12 @@ export const BaseTeeTime = z.object({
 
 export type BaseTeeTime = z.infer<typeof BaseTeeTime>;
 
-/** A tee time as scraped, before pricing. */
+/**
+ * A tee time as scraped, before pricing.
+ *
+ * Extends {@link BaseTeeTime} with the raw platform price so later stages can
+ * derive final pricing without losing the original scraped value.
+ */
 export const ScrapedTeeTime = BaseTeeTime.extend({
   // Raw per-player price exactly as scraped; null when none was provided by the platform
   dynamicPrice: z.number().nullable(),
