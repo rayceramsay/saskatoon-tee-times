@@ -38,6 +38,28 @@ Note: This list is preliminary and not exhaustive; I am open to exploring other 
 - Keep code co-located and organized by feature
 - Limit the number of comments written. Only use comments to explain non-intuitive code
 - Logically organize tests using the Arrange-Act-Assert pattern. DO NOT literally label the sections "Arrange", "Act", and "Assert"
+- Don't use barrel files for a package's external API; manually define the relevant files to export inside the relevant `package.json` `exports` map
+- JSDoc example format:
+  ````
+  /**
+  * Short description of the function's purpose.
+  *
+  * Longer paragraph explaining complex internal logic or behavior IF necessary.
+  *
+  * @param id - Description of the user's unique identifier.
+  * @param options - Configuration options.
+  * @returns Description of what the function resolves or returns.
+  *
+  * @example
+  * ```typescript
+  * const user = await fetchUserData(42, { verbose: true });
+  * ```
+  */
+  export async function fetchUserData(id: number, options?: { verbose: boolean }): Promise<User> {
+  // Implementation
+  }
+  ````
+  - JSDoc's in TS should omit data types inside the curly braces {} since TS already handles this
 
 ## Core Principles
 
