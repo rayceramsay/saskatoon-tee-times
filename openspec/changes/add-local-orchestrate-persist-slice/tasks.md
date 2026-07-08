@@ -13,9 +13,9 @@
 
 ## 3. Orchestration
 
-- [ ] 3.1 Implement the orchestrator: expand scrapers into `(scraper, courseId, date)` units via `bookableDates`, run under `Promise.all`
-- [ ] 3.2 Add per-unit failure isolation (rejection → no records + surfaced/logged, run continues)
-- [ ] 3.3 Unit-test fan-out flattening and that one failing unit does not abort the run
+- [x] 3.1 Implement the orchestrator: expand scrapers into `(scraper, courseId, date)` units via `bookableDates`, run under `Promise.all`
+- [x] 3.2 Add per-unit failure isolation (rejection → no records + surfaced/logged, run continues)
+- [x] 3.3 Unit-test fan-out flattening and that one failing unit does not abort the run
 
 ## 4. Persistence port & DynamoDB adapter
 
