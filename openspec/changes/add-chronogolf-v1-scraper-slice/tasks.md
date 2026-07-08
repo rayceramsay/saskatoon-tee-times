@@ -25,9 +25,9 @@
 
 ## 5. Chronogolf V1 parse & merge (pure)
 
-- [ ] 5.1 Define the raw response Zod schema `RawChronogolfTeeTime` (`id`, `start_time`, `date`, `hole`, `restrictions[]`, `out_of_capacity`, optional `green_fees[]`) and `parseResponse(json) → RawChronogolfTeeTime[]`
-- [ ] 5.2 Implement `mergeListing(listing, responsesByGroupSize, config, date) → ScrapedTeeTime[]`: bookable-at-G = `out_of_capacity` false AND `restrictions` empty; `groupSizes` = sizes bookable (merge by `id`); drop no-size slots; `holes` = `nbHoles`; `routing` = listing routing; `startInstant` = `date`+`start_time`+course offset; `dynamicPrice` = `green_fees[0].green_fee` from a bookable query
-- [ ] 5.3 Implement rung-3 booking URL: map every valid group size to `bookingPortalUrl` via a `bestBookingUrl(...candidates)` first-non-null helper
+- [x] 5.1 Define the raw response Zod schema `RawChronogolfV1TeeTime` (`id`, `start_time`, `date`, `hole`, `restrictions[]`, `out_of_capacity`, optional `green_fees[]`) and `parseResponse(json) → RawChronogolfV1TeeTime[]`
+- [x] 5.2 Implement `mergeListing(listing, responsesByGroupSize, config, date) → ScrapedTeeTime[]`: bookable-at-G = `out_of_capacity` false AND `restrictions` empty; `groupSizes` = sizes bookable (merge by `id`); drop no-size slots; `holes` = `nbHoles`; `routing` = listing routing; `startInstant` = `date`+`start_time`+course offset; `dynamicPrice` = `green_fees[0].green_fee` from a bookable query
+- [x] 5.3 Implement rung-3 booking URL: map every valid group size to `bookingPortalUrl` via a `bestBookingUrl(...candidates)` first-non-null helper
 
 ## 6. Chronogolf V1 scraper (I/O shell)
 

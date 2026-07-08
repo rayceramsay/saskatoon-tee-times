@@ -182,7 +182,7 @@ interface ChronogolfV1CourseConfig extends CourseBookingConfig {
 
 The split is the testability story:
 
-- `parseResponse(json)` — pure `bytes → RawChronogolfTeeTime[]`, Zod-validating the raw platform shape. No I/O.
+- `parseResponse(json)` — pure `bytes → RawChronogolfV1TeeTime[]`, Zod-validating the raw platform shape. No I/O.
 - `mergeListing(listing, responsesByGroupSize, config, date)` — pure; applies the bookable-at-G rule across the four group-size responses and emits `ScrapedTeeTime[]` for that listing.
 - `scrape` — the thin I/O shell: builds the fan-out matrix from config, `fetch`es each `(listing, groupSize)`, then delegates to `parseResponse` + `mergeListing` and concatenates.
 
