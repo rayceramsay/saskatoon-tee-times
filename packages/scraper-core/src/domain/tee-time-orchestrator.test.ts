@@ -64,7 +64,7 @@ describe('TeeTimeOrchestrator', () => {
     );
     const orchestrator = new TeeTimeOrchestrator([scraper], silentLogger());
 
-    const teeTimes = await orchestrator.orchestrate(NOW);
+    const teeTimes = await orchestrator.scrapeAllBookable(NOW);
 
     expect(teeTimes.map(unitKey).sort()).toEqual([
       'a|2026-07-08',
@@ -84,7 +84,7 @@ describe('TeeTimeOrchestrator', () => {
     const logger = silentLogger();
     const orchestrator = new TeeTimeOrchestrator([scraper], logger);
 
-    const teeTimes = await orchestrator.orchestrate(NOW);
+    const teeTimes = await orchestrator.scrapeAllBookable(NOW);
 
     expect(teeTimes.map(unitKey).sort()).toEqual([
       'a|2026-07-08',

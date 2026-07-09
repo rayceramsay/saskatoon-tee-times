@@ -39,16 +39,18 @@ export class TeeTimeOrchestrator {
    *
    * @example
    * ```typescript
-   * const teeTimes = await orchestrator.orchestrate(new Date());
+   * const teeTimes = await orchestrator.scrapeAllBookable(new Date());
    * ```
    */
-  async orchestrate(now: Date): Promise<ScrapedTeeTime[]> {
-    const units = this.buildUnits(now);
-    const unitResults = await Promise.all(units.map((unit) => this.runUnit(unit)));
+  async scrapeAllBookable(now: Date): Promise<ScrapedTeeTime[]> {
+    const units = this.buildScrapeUnits(now);
+    const unitResults = await Promise.all(
+      units.map((unit) => this.runScrapeUnit(unit))
+    );
     return unitResults.flat();
   }
 
-  private buildUnits(now: Date): ScrapeUnit[] {
+  private buildScrapeUnits(now: Date): ScrapeUnit[] {
     const units: ScrapeUnit[] = [];
     for (const scraper of this.scrapers) {
       for (const course of scraper.courses) {
@@ -60,7 +62,7 @@ export class TeeTimeOrchestrator {
     return units;
   }
 
-  private async runUnit(unit: ScrapeUnit): Promise<ScrapedTeeTime[]> {
+  private async runScrapeUnit(unit: ScrapeUnit): Promise<ScrapedTeeTime[]> {
     try {
       return await unit.scraper.scrape(unit.courseId, unit.date);
     } catch (error) {
