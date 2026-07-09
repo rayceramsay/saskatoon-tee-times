@@ -27,8 +27,8 @@
 
 ## 5. Ingestion pipeline
 
-- [ ] 5.1 Implement `IngestionPipeline.run(now)` composing orchestrate → map-to-`TeeTime` → persist, with injected stages
-- [ ] 5.2 Unit-test the pipeline invokes stages in order with stubbed collaborators
+- [x] 5.1 Implement `IngestionPipeline.run(now)` composing orchestrate → map-to-`TeeTime` → persist, with injected stages
+- [x] 5.2 Unit-test the pipeline invokes stages in order with stubbed collaborators
 
 ## 6. Local runtime: scraper-local entrypoint
 
