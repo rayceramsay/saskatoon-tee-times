@@ -3,6 +3,16 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "exports": {
+    "./domain/ingestion-pipeline": "./src/domain/ingestion-pipeline.ts",
+    "./domain/tee-time-orchestrator": "./src/domain/tee-time-orchestrator.ts",
+    "./domain/logger": "./src/domain/logger.port.ts",
+    "./persistence/dynamodb-tee-time-repository": "./src/persistence/dynamodb-tee-time-repository.adapter.ts",
+    "./persistence/tee-time-table": "./src/persistence/dynamodb-tee-time-table.ts",
+    "./platforms/chronogolf-v1": "./src/platforms/chronogolf-v1/chronogolf-v1-scraper.adapter.ts",
+    "./platforms/chronogolf-v1/courses/greenbryre": "./src/platforms/chronogolf-v1/courses/greenbryre.ts",
+    "./transport/playwright-json-fetcher": "./src/transport/playwright-json-fetcher.adapter.ts"
+  },
   "scripts": {
     "test": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts",
