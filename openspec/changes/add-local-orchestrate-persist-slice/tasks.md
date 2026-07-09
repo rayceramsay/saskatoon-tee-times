@@ -19,11 +19,11 @@
 
 ## 4. Persistence port & DynamoDB adapter
 
-- [ ] 4.1 Define the `TeeTimeRepository` port with a snapshot-replace-by-`(courseId, date)` operation
-- [ ] 4.2 Add AWS SDK v3 DynamoDB dependency to `scraper-core` (or the owning package)
-- [ ] 4.3 Implement the DynamoDB adapter: item marshalling with `PK = date`, `SK = courseId#startInstant#holes#routing` (empty routing → sentinel), and numeric TTL = `epoch(startInstant)`
-- [ ] 4.4 Implement snapshot-replace: query unit keys by `SK begins_with "courseId#"`, diff, delete vanished, put current — paged in chunks of 25, handling `UnprocessedItems`
-- [ ] 4.5 Test the adapter against local DynamoDB: vanished slots removed, routing distinguishes otherwise-identical slots
+- [x] 4.1 Define the `TeeTimeRepository` port with a snapshot-replace-by-`(courseId, date)` operation
+- [x] 4.2 Add AWS SDK v3 DynamoDB dependency to `scraper-core` (or the owning package)
+- [x] 4.3 Implement the DynamoDB adapter: item marshalling with `PK = date`, `SK = courseId#startInstant#holes#routing` (empty routing → sentinel), and numeric TTL = `epoch(startInstant)`
+- [x] 4.4 Implement snapshot-replace: query unit keys by `SK begins_with "courseId#"`, diff, delete vanished, put current — paged in chunks of 25, handling `UnprocessedItems`
+- [x] 4.5 Test the adapter against local DynamoDB: vanished slots removed, routing distinguishes otherwise-identical slots
 
 ## 5. Ingestion pipeline
 
