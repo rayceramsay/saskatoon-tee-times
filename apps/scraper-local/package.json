@@ -2,5 +2,24 @@
   "name": "scraper-local",
   "version": "0.1.0",
   "type": "module",
-  "private": true
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/main.ts",
+    "start": "tsx --env-file-if-exists=.env src/main.ts",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1081.0",
+    "@aws-sdk/lib-dynamodb": "^3.1081.0",
+    "@stt/scraper-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@stt/eslint-config": "workspace:*",
+    "@stt/typescript-config": "workspace:*",
+    "@types/node": "^26.1.0",
+    "eslint": "^9.39.1",
+    "tsx": "^4.8.1",
+    "typescript": "6.0.3"
+  }
 }
