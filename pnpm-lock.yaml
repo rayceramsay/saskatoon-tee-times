@@ -36,6 +36,9 @@ importers:
       '@stt/scraper-core':
         specifier: workspace:*
         version: link:../../packages/scraper-core
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@stt/eslint-config':
         specifier: workspace:*

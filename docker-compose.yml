@@ -1,6 +1,4 @@
-# Local-only infrastructure. Production DynamoDB is provisioned via OpenTofu; this
-# stands up an equivalent table store on the developer's machine so the
-# scraper-local entrypoint has somewhere to write.
+# Local-only infrastructure. Production DynamoDB is provisioned via OpenTofu
 services:
   dynamodb-local:
     image: amazon/dynamodb-local:latest

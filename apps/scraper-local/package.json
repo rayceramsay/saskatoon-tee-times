@@ -12,7 +12,8 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1081.0",
     "@aws-sdk/lib-dynamodb": "^3.1081.0",
-    "@stt/scraper-core": "workspace:*"
+    "@stt/scraper-core": "workspace:*",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@stt/eslint-config": "workspace:*",
