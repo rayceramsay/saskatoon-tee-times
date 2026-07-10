@@ -1,8 +1,8 @@
 ## 1. Dependency & configuration
 
-- [ ] 1.1 Add `bottleneck` to `packages/scraper-core` dependencies and install
-- [ ] 1.2 Define the limiter config shape (Zod): `perHost` (default cap + optional per-host overrides keyed by hostname), `browserPageCeiling` from `SCRAPER_MAX_BROWSER_PAGES` (fail loud if unset), and `retry` (`maxAttempts`, `maxRetryAfterSeconds`), following the repo's env-config style
-- [ ] 1.3 Encode seed values as defaults where appropriate (per-host `maxConcurrent` 3, `maxRetryAfterSeconds` 30) but keep `browserPageCeiling` required/fail-loud
+- [x] 1.1 Add `bottleneck` to `packages/scraper-core` dependencies and install
+- [x] 1.2 Define the limiter config shape (Zod): `perHost` (default cap + optional per-host overrides keyed by hostname), `browserPageCeiling` from `SCRAPER_MAX_BROWSER_PAGES` (fail loud if unset), and `retry` (`maxAttempts`, `maxRetryAfterSeconds`), following the repo's env-config style
+- [x] 1.3 Encode seed values as defaults where appropriate (per-host `maxConcurrent` 3, `maxRetryAfterSeconds` 30) but keep `browserPageCeiling` required/fail-loud
 
 ## 2. Structured transport error
 
