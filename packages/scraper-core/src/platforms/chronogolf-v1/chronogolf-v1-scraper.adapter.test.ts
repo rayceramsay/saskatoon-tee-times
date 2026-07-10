@@ -29,7 +29,9 @@ const fixtureFetcher: JsonFetcher = {
   },
 };
 
-// Only the two main-course listings, which have committed fixtures.
+// Only the two main-course listings, which have committed fixtures. The scrape
+// `tld` (com) deliberately differs from the user-facing `bookingTld` (ca) so the
+// deep-link tests can prove the scrape mirror never leaks into booking URLs.
 const testConfig: ChronogolfV1CourseConfig = {
   courseId: 'greenbryre',
   courseName: 'Greenbryre',
@@ -37,7 +39,9 @@ const testConfig: ChronogolfV1CourseConfig = {
   bookingPortalUrl: 'https://greenbryre.com/book-a-tee-time/',
   maxAdvanceDays: 7,
   releaseTime: '06:00',
-  tld: 'ca',
+  tld: 'com',
+  bookingTld: 'ca',
+  slug: 'greenbryre-country-club-closed-until-2013-season',
   clubId: 1743,
   affiliationTypeId: 7689,
   listings: [
@@ -145,15 +149,39 @@ describe('ChronogolfV1Scraper merge behaviour (through scrape)', () => {
     expect(twelveHoleTeeTimes).toHaveLength(bookableIds.size);
   });
 
-  it('maps every valid group size to the portal booking url', () => {
+  it('maps every valid group size to a slot-and-size-specific deep link', () => {
     for (const teeTime of teeTimes) {
       const urlSizes = Object.keys(teeTime.bookingUrls)
         .map(Number)
         .sort((a, b) => a - b);
       expect(urlSizes).toEqual(teeTime.groupSizes);
 
+      const date = teeTime.startInstant.slice(0, 10);
       for (const groupSize of teeTime.groupSizes) {
-        expect(teeTime.bookingUrls[groupSize]).toBe(testConfig.bookingPortalUrl);
+        const url = teeTime.bookingUrls[groupSize] ?? '';
+        const fragment = new URL(url).hash;
+        const params = new URLSearchParams(fragment.slice(fragment.indexOf('?') + 1));
+
+        expect(url).toContain(`/club/${testConfig.slug}/booking/`);
+        expect(params.get('teetime_id')).toBeTruthy();
+        expect(params.get('course_id')).toBe(String(2020));
+        expect(params.get('nb_holes')).toBe(String(teeTime.holes));
+        expect(params.get('date')).toBe(date);
+
+        const affiliationIds = params.get('affiliation_type_ids')?.split(',') ?? [];
+        expect(affiliationIds).toHaveLength(groupSize);
+        expect(
+          affiliationIds.every((id) => id === String(testConfig.affiliationTypeId))
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('builds deep links on the canonical booking host, never the scrape mirror', () => {
+    for (const teeTime of teeTimes) {
+      for (const url of Object.values(teeTime.bookingUrls)) {
+        expect(url).toContain(`https://www.chronogolf.${testConfig.bookingTld}/`);
+        expect(url).not.toContain(`chronogolf.${testConfig.tld}`);
       }
     }
   });

@@ -2,14 +2,24 @@ import { describe, expect, it, vi } from 'vitest';
 import type { TeeTimeRepository } from '../persistence/tee-time-repository.port.js';
 import { IngestionPipeline } from './ingestion-pipeline.js';
 import type { Logger } from './logger.port.js';
-import { toTeeTime } from './tee-time.mapper.js';
+import type { PricingEngine } from './pricing-engine.js';
 import type {
   ScaperOrchestrationResult,
   ScrapeUnitOutcome,
 } from './tee-time-orchestrator.js';
-import type { ScrapedTeeTime } from './tee-time.schema.js';
+import type { ScrapedTeeTime, TeeTime } from './tee-time.schema.js';
 
 const NOW = new Date('2026-07-08T12:00:00-06:00');
+
+// A stub pricing stage standing in for the injected `PricingEngine`: its `enrich`
+// drops `dynamicPrice` and copies it into `pricePerPlayer` so the pipeline can be
+// exercised without depending on the concrete engine.
+const stubPricingStage: Pick<PricingEngine, 'enrich'> = {
+  enrich(scraped: ScrapedTeeTime): TeeTime {
+    const { dynamicPrice, ...shared } = scraped;
+    return { ...shared, pricePerPlayer: dynamicPrice };
+  },
+};
 
 function scraped(courseId: string, date: string, time = '06:00'): ScrapedTeeTime {
   return {
@@ -78,7 +88,7 @@ function fakeRepository(): TeeTimeRepository {
 }
 
 describe('IngestionPipeline', () => {
-  it('runs scrapeAllBookable, then map, then persist in that order', async () => {
+  it('runs scrapeAllBookable, then price, then persist in that order', async () => {
     const stageOrder: string[] = [];
     const orchestrator = {
       planUnitCount: vi.fn(() => 1),
@@ -87,10 +97,12 @@ describe('IngestionPipeline', () => {
         return orchestrationResult([scraped('greenbryre', '2026-07-08')]);
       }),
     };
-    const mapToTeeTime = vi.fn((record: ScrapedTeeTime) => {
-      stageOrder.push('map');
-      return toTeeTime(record);
-    });
+    const pricingStage = {
+      enrich: vi.fn((record: ScrapedTeeTime) => {
+        stageOrder.push('price');
+        return stubPricingStage.enrich(record);
+      }),
+    };
     const repository: TeeTimeRepository = {
       replaceUnitTeeTimes: vi.fn(async () => {
         stageOrder.push('persist');
@@ -100,13 +112,13 @@ describe('IngestionPipeline', () => {
       orchestrator,
       repository,
       spyLogger(),
-      mapToTeeTime
+      pricingStage
     );
 
     await pipeline.run(NOW);
 
     expect(orchestrator.scrapeAllBookable).toHaveBeenCalledWith(NOW);
-    expect(stageOrder).toEqual(['scrapeAllBookable', 'map', 'persist']);
+    expect(stageOrder).toEqual(['scrapeAllBookable', 'price', 'persist']);
   });
 
   it("snapshot-replaces once per (course, date) unit with that unit's mapped tee times", async () => {
@@ -122,7 +134,12 @@ describe('IngestionPipeline', () => {
       ),
     };
     const repository = fakeRepository();
-    const pipeline = new IngestionPipeline(orchestrator, repository, spyLogger());
+    const pipeline = new IngestionPipeline(
+      orchestrator,
+      repository,
+      spyLogger(),
+      stubPricingStage
+    );
 
     await pipeline.run(NOW);
 
@@ -145,7 +162,12 @@ describe('IngestionPipeline', () => {
       ),
     };
     const repository = fakeRepository();
-    const pipeline = new IngestionPipeline(orchestrator, repository, spyLogger());
+    const pipeline = new IngestionPipeline(
+      orchestrator,
+      repository,
+      spyLogger(),
+      stubPricingStage
+    );
 
     await pipeline.run(NOW);
 
@@ -161,7 +183,12 @@ describe('IngestionPipeline', () => {
       scrapeAllBookable: vi.fn(async () => orchestrationResult([])),
     };
     const repository = fakeRepository();
-    const pipeline = new IngestionPipeline(orchestrator, repository, spyLogger());
+    const pipeline = new IngestionPipeline(
+      orchestrator,
+      repository,
+      spyLogger(),
+      stubPricingStage
+    );
 
     await pipeline.run(NOW);
 
@@ -183,7 +210,12 @@ describe('IngestionPipeline', () => {
         ]);
       }),
     };
-    const pipeline = new IngestionPipeline(orchestrator, fakeRepository(), logger);
+    const pipeline = new IngestionPipeline(
+      orchestrator,
+      fakeRepository(),
+      logger,
+      stubPricingStage
+    );
 
     await pipeline.run(NOW);
 
@@ -214,7 +246,12 @@ describe('IngestionPipeline', () => {
       ),
     };
     const logger = spyLogger();
-    const pipeline = new IngestionPipeline(orchestrator, fakeRepository(), logger);
+    const pipeline = new IngestionPipeline(
+      orchestrator,
+      fakeRepository(),
+      logger,
+      stubPricingStage
+    );
 
     await pipeline.run(NOW);
 
@@ -241,7 +278,12 @@ describe('IngestionPipeline', () => {
       ),
     };
     const logger = spyLogger();
-    const pipeline = new IngestionPipeline(orchestrator, fakeRepository(), logger);
+    const pipeline = new IngestionPipeline(
+      orchestrator,
+      fakeRepository(),
+      logger,
+      stubPricingStage
+    );
 
     await pipeline.run(NOW);
 

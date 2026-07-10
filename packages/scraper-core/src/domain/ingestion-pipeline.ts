@@ -3,9 +3,9 @@ import type {
   TeeTimeRepository,
 } from '../persistence/tee-time-repository.port.js';
 import type { Logger } from './logger.port.js';
-import { toTeeTime } from './tee-time.mapper.js';
+import type { PricingEngine } from './pricing-engine.js';
 import type { TeeTimeOrchestrator } from './tee-time-orchestrator.js';
-import type { ScrapedTeeTime, TeeTime } from './tee-time.schema.js';
+import type { TeeTime } from './tee-time.schema.js';
 
 /** The scraper orchestration stage, narrowed to the methods the pipeline drives. */
 type ScraperOrchestrationStage = Pick<
@@ -13,8 +13,8 @@ type ScraperOrchestrationStage = Pick<
   'scrapeAllBookable' | 'planUnitCount'
 >;
 
-/** The map stage: turns a scraped record into the canonical persisted tee time. */
-type MapToTeeTime = (scraped: ScrapedTeeTime) => TeeTime;
+/** The price stage, narrowed to the method the pipeline drives. */
+type PricingStage = Pick<PricingEngine, 'enrich'>;
 
 // A tee time's start instant carries its course's local offset, so its first ten
 // characters are the local `YYYY-MM-DD` — exactly the unit it was scraped under.
@@ -26,26 +26,24 @@ interface ScrapeUnitGroup {
 }
 
 /**
- * Composes the ordered ingestion stages — orchestrate → map → persist — into a
+ * Composes the ordered ingestion stages — orchestrate → price → persist — into a
  * single injected unit so entrypoints run the pipeline rather than wiring the
  * stages themselves (and risk forgetting one).
  *
- * The pricing stage is intentionally absent in this slice: the map stage is a
- * pass-through, and is injected so a real pricing engine can replace it later
- * without changing this composition. Persistence is snapshot-replace per
- * `(course, date)` unit, so the flat scraped result is regrouped by unit before
- * being handed to the repository.
+ * The price stage finalizes each scraped record's price into the canonical tee time.
+ * Persistence is snapshot-replace per `(course, date)` unit, so the flat scraped result
+ * is regrouped by unit before being handed to the repository.
  */
 export class IngestionPipeline {
   constructor(
     private readonly orchestrator: ScraperOrchestrationStage,
     private readonly repository: TeeTimeRepository,
     private readonly logger: Logger,
-    private readonly mapToTeeTime: MapToTeeTime = toTeeTime
+    private readonly pricingStage: PricingStage
   ) {}
 
   /**
-   * Run one ingestion pass: scrape every bookable unit, map the records to
+   * Run one ingestion pass: scrape every bookable unit, price the records into
    * persisted tee times, and snapshot-replace each `(course, date)` unit's set.
    *
    * @param now - The instant used to derive each course's bookable dates.
@@ -71,7 +69,7 @@ export class IngestionPipeline {
     });
 
     const normalizedTeeTimes = scrapedTeeTimes.map((record) =>
-      this.mapToTeeTime(record)
+      this.pricingStage.enrich(record)
     );
     const teeTimeGroups = this.groupByScrapeUnit(normalizedTeeTimes);
 

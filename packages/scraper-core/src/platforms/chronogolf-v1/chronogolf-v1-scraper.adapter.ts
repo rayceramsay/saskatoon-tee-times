@@ -157,6 +157,52 @@ function buildTeeTimesRequestUrl(
 }
 
 /**
+ * Inputs identifying one Chronogolf V1 reservation-review deep link.
+ *
+ * A deep link targets one slot at one party size, so it needs the slot's
+ * `teeTimeId`, its listing's `chronogolfCourseId`/`nbHoles`, the queried `date`,
+ * and the `groupSize` (the affiliation id is repeated once per player).
+ */
+interface ChronogolfV1DeepLinkParams {
+  chronogolfCourseId: number;
+  nbHoles: number;
+  date: string;
+  teeTimeId: number;
+  groupSize: GroupSize;
+}
+
+/**
+ * Build a rung-1 Chronogolf V1 reservation-review deep link for one slot and size.
+ *
+ * The hash-fragment params are assembled by hand so `affiliation_type_ids` stays
+ * a comma-joined list (repeated once per player) rather than URL-encoded. The
+ * host is the course's canonical `bookingTld`, never the scrape `tld` mirror.
+ *
+ * @param config - The course's Chronogolf V1 configuration (booking host, slug, affiliation).
+ * @param params - The slot, listing, date, and party size to target.
+ * @returns The reservation-review deep link URL.
+ */
+function buildReservationDeepLink(
+  config: ChronogolfV1CourseConfig,
+  params: ChronogolfV1DeepLinkParams
+): string {
+  const affiliationTypeIds = Array.from(
+    { length: params.groupSize },
+    () => config.affiliationTypeId
+  ).join(',');
+
+  const base = `https://www.chronogolf.${config.bookingTld}/club/${config.slug}/booking/?source=chronogolf&medium=profile`;
+  const fragment =
+    `#/teetime/review?date=${params.date}` +
+    `&course_id=${params.chronogolfCourseId}` +
+    `&nb_holes=${params.nbHoles}` +
+    `&affiliation_type_ids=${affiliationTypeIds}` +
+    `&teetime_id=${params.teeTimeId}`;
+
+  return `${base}${fragment}`;
+}
+
+/**
  * Validate and parse a raw Chronogolf V1 tee-times JSON response.
  *
  * Pure and I/O-free: it only validates the response shape, so a change in the
@@ -230,7 +276,14 @@ function mergeListing(
 
     const bookingUrls: Partial<Record<GroupSize, string>> = {};
     for (const groupSize of groupSizes) {
-      bookingUrls[groupSize] = bestBookingUrl(config.bookingPortalUrl);
+      const deepLink = buildReservationDeepLink(config, {
+        chronogolfCourseId: listing.chronogolfCourseId,
+        nbHoles: listing.nbHoles,
+        date,
+        teeTimeId: slot.representative.id,
+        groupSize,
+      });
+      bookingUrls[groupSize] = bestBookingUrl(deepLink, config.bookingPortalUrl);
     }
 
     return {

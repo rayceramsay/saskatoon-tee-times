@@ -1,8 +1,12 @@
 import { IngestionPipeline } from '@stt/scraper-core/domain/ingestion-pipeline';
+import { PricingEngine } from '@stt/scraper-core/domain/pricing-engine';
 import { TeeTimeOrchestrator } from '@stt/scraper-core/domain/tee-time-orchestrator';
 import { DynamoDbTeeTimeRepository } from '@stt/scraper-core/persistence/dynamodb-tee-time-repository';
 import { ChronogolfV1Scraper } from '@stt/scraper-core/platforms/chronogolf-v1';
-import { greenbryreConfig } from '@stt/scraper-core/platforms/chronogolf-v1/courses/greenbryre';
+import {
+  greenbryreConfig,
+  greenbryrePricingConfig,
+} from '@stt/scraper-core/platforms/chronogolf-v1/courses/greenbryre';
 import { PlaywrightJsonFetcher } from '@stt/scraper-core/transport/playwright-json-fetcher';
 import { HostLimitedJsonFetcher } from '@stt/scraper-core/transport/host-limited-json-fetcher';
 import { BottleneckRequestLimiter } from '@stt/scraper-core/transport/bottleneck-request-limiter';
@@ -46,7 +50,15 @@ async function main(): Promise<void> {
     documentClient,
     config.DYNAMODB_TABLE_NAME
   );
-  const pipeline = new IngestionPipeline(orchestrator, repository, logger);
+  const pricingEngine = new PricingEngine(
+    new Map([[greenbryreConfig.courseId, greenbryrePricingConfig]])
+  );
+  const pipeline = new IngestionPipeline(
+    orchestrator,
+    repository,
+    logger,
+    pricingEngine
+  );
 
   setupAndStartIngestionPipelineCronSchedule(config, pipeline, logger, fetcher, client);
 }

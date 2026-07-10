@@ -6,6 +6,7 @@
   "exports": {
     "./domain/ingestion-pipeline": "./src/domain/ingestion-pipeline.ts",
     "./domain/tee-time-orchestrator": "./src/domain/tee-time-orchestrator.ts",
+    "./domain/pricing-engine": "./src/domain/pricing-engine.ts",
     "./domain/logger": "./src/domain/logger.port.ts",
     "./persistence/dynamodb-tee-time-repository": "./src/persistence/dynamodb-tee-time-repository.adapter.ts",
     "./persistence/tee-time-table": "./src/persistence/dynamodb-tee-time-table.ts",

@@ -24,7 +24,13 @@ export interface ChronogolfV1Listing {
  */
 export interface ChronogolfV1CourseConfig extends CourseConfig {
   // TLD of the Chronogolf mirror to query, e.g. "ca" or "com" — pins the origin.
+  // A rate-limit lever, retuned freely; MUST NOT leak into user-facing links.
   tld: string;
+  // Canonical user-facing Chronogolf host suffix for deep links, e.g. "ca".
+  // Independent of the scrape `tld` so mirror choices never reach user links.
+  bookingTld: string;
+  // The club's booking URL slug, used to build user-facing deep links.
+  slug: string;
   // Chronogolf club id owning the course.
   clubId: number;
   // Affiliation type id repeated once per player in each request.
