@@ -40,5 +40,5 @@
 
 ## 7. Verification
 
-- [ ] 7.1 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix any errors
-- [ ] 7.2 Run the local scraper against the live course and confirm bounded concurrency (no laptop freeze / 30s timeout burst)
+- [x] 7.1 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix any errors
+- [x] 7.2 Run the local scraper against the live course and confirm bounded concurrency (no laptop freeze / 30s timeout burst)
