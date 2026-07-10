@@ -1,3 +1,4 @@
+import cron from 'node-cron';
 import { z } from 'zod';
 
 const environmentSchema = z.object({
@@ -5,12 +6,12 @@ const environmentSchema = z.object({
   DYNAMODB_ENDPOINT: z.url().default('http://localhost:8000'),
   // Table the entrypoint bootstraps and writes tee times to.
   DYNAMODB_TABLE_NAME: z.string().min(1).default('tee-times-local'),
-  // How often the ingestion pipeline runs, in milliseconds. Defaults to 15 minutes
-  SCRAPE_INTERVAL_MS: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(15 * 60 * 1000),
+  // Cron expression controlling how often the ingestion pipeline runs. Defaults to every
+  // 15 minutes (production's cadence); use e.g. '* * * * *' for fast local feedback.
+  SCRAPE_CRON: z
+    .string()
+    .refine((value) => cron.validate(value), 'must be a valid cron expression')
+    .default('*/15 * * * *'),
 });
 
 /** Runtime configuration for the local scraper entrypoint. */

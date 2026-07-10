@@ -32,11 +32,11 @@
 
 ## 6. Local runtime: scraper-local entrypoint
 
-- [ ] 6.1 Add docker-compose service for `amazon/dynamodb-local`
-- [ ] 6.2 Add table bootstrap (create table + enable TTL) against the local endpoint
-- [ ] 6.3 Configure the DynamoDB SDK client for the local endpoint via explicit env/config (endpoint + dummy credentials)
-- [ ] 6.4 Wire the composition root in `scraper-local`: build ChronogolfV1 scraper + orchestrator + repository + pipeline
-- [ ] 6.5 Add the in-process cron invoking `IngestionPipeline.run(now)` on an interval
+- [x] 6.1 Add docker-compose service for `amazon/dynamodb-local`
+- [x] 6.2 Add table bootstrap (create table + enable TTL) against the local endpoint
+- [x] 6.3 Configure the DynamoDB SDK client for the local endpoint via explicit env/config (endpoint + dummy credentials)
+- [x] 6.4 Wire the composition root in `scraper-local`: build ChronogolfV1 scraper + orchestrator + repository + pipeline
+- [x] 6.5 Add the in-process cron invoking `IngestionPipeline.run(now)` on an interval
 
 ## 7. Verify end-to-end
 
