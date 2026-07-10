@@ -16,7 +16,9 @@ import {
 } from './dynamodb-tee-time-table.js';
 
 const TABLE_NAME = 'tee-times-test';
-const DYNAMODB_LOCAL_PORT = 8093;
+// Port amazon/dynamodb-local listens on inside the container; testcontainers maps
+// it to a random host port, so this is the container-internal port to wait on.
+const DYNAMODB_LOCAL_PORT = 8000;
 
 const unit: ScrapeUnitKey = { courseId: 'greenbryre', date: '2026-07-10' };
 
