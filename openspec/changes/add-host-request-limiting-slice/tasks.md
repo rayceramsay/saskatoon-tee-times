@@ -21,8 +21,8 @@
 
 ## 4. Host-limited fetcher decorator
 
-- [ ] 4.1 Implement `HostLimitedJsonFetcher implements JsonFetcher`: derive host from `new URL(url).host`, delegate through `limiter.schedule(host, () => inner.fetchJson(url))`
-- [ ] 4.2 Add package.json `exports` entries for the decorator and limiter wiring
+- [x] 4.1 Implement `HostLimitedJsonFetcher implements JsonFetcher`: derive host from `new URL(url).host`, delegate through `limiter.schedule(host, () => inner.fetchJson(url))`
+- [x] 4.2 Add package.json `exports` entries for the decorator and limiter wiring
 
 ## 5. Wiring
 
