@@ -6,9 +6,9 @@
 
 ## 2. Structured transport error
 
-- [ ] 2.1 Define a typed transport error carrying `{ status, retryAfterSeconds }` in `transport/`
-- [ ] 2.2 In `playwright-json-fetcher.adapter.ts`, read `response.status` and `response.headers.get('retry-after')` inside the in-page fetch and throw the typed error so status + retry-after survive the `page.evaluate` boundary
-- [ ] 2.3 Add an `isRetryable(error)` predicate (429/503) and a retry-after/backoff wait computation helper
+- [x] 2.1 Define a typed transport error carrying `{ status, retryAfterSeconds }` in `transport/`
+- [x] 2.2 In `playwright-json-fetcher.adapter.ts`, read `response.status` and `response.headers.get('retry-after')` inside the in-page fetch and throw the typed error so status + retry-after survive the `page.evaluate` boundary
+- [x] 2.3 Add an `isRetryable(error)` predicate (429/503) and a retry-after/backoff wait computation helper
 
 ## 3. Request limiter port & adapter
 
