@@ -7,9 +7,9 @@ import { TransportError } from './transport-error.js';
  *
  * Some platforms (Chronogolf via Cloudflare) fingerprint the client at the TLS
  * layer and reject non-browser HTTP stacks regardless of headers, so a real
- * browser is required. Each fetch loads the target's origin, then issues a
- * same-origin `fetch` from within the page so the request carries the browser's
- * network fingerprint.
+ * browser is required. Each fetch navigates the page directly to the JSON URL so
+ * the request carries the browser's network fingerprint, then reads the body and
+ * backoff signal from the navigation response.
  *
  * The browser and a single context are launched lazily and shared across calls;
  * call {@link close} when finished to release them.
@@ -22,29 +22,21 @@ export class PlaywrightJsonFetcher implements JsonFetcher {
     const context = await this.context();
     const page = await context.newPage();
     try {
-      await page.goto(new URL(url).origin, { waitUntil: 'domcontentloaded' });
-      // Return a structured result rather than throwing inside the page: a thrown
-      // error only preserves its message across `page.evaluate`, discarding the
-      // status and Retry-After we need. We read them here and raise the typed
-      // error back on the Node side.
-      const result = await page.evaluate(async (target) => {
-        const response = await fetch(target, {
-          headers: { Accept: 'application/json' },
-        });
-        if (!response.ok) {
-          return {
-            ok: false as const,
-            status: response.status,
-            retryAfterSeconds: parseRetryAfter(response.headers.get('retry-after')),
-          };
-        }
-        return { ok: true as const, data: (await response.json()) as unknown };
-      }, url);
-
-      if (!result.ok) {
-        throw new TransportError(result.status, result.retryAfterSeconds, url);
+      const response = await page.goto(url, { waitUntil: 'domcontentloaded' });
+      if (response === null) {
+        throw new TransportError(0, undefined, url);
       }
-      return result.data;
+      if (!response.ok()) {
+        const retryAfterSeconds = parseRetryAfter(
+          response.headers()['retry-after'] ?? null
+        );
+        throw new TransportError(response.status(), retryAfterSeconds, url);
+      }
+      try {
+        return (await response.json()) as unknown;
+      } catch {
+        return JSON.parse(await response.text());
+      }
     } finally {
       await page.close();
     }
