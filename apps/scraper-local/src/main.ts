@@ -4,6 +4,8 @@ import { DynamoDbTeeTimeRepository } from '@stt/scraper-core/persistence/dynamod
 import { ChronogolfV1Scraper } from '@stt/scraper-core/platforms/chronogolf-v1';
 import { greenbryreConfig } from '@stt/scraper-core/platforms/chronogolf-v1/courses/greenbryre';
 import { PlaywrightJsonFetcher } from '@stt/scraper-core/transport/playwright-json-fetcher';
+import { HostLimitedJsonFetcher } from '@stt/scraper-core/transport/host-limited-json-fetcher';
+import { BottleneckRequestLimiter } from '@stt/scraper-core/transport/bottleneck-request-limiter';
 import cron from 'node-cron';
 import { loadConfig, type ScraperLocalConfig } from './config.js';
 import { ConsoleLogger } from './console-logger.adapter.js';
@@ -26,7 +28,19 @@ async function main(): Promise<void> {
   await ensureTeeTimeTable(client, config.DYNAMODB_TABLE_NAME);
 
   const fetcher = new PlaywrightJsonFetcher();
-  const scraper = new ChronogolfV1Scraper([greenbryreConfig], fetcher);
+  const limiter = new BottleneckRequestLimiter({
+    perHost: {
+      default: { maxConcurrent: config.SCRAPER_PER_HOST_MAX_CONCURRENT },
+      overrides: {},
+    },
+    browserPageCeiling: config.SCRAPER_MAX_BROWSER_PAGES,
+    retry: {
+      maxAttempts: config.SCRAPER_MAX_RETRY_ATTEMPTS,
+      maxRetryAfterSeconds: config.SCRAPER_MAX_RETRY_AFTER_SECONDS,
+    },
+  });
+  const limitedFetcher = new HostLimitedJsonFetcher(fetcher, limiter);
+  const scraper = new ChronogolfV1Scraper([greenbryreConfig], limitedFetcher);
   const orchestrator = new TeeTimeOrchestrator([scraper], logger);
   const repository = new DynamoDbTeeTimeRepository(
     documentClient,

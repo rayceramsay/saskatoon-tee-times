@@ -26,8 +26,8 @@
 
 ## 5. Wiring
 
-- [ ] 5.1 In `apps/scraper-local/src/main.ts`, construct the limiter from config and wrap `PlaywrightJsonFetcher` in `HostLimitedJsonFetcher`
-- [ ] 5.2 Thread the new limiter config through the scraper-local config surface
+- [x] 5.1 In `apps/scraper-local/src/main.ts`, construct the limiter from config and wrap `PlaywrightJsonFetcher` in `HostLimitedJsonFetcher`
+- [x] 5.2 Thread the new limiter config through the scraper-local config surface
 
 ## 6. Tests
 
