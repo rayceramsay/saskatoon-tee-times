@@ -13,7 +13,7 @@ const environmentSchema = z.object({
     .refine((value) => cron.validate(value), 'must be a valid cron expression')
     .default('*/15 * * * *'),
   // Global ceiling on concurrent browser pages across all hosts.
-  SCRAPER_MAX_BROWSER_PAGES: z.coerce.number().int().positive(),
+  SCRAPER_MAX_BROWSER_PAGES: z.coerce.number().int().positive().default(6),
   // Per-host concurrency budget applied to any host without an override.
   SCRAPER_PER_HOST_MAX_CONCURRENT: z.coerce.number().int().positive().default(3),
   // Max attempts for a retryable (429/503) job before giving up.
