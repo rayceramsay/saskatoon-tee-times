@@ -31,12 +31,12 @@
 
 ## 6. Tests
 
-- [ ] 6.1 Limiter caps concurrency per-host (same host shares a budget; different hosts independent)
-- [ ] 6.2 Limiter enforces the global page ceiling and shows no head-of-line blocking (free host not starved behind a busy host)
-- [ ] 6.3 Retry honors a within-threshold Retry-After, ignores/gives up over threshold and on exhausted attempts, and does not retry non-retryable errors
-- [ ] 6.4 A 429 pauses only its host (others keep flowing) and the host resumes at `resumeAt`; concurrent pauses extend rather than stack
-- [ ] 6.5 Structured transport error exposes `status` and `retryAfterSeconds` (with and without the header)
-- [ ] 6.6 Decorator derives host from the URL and delegates through the limiter, returning the inner result unchanged
+- [x] 6.1 Limiter caps concurrency per-host (same host shares a budget; different hosts independent)
+- [x] 6.2 Limiter enforces the global page ceiling and shows no head-of-line blocking (free host not starved behind a busy host)
+- [x] 6.3 Retry honors a within-threshold Retry-After, ignores/gives up over threshold and on exhausted attempts, and does not retry non-retryable errors
+- [x] 6.4 A 429 pauses only its host (others keep flowing) and the host resumes at `resumeAt`; concurrent pauses extend rather than stack
+- [x] 6.5 Structured transport error exposes `status` and `retryAfterSeconds` (with and without the header)
+- [x] 6.6 Decorator derives host from the URL and delegates through the limiter, returning the inner result unchanged
 
 ## 7. Verification
 
