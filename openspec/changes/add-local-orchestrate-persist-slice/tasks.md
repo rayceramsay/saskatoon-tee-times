@@ -40,6 +40,39 @@
 
 ## 7. Verify end-to-end
 
-- [ ] 7.1 Run the local cron once and `aws dynamodb scan` the local table to confirm Greenbryre tee times land
-- [ ] 7.2 Re-run and confirm snapshot-replace reconciles (a slot removed between runs disappears from the table)
-- [ ] 7.3 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix any errors
+- [x] 7.1 Run the local cron once and `aws dynamodb scan` the local table to confirm Greenbryre tee times land
+- [x] 7.2 Re-run and confirm snapshot-replace reconciles (a slot removed between runs disappears from the table)
+- [x] 7.3 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix any errors
+
+## Verification notes & evidence
+
+**Two defects found and fixed while verifying (§7):**
+
+1. **docker-compose volume permission (6.1).** `amazon/dynamodb-local` runs as uid 1000, but the
+   named volume mounts root-owned, so every write failed with `unable to open database file` and
+   `CreateTable` hung (SDK retrying the server-side 500) — the pipeline never got past table
+   bootstrap. Fixed by running the service as `user: root` in `docker-compose.yml`.
+2. **Integration test never ran (4.5).** The testcontainers test exposed port `8093`, but
+   DynamoDB Local listens on `8000` inside the container, so testcontainers waited 60s for a port
+   that never binds and skipped all assertions (was marked done but had never passed). Fixed the
+   constant to `8000`; now 3/3 pass in ~3.6s, covering vanished-slot removal, routing distinctness,
+   and TTL marshalling.
+
+**7.1 — tee times land.** A pipeline run landed **731** Greenbryre tee times across the 7 future
+dates (2026-07-10 … 07-16); `aws dynamodb scan` confirmed the canonical item shape: `PK=date`,
+`SK=greenbryre#<startInstant>#<holes>#<routing|->`, `pricePerPlayer` (pass-through of `dynamicPrice`,
+e.g. `46.62`), and numeric `ttl` = epoch(startInstant).
+
+**7.2 — snapshot-replace reconciles.** Verified two ways: (a) the adapter integration test asserts a
+slot vanishing between replaces is deleted; (b) a live second run reconciled deterministically —
+total went 731 → 830 (not ~1462, so no accumulation), **0** items retained the prior run's
+`scrapedAt` (every unit fully rewritten), and date `2026-07-16` went **65 → 63** as slots that
+disappeared upstream were removed from the table.
+
+**Known limitation (deferred, not a defect in this slice).** The orchestrator fans out
+`dates × listings × group-sizes` (≈96) `fetchJson` calls with no concurrency bound, each opening a
+page in a single shared Playwright browser context. That contention makes most `page.goto` calls
+exceed the 30s default navigation timeout, so full-window live runs are unreliable. This is the
+consequence of the intentionally-deferred per-host choke point (Decision 3 / FR-1.6 `HostRateLimiter`);
+the §7 evidence above was gathered with the Chronogolf V1 adapter's inner fetches temporarily
+serialized (i.e. ran sequentially rather than concurrently) to isolate the pipeline from that contention. Adding the concurrency bound is future work.
