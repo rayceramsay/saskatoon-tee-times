@@ -7,6 +7,8 @@
  * observable rather than silently swallowed.
  */
 export interface Logger {
+  // Report a confirmation that a routine operation was succesful and expected events are occuring.
+  info(message: string, context?: Record<string, unknown>): void;
   // Report a non-fatal condition worth attention that did not stop the run.
   warn(message: string, context?: Record<string, unknown>): void;
   // Report a failure that occurred, even if it was isolated and recovered from.

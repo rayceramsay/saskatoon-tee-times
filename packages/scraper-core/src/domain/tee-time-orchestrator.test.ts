@@ -50,7 +50,7 @@ class FakeScraper implements BookingPlatformScraper {
 }
 
 function silentLogger(): Logger {
-  return { warn: vi.fn(), error: vi.fn() };
+  return { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 }
 
 function unitKey(teeTime: ScrapedTeeTime): string {
