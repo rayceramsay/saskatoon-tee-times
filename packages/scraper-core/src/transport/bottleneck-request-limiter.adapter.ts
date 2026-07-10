@@ -1,6 +1,6 @@
 import Bottleneck from 'bottleneck';
 import type { RequestLimiter } from './request-limiter.port.js';
-import type { RequestLimiterConfig } from './request-limiter.config.js';
+import type { RequestLimiterConfig } from './request-limiter-config.schema.js';
 import { computeRetryWaitMs, isRetryable } from './retry-policy.js';
 
 /**
