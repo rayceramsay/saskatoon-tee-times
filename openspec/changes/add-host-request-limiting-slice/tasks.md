@@ -12,12 +12,12 @@
 
 ## 3. Request limiter port & adapter
 
-- [ ] 3.1 Define the limiter port in `transport/` exposing a `schedule(host, fn)`-style surface (no `bottleneck` types in the port)
-- [ ] 3.2 Implement the `bottleneck`-backed adapter: `Bottleneck.Group` keyed by hostname (Axis A) with per-host `maxConcurrent` from config
-- [ ] 3.3 Add the global parent `Bottleneck` (Axis B) with `maxConcurrent = browserPageCeiling`; chain each child via the Group `created` hook (verify the exact event name/signature against the library)
-- [ ] 3.4 Implement the `failed` handler: retry the failing job honoring `retryAfterSeconds`/backoff up to `maxAttempts`; give up (no pause) when non-retryable, attempts exhausted, or wait exceeds `maxRetryAfterSeconds`
-- [ ] 3.5 Implement the pause coordinator (`pauseHost`): reservoir `0` to pause / `null` to resume via `group.key(host)`, deduping and extending (not stacking) the window to the latest `resumeAt`; make the handler async and await `updateSettings`
-- [ ] 3.6 Ensure `bottleneck` does not leak past the adapter file
+- [x] 3.1 Define the limiter port in `transport/` exposing a `schedule(host, fn)`-style surface (no `bottleneck` types in the port)
+- [x] 3.2 Implement the `bottleneck`-backed adapter: `Bottleneck.Group` keyed by hostname (Axis A) with per-host `maxConcurrent` from config
+- [x] 3.3 Add the global parent `Bottleneck` (Axis B) with `maxConcurrent = browserPageCeiling`; chain each child via the Group `created` hook (verify the exact event name/signature against the library)
+- [x] 3.4 Implement the `failed` handler: retry the failing job honoring `retryAfterSeconds`/backoff up to `maxAttempts`; give up (no pause) when non-retryable, attempts exhausted, or wait exceeds `maxRetryAfterSeconds`
+- [x] 3.5 Implement the pause coordinator (`pauseHost`): reservoir `0` to pause / `null` to resume via `group.key(host)`, deduping and extending (not stacking) the window to the latest `resumeAt`; make the handler async and await `updateSettings`
+- [x] 3.6 Ensure `bottleneck` does not leak past the adapter file
 
 ## 4. Host-limited fetcher decorator
 
