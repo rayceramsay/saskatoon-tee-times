@@ -20,6 +20,8 @@ const environmentSchema = z.object({
   SCRAPER_MAX_RETRY_ATTEMPTS: z.coerce.number().int().positive().default(3),
   // Longest Retry-After (seconds) we will honor before giving up on the job.
   SCRAPER_MAX_RETRY_AFTER_SECONDS: z.coerce.number().int().positive().default(30),
+  // Minimum severity the console logger emits.
+  LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 });
 
 /** Runtime configuration for the local scraper entrypoint. */

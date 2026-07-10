@@ -2,12 +2,16 @@ import type {
   ScrapeUnitKey,
   TeeTimeRepository,
 } from '../persistence/tee-time-repository.port.js';
+import type { Logger } from './logger.port.js';
 import { toTeeTime } from './tee-time.mapper.js';
 import type { TeeTimeOrchestrator } from './tee-time-orchestrator.js';
 import type { ScrapedTeeTime, TeeTime } from './tee-time.schema.js';
 
-/** The scraper orchestration stage, narrowed to the one method the pipeline drives. */
-type ScraperOrchestrationStage = Pick<TeeTimeOrchestrator, 'scrapeAllBookable'>;
+/** The scraper orchestration stage, narrowed to the methods the pipeline drives. */
+type ScraperOrchestrationStage = Pick<
+  TeeTimeOrchestrator,
+  'scrapeAllBookable' | 'planUnitCount'
+>;
 
 /** The map stage: turns a scraped record into the canonical persisted tee time. */
 type MapToTeeTime = (scraped: ScrapedTeeTime) => TeeTime;
@@ -36,6 +40,7 @@ export class IngestionPipeline {
   constructor(
     private readonly orchestrator: ScraperOrchestrationStage,
     private readonly repository: TeeTimeRepository,
+    private readonly logger: Logger,
     private readonly mapToTeeTime: MapToTeeTime = toTeeTime
   ) {}
 
@@ -52,16 +57,51 @@ export class IngestionPipeline {
    * ```
    */
   async run(now: Date): Promise<void> {
-    const scrapedTeeTimes = await this.orchestrator.scrapeAllBookable(now);
+    const startedAt = performance.now();
+
+    this.logger.info('Ingestion run started', {
+      queuedUnits: this.orchestrator.planUnitCount(now),
+    });
+
+    const { teeTimes: scrapedTeeTimes, unitOutcomes } =
+      await this.orchestrator.scrapeAllBookable(now);
+
+    this.logger.debug('Scrape phase complete', {
+      durationMs: Math.round(performance.now() - startedAt),
+    });
+
     const normalizedTeeTimes = scrapedTeeTimes.map((record) =>
       this.mapToTeeTime(record)
     );
     const teeTimeGroups = this.groupByScrapeUnit(normalizedTeeTimes);
+
+    await this.persistGroups(teeTimeGroups);
+
+    const unitsOk = unitOutcomes.filter((outcome) => outcome.status === 'ok').length;
+    this.logger.info('Ingestion run finished', {
+      durationMs: Math.round(performance.now() - startedAt),
+      unitsOk,
+      unitsFailed: unitOutcomes.length - unitsOk,
+      teeTimesPersisted: normalizedTeeTimes.length,
+      groupsWritten: teeTimeGroups.length,
+    });
+  }
+
+  private async persistGroups(teeTimeGroups: ScrapeUnitGroup[]): Promise<void> {
+    this.logger.debug('Persisting tee time groups', {
+      groupCount: teeTimeGroups.length,
+    });
     await Promise.all(
-      teeTimeGroups.map((group) =>
-        this.repository.replaceUnitTeeTimes(group.unitKey, group.teeTimes)
-      )
+      teeTimeGroups.map(async (group) => {
+        await this.repository.replaceUnitTeeTimes(group.unitKey, group.teeTimes);
+        this.logger.debug('Wrote tee time group', {
+          courseId: group.unitKey.courseId,
+          date: group.unitKey.date,
+          teeTimeCount: group.teeTimes.length,
+        });
+      })
     );
+    this.logger.debug('Persist stage finished');
   }
 
   private groupByScrapeUnit(teeTimes: readonly TeeTime[]): ScrapeUnitGroup[] {

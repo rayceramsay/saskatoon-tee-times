@@ -1,7 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { TeeTimeRepository } from '../persistence/tee-time-repository.port.js';
 import { IngestionPipeline } from './ingestion-pipeline.js';
+import type { Logger } from './logger.port.js';
 import { toTeeTime } from './tee-time.mapper.js';
+import type {
+  ScaperOrchestrationResult,
+  ScrapeUnitOutcome,
+} from './tee-time-orchestrator.js';
 import type { ScrapedTeeTime } from './tee-time.schema.js';
 
 const NOW = new Date('2026-07-08T12:00:00-06:00');
@@ -20,6 +25,54 @@ function scraped(courseId: string, date: string, time = '06:00'): ScrapedTeeTime
   };
 }
 
+function okOutcome(courseId: string, date: string, recordCount = 1): ScrapeUnitOutcome {
+  return {
+    platform: 'chronogolf-v1',
+    courseId,
+    date,
+    status: 'ok',
+    recordCount,
+  };
+}
+
+function failedOutcome(courseId: string, date: string): ScrapeUnitOutcome {
+  return {
+    platform: 'chronogolf-v1',
+    courseId,
+    date,
+    status: 'failed',
+    recordCount: 0,
+  };
+}
+
+// Derives one `ok` outcome per `(course, date)` unit present in the records, so
+// simple tests can pass records and get a coherent result without spelling out
+// outcomes; the partial-failure test supplies outcomes explicitly instead.
+function deriveOkOutcomes(teeTimes: ScrapedTeeTime[]): ScrapeUnitOutcome[] {
+  const counts = new Map<string, { courseId: string; date: string; count: number }>();
+  for (const teeTime of teeTimes) {
+    const date = teeTime.startInstant.slice(0, 10);
+    const key = `${teeTime.courseId}|${date}`;
+    const entry = counts.get(key) ?? { courseId: teeTime.courseId, date, count: 0 };
+    entry.count += 1;
+    counts.set(key, entry);
+  }
+  return [...counts.values()].map((entry) =>
+    okOutcome(entry.courseId, entry.date, entry.count)
+  );
+}
+
+function orchestrationResult(
+  teeTimes: ScrapedTeeTime[],
+  unitOutcomes?: ScrapeUnitOutcome[]
+): ScaperOrchestrationResult {
+  return { teeTimes, unitOutcomes: unitOutcomes ?? deriveOkOutcomes(teeTimes) };
+}
+
+function spyLogger(): Logger {
+  return { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+}
+
 function fakeRepository(): TeeTimeRepository {
   return { replaceUnitTeeTimes: vi.fn().mockResolvedValue(undefined) };
 }
@@ -28,9 +81,10 @@ describe('IngestionPipeline', () => {
   it('runs scrapeAllBookable, then map, then persist in that order', async () => {
     const stageOrder: string[] = [];
     const orchestrator = {
+      planUnitCount: vi.fn(() => 1),
       scrapeAllBookable: vi.fn(async () => {
         stageOrder.push('scrapeAllBookable');
-        return [scraped('greenbryre', '2026-07-08')];
+        return orchestrationResult([scraped('greenbryre', '2026-07-08')]);
       }),
     };
     const mapToTeeTime = vi.fn((record: ScrapedTeeTime) => {
@@ -42,7 +96,12 @@ describe('IngestionPipeline', () => {
         stageOrder.push('persist');
       }),
     };
-    const pipeline = new IngestionPipeline(orchestrator, repository, mapToTeeTime);
+    const pipeline = new IngestionPipeline(
+      orchestrator,
+      repository,
+      spyLogger(),
+      mapToTeeTime
+    );
 
     await pipeline.run(NOW);
 
@@ -52,15 +111,18 @@ describe('IngestionPipeline', () => {
 
   it("snapshot-replaces once per (course, date) unit with that unit's mapped tee times", async () => {
     const orchestrator = {
-      scrapeAllBookable: vi.fn(async () => [
-        scraped('greenbryre', '2026-07-08', '06:00'),
-        scraped('greenbryre', '2026-07-08', '06:10'),
-        scraped('greenbryre', '2026-07-09', '07:00'),
-        scraped('holiday-park', '2026-07-08', '08:00'),
-      ]),
+      planUnitCount: vi.fn(() => 3),
+      scrapeAllBookable: vi.fn(async () =>
+        orchestrationResult([
+          scraped('greenbryre', '2026-07-08', '06:00'),
+          scraped('greenbryre', '2026-07-08', '06:10'),
+          scraped('greenbryre', '2026-07-09', '07:00'),
+          scraped('holiday-park', '2026-07-08', '08:00'),
+        ])
+      ),
     };
     const repository = fakeRepository();
-    const pipeline = new IngestionPipeline(orchestrator, repository);
+    const pipeline = new IngestionPipeline(orchestrator, repository, spyLogger());
 
     await pipeline.run(NOW);
 
@@ -77,10 +139,13 @@ describe('IngestionPipeline', () => {
 
   it('persists the mapped tee times, not the raw scraped records', async () => {
     const orchestrator = {
-      scrapeAllBookable: vi.fn(async () => [scraped('greenbryre', '2026-07-08')]),
+      planUnitCount: vi.fn(() => 1),
+      scrapeAllBookable: vi.fn(async () =>
+        orchestrationResult([scraped('greenbryre', '2026-07-08')])
+      ),
     };
     const repository = fakeRepository();
-    const pipeline = new IngestionPipeline(orchestrator, repository);
+    const pipeline = new IngestionPipeline(orchestrator, repository, spyLogger());
 
     await pipeline.run(NOW);
 
@@ -92,13 +157,102 @@ describe('IngestionPipeline', () => {
 
   it('persists nothing when no tee times are scraped', async () => {
     const orchestrator = {
-      scrapeAllBookable: vi.fn(async () => [] as ScrapedTeeTime[]),
+      planUnitCount: vi.fn(() => 0),
+      scrapeAllBookable: vi.fn(async () => orchestrationResult([])),
     };
     const repository = fakeRepository();
-    const pipeline = new IngestionPipeline(orchestrator, repository);
+    const pipeline = new IngestionPipeline(orchestrator, repository, spyLogger());
 
     await pipeline.run(NOW);
 
     expect(repository.replaceUnitTeeTimes).not.toHaveBeenCalled();
+  });
+
+  it('emits run started before scraping begins, reporting the planned queued-unit count', async () => {
+    const logger = spyLogger();
+    let startedBeforeScrape = false;
+    const orchestrator = {
+      planUnitCount: vi.fn(() => 2),
+      scrapeAllBookable: vi.fn(async () => {
+        startedBeforeScrape = vi
+          .mocked(logger.info)
+          .mock.calls.some(([message]) => message === 'Ingestion run started');
+        return orchestrationResult([
+          scraped('greenbryre', '2026-07-08'),
+          scraped('holiday-park', '2026-07-08'),
+        ]);
+      }),
+    };
+    const pipeline = new IngestionPipeline(orchestrator, fakeRepository(), logger);
+
+    await pipeline.run(NOW);
+
+    expect(orchestrator.planUnitCount).toHaveBeenCalledWith(NOW);
+    expect(logger.info).toHaveBeenCalledWith(
+      'Ingestion run started',
+      expect.objectContaining({ queuedUnits: 2 })
+    );
+    expect(startedBeforeScrape).toBe(true);
+  });
+
+  it('emits an info run-finished summary totaling ok/failed units, tee times, and groups', async () => {
+    const orchestrator = {
+      planUnitCount: vi.fn(() => 3),
+      scrapeAllBookable: vi.fn(async () =>
+        orchestrationResult(
+          [
+            scraped('greenbryre', '2026-07-08', '06:00'),
+            scraped('greenbryre', '2026-07-08', '06:10'),
+            scraped('holiday-park', '2026-07-08', '08:00'),
+          ],
+          [
+            okOutcome('greenbryre', '2026-07-08', 2),
+            okOutcome('holiday-park', '2026-07-08', 1),
+            failedOutcome('greenbryre', '2026-07-09'),
+          ]
+        )
+      ),
+    };
+    const logger = spyLogger();
+    const pipeline = new IngestionPipeline(orchestrator, fakeRepository(), logger);
+
+    await pipeline.run(NOW);
+
+    expect(logger.info).toHaveBeenCalledWith(
+      'Ingestion run finished',
+      expect.objectContaining({
+        unitsOk: 2,
+        unitsFailed: 1,
+        teeTimesPersisted: 3,
+        groupsWritten: 2,
+        durationMs: expect.any(Number),
+      })
+    );
+  });
+
+  it('emits persist-stage detail only at debug level', async () => {
+    const orchestrator = {
+      planUnitCount: vi.fn(() => 2),
+      scrapeAllBookable: vi.fn(async () =>
+        orchestrationResult([
+          scraped('greenbryre', '2026-07-08'),
+          scraped('holiday-park', '2026-07-08'),
+        ])
+      ),
+    };
+    const logger = spyLogger();
+    const pipeline = new IngestionPipeline(orchestrator, fakeRepository(), logger);
+
+    await pipeline.run(NOW);
+
+    expect(logger.debug).toHaveBeenCalledWith(
+      'Persisting tee time groups',
+      expect.objectContaining({ groupCount: 2 })
+    );
+    expect(logger.debug).toHaveBeenCalledWith(
+      'Wrote tee time group',
+      expect.objectContaining({ courseId: 'greenbryre', teeTimeCount: 1 })
+    );
+    expect(logger.debug).toHaveBeenCalledWith('Persist stage finished');
   });
 });

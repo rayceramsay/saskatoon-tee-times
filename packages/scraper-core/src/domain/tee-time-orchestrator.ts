@@ -1,5 +1,5 @@
 import type { BookingPlatformScraper } from './booking-platform-scraper.port.js';
-import type { CourseId } from './primitives.schema.js';
+import type { CourseId, PlatformId } from './primitives.schema.js';
 import type { ScrapedTeeTime } from './tee-time.schema.js';
 import type { Logger } from './logger.port.js';
 import { bookableDates } from './bookable-dates.util.js';
@@ -11,6 +11,33 @@ interface ScrapeUnit {
   scraper: BookingPlatformScraper;
   courseId: CourseId;
   date: string;
+}
+
+/**
+ * The outcome of one `(scraper, course, date)` work unit: which unit it was,
+ * whether it succeeded, and how many records it contributed (0 on failure).
+ */
+export interface ScrapeUnitOutcome {
+  platform: PlatformId;
+  courseId: CourseId;
+  date: string;
+  status: 'ok' | 'failed';
+  recordCount: number;
+}
+
+/**
+ * The result of a fan-out run: the flattened records from every successful unit
+ * plus the per-unit outcomes
+ */
+export interface ScaperOrchestrationResult {
+  teeTimes: ScrapedTeeTime[];
+  unitOutcomes: ScrapeUnitOutcome[];
+}
+
+/** One unit's run: the records it produced alongside its outcome. */
+interface ScrapeUnitResult {
+  teeTimes: ScrapedTeeTime[];
+  outcome: ScrapeUnitOutcome;
 }
 
 /**
@@ -35,19 +62,34 @@ export class TeeTimeOrchestrator {
    * Scrape every bookable `(course, date)` unit across all scrapers.
    *
    * @param now - The instant used to derive each course's bookable dates.
-   * @returns The concatenation of every successful unit's scraped tee times.
+   * @returns The flattened records from every successful unit plus each unit's
+   * outcome (success/failure and record count).
    *
    * @example
    * ```typescript
-   * const teeTimes = await orchestrator.scrapeAllBookable(new Date());
+   * const { teeTimes, unitOutcomes } = await orchestrator.scrapeAllBookable(new Date());
    * ```
    */
-  async scrapeAllBookable(now: Date): Promise<ScrapedTeeTime[]> {
+  async scrapeAllBookable(now: Date): Promise<ScaperOrchestrationResult> {
     const units = this.buildScrapeUnits(now);
     const unitResults = await Promise.all(
       units.map((unit) => this.runScrapeUnit(unit))
     );
-    return unitResults.flat();
+    return {
+      teeTimes: unitResults.flatMap((result) => result.teeTimes),
+      unitOutcomes: unitResults.map((result) => result.outcome),
+    };
+  }
+
+  /**
+   * Count the `(course, date)` work units a run would fan out to, without
+   * executing any of them.
+   *
+   * @param now - The instant used to derive each course's bookable dates.
+   * @returns How many units {@link scrapeAllBookable} would run for `now`.
+   */
+  planUnitCount(now: Date): number {
+    return this.buildScrapeUnits(now).length;
   }
 
   private buildScrapeUnits(now: Date): ScrapeUnit[] {
@@ -62,9 +104,29 @@ export class TeeTimeOrchestrator {
     return units;
   }
 
-  private async runScrapeUnit(unit: ScrapeUnit): Promise<ScrapedTeeTime[]> {
+  private async runScrapeUnit(unit: ScrapeUnit): Promise<ScrapeUnitResult> {
+    const startedAt = performance.now();
     try {
-      return await unit.scraper.scrape(unit.courseId, unit.date);
+      const teeTimes = await unit.scraper.scrape(unit.courseId, unit.date);
+
+      this.logger.debug('Scrape unit ok', {
+        platform: unit.scraper.platform,
+        courseId: unit.courseId,
+        date: unit.date,
+        recordCount: teeTimes.length,
+        durationMs: Math.round(performance.now() - startedAt),
+      });
+
+      return {
+        teeTimes,
+        outcome: {
+          platform: unit.scraper.platform,
+          courseId: unit.courseId,
+          date: unit.date,
+          status: 'ok',
+          recordCount: teeTimes.length,
+        },
+      };
     } catch (error) {
       this.logger.error('Scrape unit failed', {
         platform: unit.scraper.platform,
@@ -72,7 +134,17 @@ export class TeeTimeOrchestrator {
         date: unit.date,
         error,
       });
-      return [];
+
+      return {
+        teeTimes: [],
+        outcome: {
+          platform: unit.scraper.platform,
+          courseId: unit.courseId,
+          date: unit.date,
+          status: 'failed',
+          recordCount: 0,
+        },
+      };
     }
   }
 }

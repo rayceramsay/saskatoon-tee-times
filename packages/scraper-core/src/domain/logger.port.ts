@@ -7,6 +7,8 @@
  * observable rather than silently swallowed.
  */
 export interface Logger {
+  // Report opt-in developer-facing detail for debugging purposes.
+  debug(message: string, context?: Record<string, unknown>): void;
   // Report a confirmation that a routine operation was succesful and expected events are occuring.
   info(message: string, context?: Record<string, unknown>): void;
   // Report a non-fatal condition worth attention that did not stop the run.

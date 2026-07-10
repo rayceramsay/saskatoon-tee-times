@@ -22,7 +22,7 @@ import { type DynamoDBClient } from '@aws-sdk/client-dynamodb';
 async function main(): Promise<void> {
   const config = loadConfig();
 
-  const logger = new ConsoleLogger();
+  const logger = new ConsoleLogger(config.LOG_LEVEL);
 
   const { client, documentClient } = createDynamoDbClient(config.DYNAMODB_ENDPOINT);
   await ensureTeeTimeTable(client, config.DYNAMODB_TABLE_NAME);
@@ -46,7 +46,7 @@ async function main(): Promise<void> {
     documentClient,
     config.DYNAMODB_TABLE_NAME
   );
-  const pipeline = new IngestionPipeline(orchestrator, repository);
+  const pipeline = new IngestionPipeline(orchestrator, repository, logger);
 
   setupAndStartIngestionPipelineCronSchedule(config, pipeline, logger, fetcher, client);
 }

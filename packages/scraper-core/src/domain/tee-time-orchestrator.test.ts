@@ -50,7 +50,7 @@ class FakeScraper implements BookingPlatformScraper {
 }
 
 function silentLogger(): Logger {
-  return { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+  return { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 }
 
 function unitKey(teeTime: ScrapedTeeTime): string {
@@ -64,7 +64,7 @@ describe('TeeTimeOrchestrator', () => {
     );
     const orchestrator = new TeeTimeOrchestrator([scraper], silentLogger());
 
-    const teeTimes = await orchestrator.scrapeAllBookable(NOW);
+    const { teeTimes, unitOutcomes } = await orchestrator.scrapeAllBookable(NOW);
 
     expect(teeTimes.map(unitKey).sort()).toEqual([
       'a|2026-07-08',
@@ -72,6 +72,12 @@ describe('TeeTimeOrchestrator', () => {
       'b|2026-07-08',
       'b|2026-07-09',
     ]);
+    expect(unitOutcomes).toHaveLength(4);
+    expect(unitOutcomes.every((outcome) => outcome.status === 'ok')).toBe(true);
+    expect(
+      unitOutcomes.map((outcome) => `${outcome.courseId}|${outcome.date}`).sort()
+    ).toEqual(['a|2026-07-08', 'a|2026-07-09', 'b|2026-07-08', 'b|2026-07-09']);
+    expect(unitOutcomes.every((outcome) => outcome.recordCount === 1)).toBe(true);
   });
 
   it('keeps the run alive when one unit fails and surfaces that failure', async () => {
@@ -84,13 +90,18 @@ describe('TeeTimeOrchestrator', () => {
     const logger = silentLogger();
     const orchestrator = new TeeTimeOrchestrator([scraper], logger);
 
-    const teeTimes = await orchestrator.scrapeAllBookable(NOW);
+    const { teeTimes, unitOutcomes } = await orchestrator.scrapeAllBookable(NOW);
 
     expect(teeTimes.map(unitKey).sort()).toEqual([
       'a|2026-07-08',
       'b|2026-07-08',
       'b|2026-07-09',
     ]);
+    const failed = unitOutcomes.filter((outcome) => outcome.status === 'failed');
+    expect(failed).toEqual([
+      expect.objectContaining({ courseId: 'a', date: '2026-07-09', recordCount: 0 }),
+    ]);
+    expect(unitOutcomes.filter((outcome) => outcome.status === 'ok')).toHaveLength(3);
     expect(logger.error).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith(
       expect.any(String),
