@@ -3,6 +3,7 @@ services:
   dynamodb-local:
     image: amazon/dynamodb-local:latest
     container_name: stt-dynamodb-local
+    user: root
     working_dir: /home/dynamodblocal
     command: ['-jar', 'DynamoDBLocal.jar', '-sharedDb', '-dbPath', './data']
     ports:
