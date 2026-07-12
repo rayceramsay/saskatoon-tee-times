@@ -25,8 +25,8 @@
 
 ## 5. Static pricing resolution
 
-- [ ] 5.1 Implement `resolveStatic(scraped, rules)` in `domain/pricing-engine.ts` as first-match rule evaluation: `holes` equality plus optional `daysOfWeek` / `after`/`before` (`[after, before)`) / `dates`, deriving local date, `HH:mm`, and day-of-week from `startInstant`
-- [ ] 5.2 Add pricing-engine tests: first-match precedence, hole-count + weekday/weekend narrowing, no-match → `null`, and local day/time derived from the start instant's offset (not UTC)
+- [x] 5.1 Implement `resolveStatic(scraped, rules)` in `domain/pricing-engine.ts` as first-match rule evaluation: `holes` equality plus optional `daysOfWeek` / `after`/`before` (`[after, before)`) / `dates`, deriving local date, `HH:mm`, and day-of-week from `startInstant`
+- [x] 5.2 Add pricing-engine tests: first-match precedence, hole-count + weekday/weekend narrowing, no-match → `null`, and local day/time derived from the start instant's offset (not UTC)
 
 ## 6. WebTrac platform
 

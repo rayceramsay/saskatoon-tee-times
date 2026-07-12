@@ -74,11 +74,8 @@ export function applyTax(
 }
 
 /**
- * Resolve a statically configured price for a slot.
+ * Resolve a statically configured after-tax price for a slot by first-match rule evaluation.
  *
- * A deferred stub that always returns `null` for now: no static-only course
- * exists yet to exercise rule evaluation. The parameters are threaded so the
- * real matcher slots in later without a signature change.
  *
  * @param scraped - The scraped tee time to price.
  * @param rules - The course's ordered static pricing rules.
@@ -88,9 +85,30 @@ export function resolveStatic(
   scraped: ScrapedTeeTime,
   rules: readonly PricingRule[]
 ): number | null {
-  void scraped;
-  void rules;
-  return null;
+  const localDate = scraped.startInstant.slice(0, 10);
+  const localTime = scraped.startInstant.slice(11, 16);
+  const localDayOfWeek = new Date(`${localDate}T00:00:00Z`).getUTCDay();
+
+  const match = rules.find((rule) => {
+    if (rule.holes !== scraped.holes) {
+      return false;
+    }
+    if (rule.daysOfWeek && !rule.daysOfWeek.includes(localDayOfWeek)) {
+      return false;
+    }
+    if (rule.after && localTime < rule.after) {
+      return false;
+    }
+    if (rule.before && localTime >= rule.before) {
+      return false;
+    }
+    if (rule.dates && !rule.dates.includes(localDate)) {
+      return false;
+    }
+    return true;
+  });
+
+  return match?.price ?? null;
 }
 
 /**

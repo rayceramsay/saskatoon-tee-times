@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { greenbryrePricingConfig } from '../platforms/chronogolf-v1/courses/greenbryre.js';
-import { applyTax, PricingEngine, type CoursePricingConfig } from './pricing-engine.js';
+import {
+  applyTax,
+  PricingEngine,
+  resolveStatic,
+  type CoursePricingConfig,
+} from './pricing-engine.js';
 import type { ScrapedTeeTime } from './tee-time.schema.js';
 
 const scraped: ScrapedTeeTime = {
@@ -100,11 +105,16 @@ describe('PricingEngine', () => {
     expect(() => engine.enrich(scraped)).toThrow(/greenbryre/);
   });
 
-  it('resolves a null dynamic price to null through the static stub', () => {
-    const engine = engineFor({
-      tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
-      rules: [],
-    });
+  it('resolves a null dynamic price to a matching static rule', () => {
+    const engine = engineFor({ rules: [{ holes: 12, price: 40 }] });
+
+    const teeTime = engine.enrich({ ...scraped, dynamicPrice: null });
+
+    expect(teeTime.pricePerPlayer).toBe(40);
+  });
+
+  it('resolves a null dynamic price to null when no static rule matches', () => {
+    const engine = engineFor({ rules: [] });
 
     const teeTime = engine.enrich({ ...scraped, dynamicPrice: null });
 
@@ -127,5 +137,71 @@ describe('PricingEngine with the real Greenbryre config', () => {
     const teeTime = engine.enrich({ ...scraped, dynamicPrice: 52.7 });
 
     expect(teeTime.pricePerPlayer).toBe(58.5);
+  });
+});
+
+describe('resolveStatic', () => {
+  // 2026-07-08 is a Wednesday (day 3), 2026-07-11 a Saturday (day 6).
+  const wednesday: ScrapedTeeTime = {
+    ...scraped,
+    holes: 18,
+    startInstant: '2026-07-08T08:00:00-06:00',
+    dynamicPrice: null,
+  };
+  const saturday: ScrapedTeeTime = {
+    ...wednesday,
+    startInstant: '2026-07-11T08:00:00-06:00',
+  };
+
+  it('returns the price of the first matching rule', () => {
+    const price = resolveStatic(wednesday, [
+      { holes: 18, price: 42 },
+      { holes: 18, price: 99 },
+    ]);
+
+    expect(price).toBe(42);
+  });
+
+  it('narrows by hole count and weekday/weekend day of week', () => {
+    const rules = [
+      { holes: 18, daysOfWeek: [1, 2, 3, 4], price: 42 },
+      { holes: 18, daysOfWeek: [5, 6, 0], price: 45 },
+    ];
+
+    expect(resolveStatic(wednesday, rules)).toBe(42);
+    expect(resolveStatic(saturday, rules)).toBe(45);
+  });
+
+  it('returns null when no rule matches the hole count', () => {
+    const price = resolveStatic(wednesday, [{ holes: 9, price: 25 }]);
+
+    expect(price).toBeNull();
+  });
+
+  it('applies the after/before window on the [after, before) boundaries', () => {
+    const rules = [{ holes: 18, after: '08:00', before: '12:00', price: 30 }];
+
+    expect(resolveStatic(wednesday, rules)).toBe(30);
+    expect(
+      resolveStatic({ ...wednesday, startInstant: '2026-07-08T12:00:00-06:00' }, rules)
+    ).toBeNull();
+    expect(
+      resolveStatic({ ...wednesday, startInstant: '2026-07-08T07:59:00-06:00' }, rules)
+    ).toBeNull();
+  });
+
+  it('derives local day and time from the start instant offset, not UTC', () => {
+    // Local Saturday 23:30 in America/Regina is Sunday 05:30 UTC; matching on the
+    // UTC instant would read the wrong day (0) and time (05:30).
+    const lateSaturday: ScrapedTeeTime = {
+      ...saturday,
+      startInstant: '2026-07-11T23:30:00-06:00',
+    };
+
+    const price = resolveStatic(lateSaturday, [
+      { holes: 18, daysOfWeek: [6], after: '20:00', price: 45 },
+    ]);
+
+    expect(price).toBe(45);
   });
 });
