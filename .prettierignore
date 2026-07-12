@@ -73,3 +73,6 @@ public/
 # AI generated
 .claude/
 openspec/
+
+# Test Fixtures
+__fixtures__

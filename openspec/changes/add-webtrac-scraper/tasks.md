@@ -1,6 +1,6 @@
 ## 1. Fixtures
 
-- [ ] 1.1 Pull real WebTrac search-results HTML for each course/hole-count (holiday-park-championship 18 & 9, holiday-park-executive-9 9, silverwood 18 & 9, wildwood 18 & 9), including at least one same-day page exhibiting the "Individual Allowance Rules" phone-only state, and commit them under `packages/scraper-core/src/platforms/webtrac/__fixtures__/` with a short `README.md` documenting how they were captured (URL params, date)
+- [x] 1.1 Pull real WebTrac search-results HTML for each course/hole-count (holiday-park-championship 18 & 9, holiday-park-executive-9 9, silverwood 18 & 9, wildwood 18 & 9), including at least one same-day page exhibiting the "Individual Allowance Rules" phone-only state, and commit them under `packages/scraper-core/src/platforms/webtrac/__fixtures__/` with a short `README.md` documenting how they were captured (URL params, date)
 
 ## 2. Transport rename (globalMaxConcurrent)
 
