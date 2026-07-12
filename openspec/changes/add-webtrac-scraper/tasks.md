@@ -49,12 +49,12 @@
 
 ## 8. Wiring
 
-- [ ] 8.1 In `apps/scraper-local/src/main.ts`, construct `HttpTextFetcher` → its own `HostLimitedTextFetcher` backed by a dedicated `BottleneckRequestLimiter` instance
-- [ ] 8.2 Construct `WebtracScraper` with the four course configs + text fetcher and add it to the orchestrator's scraper array
-- [ ] 8.3 Add the four WebTrac pricing configs to the `PricingEngine` course-config map
+- [x] 8.1 In `apps/scraper-local/src/main.ts`, construct `HttpTextFetcher` → its own `HostLimitedTextFetcher` backed by a dedicated `BottleneckRequestLimiter` instance
+- [x] 8.2 Construct `WebtracScraper` with the four course configs + text fetcher and add it to the orchestrator's scraper array
+- [x] 8.3 Add the four WebTrac pricing configs to the `PricingEngine` course-config map
 
 ## 9. Verify
 
-- [ ] 9.1 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix all errors
-- [ ] 9.2 Run the full test suite green
-- [ ] 9.3 Run `apps/scraper-local` against local DynamoDB and confirm WebTrac records land for a future date (online-bookable, priced) and a same-day date (phone-only, `onlineBookable: false`, no booking URLs)
+- [x] 9.1 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix all errors
+- [x] 9.2 Run the full test suite green
+- [x] 9.3 Run `apps/scraper-local` against local DynamoDB and confirm WebTrac records land for a future date (online-bookable, priced) and a same-day date (phone-only, `onlineBookable: false`, no booking URLs)
