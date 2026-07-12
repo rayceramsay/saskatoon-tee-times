@@ -11,11 +11,11 @@
 
 ## 3. Text transport stack
 
-- [ ] 3.1 Add `transport/text-fetcher.port.ts` defining `TextFetcher { fetchText(url): Promise<string> }`
-- [ ] 3.2 Add `transport/http-text-fetcher.adapter.ts` (`HttpTextFetcher`) using plain `fetch`, returning the body as text on OK and throwing `TransportError` (with parsed `Retry-After`) on non-OK
-- [ ] 3.3 Add `transport/host-limited-text-fetcher.adapter.ts` (`HostLimitedTextFetcher`) mirroring `HostLimitedJsonFetcher`, scheduling by URL host through the injected `RequestLimiter`
-- [ ] 3.4 Add unit tests for `HttpTextFetcher` (OK → text, non-OK → `TransportError` with status/retry-after) and `HostLimitedTextFetcher` (schedules under URL host, substitutable)
-- [ ] 3.5 Add the three transport files to the `@stt/scraper-core` `package.json` `exports` map
+- [x] 3.1 Add `transport/text-fetcher.port.ts` defining `TextFetcher { fetchText(url): Promise<string> }`
+- [x] 3.2 Add `transport/http-text-fetcher.adapter.ts` (`HttpTextFetcher`) using plain `fetch`, returning the body as text on OK and throwing `TransportError` (with parsed `Retry-After`) on non-OK
+- [x] 3.3 Add `transport/host-limited-text-fetcher.adapter.ts` (`HostLimitedTextFetcher`) mirroring `HostLimitedJsonFetcher`, scheduling by URL host through the injected `RequestLimiter`
+- [x] 3.4 Add unit tests for `HttpTextFetcher` (OK → text, non-OK → `TransportError` with status/retry-after) and `HostLimitedTextFetcher` (schedules under URL host, substitutable)
+- [x] 3.5 Add the three transport files to the `@stt/scraper-core` `package.json` `exports` map
 
 ## 4. Bookability schema field
 

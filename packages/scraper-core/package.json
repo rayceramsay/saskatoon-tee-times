@@ -14,6 +14,9 @@
     "./platforms/chronogolf-v1/courses/greenbryre": "./src/platforms/chronogolf-v1/courses/greenbryre.ts",
     "./transport/playwright-json-fetcher": "./src/transport/playwright-json-fetcher.adapter.ts",
     "./transport/host-limited-json-fetcher": "./src/transport/host-limited-json-fetcher.adapter.ts",
+    "./transport/http-text-fetcher": "./src/transport/http-text-fetcher.adapter.ts",
+    "./transport/host-limited-text-fetcher": "./src/transport/host-limited-text-fetcher.adapter.ts",
+    "./transport/text-fetcher": "./src/transport/text-fetcher.port.ts",
     "./transport/bottleneck-request-limiter": "./src/transport/bottleneck-request-limiter.adapter.ts"
   },
   "scripts": {
