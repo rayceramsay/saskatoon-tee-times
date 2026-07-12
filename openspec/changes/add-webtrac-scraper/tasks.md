@@ -41,11 +41,11 @@
 
 ## 7. Course + pricing configs
 
-- [ ] 7.1 Add `platforms/webtrac/courses/holiday-park-championship.ts` (config: secondaryCode 1, holes [18,9]; pricing rules 18 wk62/wknd70, 9 wk38/wknd42)
-- [ ] 7.2 Add `platforms/webtrac/courses/holiday-park-executive-9.ts` (secondaryCode 2, holes [9]; pricing 9 wk31/wknd35)
-- [ ] 7.3 Add `platforms/webtrac/courses/silverwood.ts` (secondaryCode 3, holes [18,9]; pricing 18 wk42/wknd45, 9 wk25/wknd27)
-- [ ] 7.4 Add `platforms/webtrac/courses/wildwood.ts` (secondaryCode 4, holes [18,9]; pricing 18 wk47/wknd50, 9 wk28/wknd30)
-- [ ] 7.5 Each course exports a course config + a `CoursePricingConfig` (weekday `[1,2,3,4]` / weekend `[5,6,0]` rules, after-tax, no `tax`), sets `America/Regina`, `maxAdvanceDays: 7`, `releaseTime: '06:00'`, and a WebTrac `bookingPortalUrl`; add a comment flagging annual green-fee re-verification; add course exports to `package.json`
+- [x] 7.1 Add `platforms/webtrac/courses/holiday-park-championship.ts` (config: secondaryCode 1, holes [18,9]; pricing rules 18 wk62/wknd70, 9 wk38/wknd42)
+- [x] 7.2 Add `platforms/webtrac/courses/holiday-park-executive-9.ts` (secondaryCode 2, holes [9]; pricing 9 wk31/wknd35)
+- [x] 7.3 Add `platforms/webtrac/courses/silverwood.ts` (secondaryCode 3, holes [18,9]; pricing 18 wk42/wknd45, 9 wk25/wknd27)
+- [x] 7.4 Add `platforms/webtrac/courses/wildwood.ts` (secondaryCode 4, holes [18,9]; pricing 18 wk47/wknd50, 9 wk28/wknd30)
+- [x] 7.5 Each course exports a course config + a `CoursePricingConfig` (weekday `[1,2,3,4]` / weekend `[5,6,0]` rules, after-tax, no `tax`), sets `America/Regina`, `maxAdvanceDays: 7`, `releaseTime: '06:00'`, and a WebTrac `bookingPortalUrl`; add a comment flagging annual green-fee re-verification; add course exports to `package.json`
 
 ## 8. Wiring
 
