@@ -4,10 +4,10 @@
 
 ## 2. Transport rename (globalMaxConcurrent)
 
-- [ ] 2.1 Rename `browserPageCeiling` → `globalMaxConcurrent` in `transport/request-limiter-config.schema.ts` (field + doc comment)
-- [ ] 2.2 Update `transport/bottleneck-request-limiter.adapter.ts` references and the "Axis B — global browser-page ceiling" comment to be transport-neutral
-- [ ] 2.3 Update `apps/scraper-local` config + `main.ts` (env var `SCRAPER_MAX_BROWSER_PAGES` → transport-neutral name, and its usage)
-- [ ] 2.4 Update the limiter tests to the new field name and run them green
+- [x] 2.1 Rename `browserPageCeiling` → `globalMaxConcurrent` in `transport/request-limiter-config.schema.ts` (field + doc comment)
+- [x] 2.2 Update `transport/bottleneck-request-limiter.adapter.ts` references and the "Axis B — global browser-page ceiling" comment to be transport-neutral
+- [x] 2.3 Update `apps/scraper-local` config + `main.ts` (env var `SCRAPER_MAX_BROWSER_PAGES` → transport-neutral name, and its usage)
+- [x] 2.4 Update the limiter tests to the new field name and run them green
 
 ## 3. Text transport stack
 

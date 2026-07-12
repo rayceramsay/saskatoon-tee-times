@@ -23,8 +23,9 @@ export const RequestLimiterConfig = z.object({
         .default({}),
     })
     .prefault({}),
-  // Global ceiling on concurrent browser pages across all hosts,
-  browserPageCeiling: z.number().int().positive(),
+  // Global ceiling on concurrent jobs across all hosts, representing this
+  // instance's compute/politeness budget independent of transport.
+  globalMaxConcurrent: z.number().int().positive(),
   // Retry/backoff thresholds.
   retry: z.object({
     // Maximum attempts for a retryable (429/503) job before giving up.

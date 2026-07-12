@@ -37,7 +37,7 @@ async function main(): Promise<void> {
       default: { maxConcurrent: config.SCRAPER_PER_HOST_MAX_CONCURRENT },
       overrides: {},
     },
-    browserPageCeiling: config.SCRAPER_MAX_BROWSER_PAGES,
+    globalMaxConcurrent: config.SCRAPER_GLOBAL_MAX_CONCURRENT,
     retry: {
       maxAttempts: config.SCRAPER_MAX_RETRY_ATTEMPTS,
       maxRetryAfterSeconds: config.SCRAPER_MAX_RETRY_AFTER_SECONDS,

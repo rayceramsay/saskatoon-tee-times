@@ -11,9 +11,9 @@ import { computeRetryWaitMs, isRetryable } from './retry-policy.js';
  *
  * - **Per host** (server politeness): a `Bottleneck.Group` keyed by hostname, so
  *   each host gets its own child limiter capped at its `maxConcurrent`.
- * - **Global page ceiling** (machine compute): a single parent limiter every
- *   child is chained under, so a job starts only when both a host slot and a
- *   global slot are free — with no head-of-line blocking on a busy host.
+ * - **Global concurrency ceiling** (machine compute): a single parent limiter
+ *   every child is chained under, so a job starts only when both a host slot and
+ *   a global slot are free — with no head-of-line blocking on a busy host.
  *
  * On a retryable failure (429/503) within threshold it retries the failing job
  * and circuit-pauses only the offending host for the backoff window; other hosts
@@ -28,10 +28,10 @@ export class BottleneckRequestLimiter implements RequestLimiter {
   >();
 
   constructor(private readonly config: RequestLimiterConfig) {
-    // Axis B — the global browser-page ceiling shared across every host.
-    this.parent = new Bottleneck({ maxConcurrent: config.browserPageCeiling });
+    // The global concurrency ceiling shared across every host.
+    this.parent = new Bottleneck({ maxConcurrent: config.globalMaxConcurrent });
 
-    // Axis A — one child limiter per hostname, seeded with the default cap.
+    // One child limiter per hostname, seeded with the default cap.
     this.group = new Bottleneck.Group({
       maxConcurrent: config.perHost.default.maxConcurrent,
     });
@@ -46,7 +46,7 @@ export class BottleneckRequestLimiter implements RequestLimiter {
   }
 
   private configureChild(limiter: Bottleneck, host: string): void {
-    // Axis B: a job runs only when the global ceiling also has a free slot.
+    // A job runs only when the global ceiling also has a free slot.
     limiter.chain(this.parent);
 
     // A host inherits the default cap unless it carries an explicit override.

@@ -7,7 +7,7 @@ const url = 'https://host/path';
 
 function makeConfig(opts: {
   maxConcurrent?: number;
-  browserPageCeiling?: number;
+  globalMaxConcurrent?: number;
   maxAttempts?: number;
   maxRetryAfterSeconds?: number;
   overrides?: Record<string, { maxConcurrent: number }>;
@@ -17,7 +17,7 @@ function makeConfig(opts: {
       default: { maxConcurrent: opts.maxConcurrent ?? 3 },
       overrides: opts.overrides ?? {},
     },
-    browserPageCeiling: opts.browserPageCeiling ?? 100,
+    globalMaxConcurrent: opts.globalMaxConcurrent ?? 100,
     retry: {
       maxAttempts: opts.maxAttempts ?? 3,
       maxRetryAfterSeconds: opts.maxRetryAfterSeconds ?? 30,
@@ -98,10 +98,10 @@ describe('BottleneckRequestLimiter', () => {
     });
   });
 
-  describe('global browser-page ceiling', () => {
+  describe('global concurrency ceiling', () => {
     it('never runs more jobs at once than the ceiling', async () => {
       const limiter = new BottleneckRequestLimiter(
-        makeConfig({ maxConcurrent: 3, browserPageCeiling: 4 })
+        makeConfig({ maxConcurrent: 3, globalMaxConcurrent: 4 })
       );
       const tracker = createTracker();
 
@@ -126,7 +126,7 @@ describe('BottleneckRequestLimiter', () => {
 
     it('does not starve a free host behind a busy host (no head-of-line blocking)', async () => {
       const limiter = new BottleneckRequestLimiter(
-        makeConfig({ maxConcurrent: 3, browserPageCeiling: 4 })
+        makeConfig({ maxConcurrent: 3, globalMaxConcurrent: 4 })
       );
       const tracker = createTracker();
 
