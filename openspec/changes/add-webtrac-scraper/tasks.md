@@ -30,14 +30,14 @@
 
 ## 6. WebTrac platform
 
-- [ ] 6.1 Add `platforms/webtrac/webtrac-course-config.ts` (`WebtracCourseConfig extends CourseConfig` with `secondaryCode: number` and `holes: number[]`)
-- [ ] 6.2 Add `platforms/webtrac/webtrac-scraper.adapter.ts` (`WebtracScraper implements BookingPlatformScraper`, private configs, injected `TextFetcher`): build the search URL, fan out over hole counts, fetch, parse, concatenate; emit `dynamicPrice: null`
-- [ ] 6.3 Implement HTML parsing (cheerio): rows from `table#grwebsearch_output_table tbody tr`; cells by `data-title`; `Date` `MM/DD/YYYY`→`YYYY-MM-DD`; trim `Time`; `Holes` → count + start set; map to the requested course config (ignore page course label)
-- [ ] 6.4 Implement row classification: success → `onlineBookable: true`; error + "Individual Allowance Rules" tooltip + `openSlots > 0` → `onlineBookable: false`, empty `bookingUrls`; else drop
-- [ ] 6.5 Implement routing (`9→[startSet]`, `18 (Front)→["Front","Back"]`, `18 (Back)→["Back","Front"]`, none→`[]`), `groupSizes = [1..min(openSlots,4)]`, and `startInstant` via the shared local-start-instant util
-- [ ] 6.6 Implement per-group-size booking URLs from the absolute add-to-cart href by setting `GlobalSalesArea_GRNumSlots=<size>`
-- [ ] 6.7 Add scraper/parser tests driven by the committed fixtures, asserting online-bookable rows, phone-only rows (kept, no URLs), dropped rows, routing, group sizes, and per-size URLs
-- [ ] 6.8 Add the WebTrac scraper adapter to the `@stt/scraper-core` `package.json` `exports` map
+- [x] 6.1 Add `platforms/webtrac/webtrac-course-config.ts` (`WebtracCourseConfig extends CourseConfig` with `secondaryCode: number` and `holes: number[]`)
+- [x] 6.2 Add `platforms/webtrac/webtrac-scraper.adapter.ts` (`WebtracScraper implements BookingPlatformScraper`, private configs, injected `TextFetcher`): build the search URL, fan out over hole counts, fetch, parse, concatenate; emit `dynamicPrice: null`
+- [x] 6.3 Implement HTML parsing (cheerio): rows from `table#grwebsearch_output_table tbody tr`; cells by `data-title`; `Date` `MM/DD/YYYY`→`YYYY-MM-DD`; trim `Time`; `Holes` → count + start set; map to the requested course config (ignore page course label)
+- [x] 6.4 Implement row classification: success → `onlineBookable: true`; error + "Individual Allowance Rules" tooltip + `openSlots > 0` → `onlineBookable: false`, empty `bookingUrls`; else drop
+- [x] 6.5 Implement routing (`9→[startSet]`, `18 (Front)→["Front","Back"]`, `18 (Back)→["Back","Front"]`, none→`[]`), `groupSizes = [1..min(openSlots,4)]`, and `startInstant` via the shared local-start-instant util
+- [x] 6.6 Implement per-group-size booking URLs from the absolute add-to-cart href by setting `GlobalSalesArea_GRNumSlots=<size>`
+- [x] 6.7 Add scraper/parser tests driven by the committed fixtures, asserting online-bookable rows, phone-only rows (kept, no URLs), dropped rows, routing, group sizes, and per-size URLs
+- [x] 6.8 Add the WebTrac scraper adapter to the `@stt/scraper-core` `package.json` `exports` map
 
 ## 7. Course + pricing configs
 
