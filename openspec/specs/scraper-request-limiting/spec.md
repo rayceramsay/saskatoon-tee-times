@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Bounding and pacing the scraper's outbound requests so a full scrape stays within each host's tolerance and the machine's browser-page compute budget. This capability establishes a request limiter port (backed by `bottleneck`), per-host concurrency caps, a global browser-page ceiling, structured transport errors carrying backoff signals, `Retry-After`-aware retry and per-host circuit pausing, a host-limited `JsonFetcher` decorator, and explicit limiter configuration.
+Bounding and pacing the scraper's outbound requests so a full scrape stays within each host's tolerance and each limiter instance's compute/politeness budget. This capability establishes a request limiter port (backed by `bottleneck`), per-host concurrency caps, a transport-neutral global concurrency ceiling, structured transport errors carrying backoff signals, `Retry-After`-aware retry and per-host circuit pausing, host-limited `JsonFetcher` and `TextFetcher` decorators, a plain-HTTP text transport, and explicit limiter configuration.
 
 ## Requirements
 
@@ -37,9 +37,9 @@ The limiter SHALL bound the number of concurrently running jobs per hostname to 
 - **WHEN** jobs are scheduled for two different hosts, each up to its cap
 - **THEN** both hosts run their jobs concurrently without one host's load reducing the other's available slots
 
-### Requirement: Global browser-page ceiling
+### Requirement: Global concurrency ceiling
 
-The browser transport's limiter SHALL enforce a single global ceiling on the number of jobs running concurrently across all hosts, representing the machine's browser-page compute limit. A job SHALL start only when both a slot for its host and a global slot are free, and holding a global slot SHALL NOT block on a busy host (no head-of-line blocking). The ceiling SHALL be sourced from explicit configuration, not a hard-coded constant.
+A limiter instance SHALL enforce a single global ceiling on the number of jobs running concurrently across all hosts, representing that instance's compute/politeness budget independent of transport. A job SHALL start only when both a slot for its host and a global slot are free, and holding a global slot SHALL NOT block on a busy host (no head-of-line blocking). The ceiling SHALL be sourced from explicit configuration (`globalMaxConcurrent`), not a hard-coded constant, and SHALL be transport-neutral — it applies equally to a browser transport and a plain-HTTP text transport.
 
 #### Scenario: Total concurrency never exceeds the ceiling
 
@@ -112,22 +112,22 @@ On a retryable failure within the threshold, in addition to retrying the failing
 
 ### Requirement: Host-limited fetcher decorator
 
-The system SHALL provide a `JsonFetcher` decorator that derives the hostname from the request URL and runs the delegated fetch through the limiter's `schedule` operation. The decorator SHALL implement the same `JsonFetcher` port as the transport it wraps, so it is substitutable wherever a `JsonFetcher` is expected and keeps limiting independent of transport mechanics.
+The system SHALL provide a host-limited decorator for each fetcher port — the `JsonFetcher` and the `TextFetcher` — that derives the hostname from the request URL and runs the delegated fetch through the limiter's `schedule` operation. Each decorator SHALL implement the same fetcher port it wraps, so it is substitutable wherever that port is expected and keeps limiting independent of transport mechanics.
 
 #### Scenario: Fetch is scheduled under the URL's host
 
-- **WHEN** the decorator's `fetchJson(url)` is called
+- **WHEN** a host-limited decorator's fetch (`fetchJson(url)` or `fetchText(url)`) is called
 - **THEN** it schedules the inner fetch under the hostname parsed from `url`
 - **AND** returns the inner fetcher's result unchanged on success
 
 #### Scenario: Decorator is substitutable for the wrapped fetcher
 
-- **WHEN** the decorator is used in place of a plain `JsonFetcher`
-- **THEN** scrapers call it through the unchanged `fetchJson(url)` contract with no scraper changes
+- **WHEN** a host-limited decorator is used in place of its plain fetcher
+- **THEN** scrapers call it through the unchanged fetcher-port contract with no scraper changes
 
 ### Requirement: Explicit limiter configuration
 
-Limiter behavior SHALL be driven by explicit configuration: a per-host default cap plus optional per-host overrides keyed by hostname, a global browser-page ceiling from an environment variable, and retry thresholds (maximum attempts and `maxRetryAfterSeconds`). Configuration SHALL be keyed by hostname and a single default — never per course or per platform. The browser-page ceiling SHALL fail loud when unset rather than defaulting silently. Hosts without an override SHALL inherit the default cap.
+Limiter behavior SHALL be driven by explicit configuration: a per-host default cap plus optional per-host overrides keyed by hostname, a global concurrency ceiling (`globalMaxConcurrent`) from an environment variable, and retry thresholds (maximum attempts and `maxRetryAfterSeconds`). Configuration SHALL be keyed by hostname and a single default — never per course or per platform. The global concurrency ceiling SHALL fail loud when unset rather than defaulting silently. Hosts without an override SHALL inherit the default cap.
 
 #### Scenario: Host without override inherits the default
 
@@ -139,7 +139,26 @@ Limiter behavior SHALL be driven by explicit configuration: a per-host default c
 - **WHEN** a job runs for a host listed in the overrides
 - **THEN** that host's overridden cap applies instead of the default
 
-#### Scenario: Missing page ceiling fails loud
+#### Scenario: Missing concurrency ceiling fails loud
 
-- **WHEN** the browser-page ceiling environment variable is not set
+- **WHEN** the global concurrency ceiling environment variable is not set
 - **THEN** configuration loading fails with an error rather than proceeding with an implicit default
+
+### Requirement: Plain-HTTP text transport
+
+The system SHALL provide a `TextFetcher` port whose `fetchText(url)` returns the response body as a string, and a plain-HTTP `HttpTextFetcher` adapter implementing it with `fetch` (no browser). On a non-OK HTTP response the adapter SHALL throw the shared structured `TransportError` carrying the HTTP `status` and, when present, the parsed `Retry-After` seconds, so the same limiter retry/backoff machinery applies uniformly across transports. The adapter SHALL return the decoded body on success without parsing it as JSON.
+
+#### Scenario: Successful fetch returns the body as text
+
+- **WHEN** `fetchText(url)` receives an OK response
+- **THEN** it resolves with the response body as a string, unparsed
+
+#### Scenario: Non-OK response yields a structured transport error
+
+- **WHEN** `fetchText(url)` receives a non-OK response with a `Retry-After` header
+- **THEN** it throws a `TransportError` exposing the numeric `status` and the parsed `retryAfterSeconds`
+
+#### Scenario: Text transport is limitable by the same limiter
+
+- **WHEN** an `HttpTextFetcher` is wrapped by the host-limited text decorator and scheduled through a limiter
+- **THEN** its requests are throttled per host under that limiter with no transport-specific limiter code
