@@ -19,9 +19,9 @@
 
 ## 4. Bookability schema field
 
-- [ ] 4.1 Add `onlineBookable: boolean` to `BaseTeeTime` in `domain/tee-time.schema.ts` so it lives on both `ScrapedTeeTime` and `TeeTime`
-- [ ] 4.2 Update `tee-time.schema` tests and any existing fixtures/builders; ensure chronogolf-v1 scraped records set `onlineBookable: true`
-- [ ] 4.3 Confirm `PricingEngine.enrich` passes `onlineBookable` through unchanged (it is in `shared`); add a pass-through test
+- [x] 4.1 Add `onlineBookable: boolean` to `BaseTeeTime` in `domain/tee-time.schema.ts` so it lives on both `ScrapedTeeTime` and `TeeTime`
+- [x] 4.2 Update `tee-time.schema` tests and any existing fixtures/builders; ensure chronogolf-v1 scraped records set `onlineBookable: true`
+- [x] 4.3 Confirm `PricingEngine.enrich` passes `onlineBookable` through unchanged (it is in `shared`); add a pass-through test
 
 ## 5. Static pricing resolution
 

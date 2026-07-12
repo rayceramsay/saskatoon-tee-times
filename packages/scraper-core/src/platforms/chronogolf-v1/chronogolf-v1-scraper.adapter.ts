@@ -298,6 +298,7 @@ function mergeListing(
       routing: listing.routing,
       groupSizes,
       bookingUrls,
+      onlineBookable: true,
       scrapedAt,
       dynamicPrice: slot.dynamicPrice,
     };

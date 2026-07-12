@@ -11,6 +11,7 @@ const scraped: ScrapedTeeTime = {
   routing: [],
   groupSizes: [2, 3, 4],
   bookingUrls: { 2: 'https://example.com' },
+  onlineBookable: true,
   scrapedAt: '2026-07-10T18:00:00Z',
   dynamicPrice: 52.7,
 };
@@ -74,9 +75,23 @@ describe('PricingEngine', () => {
       routing: scraped.routing,
       groupSizes: scraped.groupSizes,
       bookingUrls: scraped.bookingUrls,
+      onlineBookable: scraped.onlineBookable,
       scrapedAt: scraped.scrapedAt,
       pricePerPlayer: 58.5,
     });
+  });
+
+  it('passes onlineBookable through unchanged', () => {
+    const engine = engineFor({
+      tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
+      rules: [],
+    });
+
+    const bookable = engine.enrich({ ...scraped, onlineBookable: true });
+    const phoneOnly = engine.enrich({ ...scraped, onlineBookable: false });
+
+    expect(bookable.onlineBookable).toBe(true);
+    expect(phoneOnly.onlineBookable).toBe(false);
   });
 
   it('throws naming the course when a dynamic price has no tax rule', () => {

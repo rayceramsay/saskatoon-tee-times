@@ -31,6 +31,7 @@ function teeTime(overrides: Partial<TeeTime> = {}): TeeTime {
     routing: [],
     groupSizes: [2, 3, 4],
     bookingUrls: { 2: 'https://example.com' },
+    onlineBookable: true,
     scrapedAt: '2026-07-07T18:00:00Z',
     pricePerPlayer: 42.5,
     ...overrides,

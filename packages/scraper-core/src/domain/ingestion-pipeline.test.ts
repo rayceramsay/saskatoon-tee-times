@@ -30,6 +30,7 @@ function scraped(courseId: string, date: string, time = '06:00'): ScrapedTeeTime
     routing: [],
     groupSizes: [1],
     bookingUrls: { 1: 'https://example.com' },
+    onlineBookable: true,
     scrapedAt: '2026-07-07T18:00:00Z',
     dynamicPrice: 42.5,
   };

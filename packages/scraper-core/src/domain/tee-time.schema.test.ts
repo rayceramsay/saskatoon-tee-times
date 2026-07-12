@@ -14,6 +14,7 @@ describe('ScrapedTeeTime schema', () => {
       3: 'https://www.chronogolf.ca/club/greenbryre',
       4: 'https://www.chronogolf.ca/club/greenbryre',
     },
+    onlineBookable: true,
     scrapedAt: '2026-07-07T18:00:00Z',
     dynamicPrice: 42.5,
   };

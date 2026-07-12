@@ -23,6 +23,8 @@ export const BaseTeeTime = z.object({
   groupSizes: z.array(GroupSize),
   // Best booking URL per valid group size.
   bookingUrls: z.partialRecord(GroupSize, z.string()),
+  // Whether the slot can be booked online; false means it is available but phone-only.
+  onlineBookable: z.boolean(),
   // ISO 8601 UTC instant of the scrape.
   scrapedAt: z.iso.datetime(),
 });
