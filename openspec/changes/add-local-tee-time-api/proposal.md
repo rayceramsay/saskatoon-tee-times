@@ -5,7 +5,7 @@ The scraper writes tee times into DynamoDB, but nothing reads them back out — 
 ## What Changes
 
 - Add a read side to persistence: a transport-agnostic `TeeTimeReader` port and a `DynamoDbTeeTimeReader` adapter that returns a date's tee times via a single `Query` on the date partition. A missing table resolves to an empty list rather than an error.
-- Introduce a new `tee-time-api` capability: a Hono HTTP app exposing `GET /tee-times?date=YYYY-MM-DD`. `date` is **required**; a missing or malformed date is a `400`. The response is an envelope `{ teeTimes, lastUpdatedAt }`, where `lastUpdatedAt` is the maximum `scrapedAt` across the returned set (`null` when empty) to feed the dashboard's freshness indicator.
+- Introduce a new `tee-time-api` capability: a Hono HTTP app exposing `GET /tee-times?date=YYYY-MM-DD`. `date` is **required**; a missing or malformed date is a `400`. The response is an envelope `{ date, teeTimes, lastUpdatedAt }`, where `date` echoes the requested date and `lastUpdatedAt` is the maximum `scrapedAt` across the returned set (`null` when empty) to feed the dashboard's freshness indicator.
 - The API applies no filtering and computes no "current date": it answers strictly for the requested date. Filtering and "today" are the frontend's responsibility.
 - Wire the app through a `createApp(deps)` factory and a thin `server.local.ts` composition root served by `@hono/node-server`, reading from the same local DynamoDB the scraper writes to. The factory/entrypoint split leaves a seam for a future AWS Lambda handler with no restructuring.
 - Enable CORS for local cross-port development and Hono's `logger()` middleware for HTTP access logs.

@@ -234,11 +234,11 @@ Context-dependent rules exist at some courses (e.g., singles can only book parti
 
 **Query parameters:**
 
-- `date` — Target date (defaults to current date)
+- `date` — Target date
 
 **Response:**
 
-Responses should return a `lastUpdated` field indicating minimum `scrapedAt` value across the day's set, and an array of tee time objects matching the schema below:
+Responses should return a `lastUpdated` field indicating maximum `scrapedAt` value across the day's set, a `date` field with the target date, and an array of tee time objects matching the schema below:
 
 ```json
 {

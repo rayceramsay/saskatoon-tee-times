@@ -34,7 +34,12 @@ The API SHALL respond with `400 Bad Request` when the `date` parameter is absent
 
 ### Requirement: Response envelope with freshness timestamp
 
-A successful response SHALL be a JSON envelope containing the tee time set and a `lastUpdatedAt` field. `lastUpdatedAt` SHALL be the maximum `scrapedAt` across the returned tee times, so the dashboard can surface data freshness. When the returned set is empty, `lastUpdatedAt` SHALL be `null`.
+A successful response SHALL be a JSON envelope containing the queried `date`, the tee time set, and a `lastUpdatedAt` field. The `date` field SHALL echo the requested `YYYY-MM-DD` date so the client can correlate the response without re-parsing its request. `lastUpdatedAt` SHALL be the maximum `scrapedAt` across the returned tee times, so the dashboard can surface data freshness. When the returned set is empty, `lastUpdatedAt` SHALL be `null`.
+
+#### Scenario: Envelope echoes the queried date
+
+- **WHEN** a client requests `GET /tee-times?date=2026-07-15`
+- **THEN** the response envelope's `date` field is `2026-07-15`
 
 #### Scenario: Freshness reflects the newest scrape
 

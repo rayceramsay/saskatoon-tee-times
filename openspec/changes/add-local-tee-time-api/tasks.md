@@ -18,20 +18,20 @@
 
 ## 4. HTTP app and endpoint
 
-- [ ] 4.1 Add `apps/api/src/app.ts` exporting `createApp({ reader }: AppDeps): Hono`, registering `cors()` and `logger()` middleware
-- [ ] 4.2 Implement `GET /tee-times`: validate required `date` (`YYYY-MM-DD`, real calendar date) with a Zod schema, returning `400` (prettified message) on missing/malformed input
-- [ ] 4.3 On valid input, call `reader.readTeeTimesForDate(date)` and respond `200` with `{ teeTimes, lastUpdatedAt }` where `lastUpdatedAt` is the max `scrapedAt` (or `null` when empty)
+- [x] 4.1 Add `apps/api/src/app.ts` exporting `createApp({ reader }: AppDeps): Hono`, registering `cors()` and `logger()` middleware
+- [x] 4.2 Implement `GET /tee-times`: validate required `date` (`YYYY-MM-DD`, real calendar date) with a Zod schema, returning `400` (prettified message) on missing/malformed input
+- [x] 4.3 On valid input, call `reader.readTeeTimesForDate(date)` and respond `200` with `{ date, teeTimes, lastUpdatedAt }` where `date` echoes the request and `lastUpdatedAt` is the max `scrapedAt` (or `null` when empty)
 
 ## 5. Local server entrypoint
 
-- [ ] 5.1 Add `apps/api/src/server.local.ts` composition root: `loadConfig()` → `createDynamoDbClient({ mode: 'local', endpoint })` → `new DynamoDbTeeTimeReader(...)` → `createApp(...)` → serve via `@hono/node-server` on `PORT`
-- [ ] 5.2 Log a startup line (endpoint, table, port) and handle graceful shutdown (SIGINT/SIGTERM close the server and destroy the client)
+- [x] 5.1 Add `apps/api/src/server.local.ts` composition root: `loadConfig()` → `createDynamoDbClient({ mode: 'local', endpoint })` → `new DynamoDbTeeTimeReader(...)` → `createApp(...)` → serve via `@hono/node-server` on `PORT`
+- [x] 5.2 Log a startup line (endpoint, table, port) and handle graceful shutdown (SIGINT/SIGTERM close the server and destroy the client)
 
 ## 6. Tests
 
-- [ ] 6.1 Add app-level tests hitting `createApp` with an in-memory fake `TeeTimeReader`: `200` envelope shape, `lastUpdatedAt` = max `scrapedAt`, `null` for empty result, `400` on missing date, `400` on malformed date
+- [x] 6.1 Add app-level tests hitting `createApp` with an in-memory fake `TeeTimeReader`: `200` envelope shape, `lastUpdatedAt` = max `scrapedAt`, `null` for empty result, `400` on missing date, `400` on malformed date
 
 ## 7. Verify
 
-- [ ] 7.1 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix any errors
-- [ ] 7.2 With local DynamoDB and `scraper-local` running, start the API and confirm `GET /tee-times?date=<date>` returns the envelope and a bad/missing date returns `400`
+- [x] 7.1 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix any errors
+- [x] 7.2 With local DynamoDB and `scraper-local` running, start the API and confirm `GET /tee-times?date=<date>` returns the envelope and a bad/missing date returns `400`

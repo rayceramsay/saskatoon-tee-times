@@ -9,7 +9,7 @@ The project is a pnpm/turborepo monorepo following hexagonal architecture with d
 **Goals:**
 
 - A read side in persistence mirroring the write side: `TeeTimeReader` port + `DynamoDbTeeTimeReader` adapter reading a full date from one partition.
-- A Hono `GET /tee-times?date=YYYY-MM-DD` endpoint returning `{ teeTimes, lastUpdatedAt }`, runnable locally against the scraper's DynamoDB.
+- A Hono `GET /tee-times?date=YYYY-MM-DD` endpoint returning `{ date, teeTimes, lastUpdatedAt }`, runnable locally against the scraper's DynamoDB.
 - Structure the app so a future AWS Lambda handler is additive, not a rewrite.
 - Match the existing app's conventions so the codebase reads as one system.
 
