@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defining the public, persisted representation of a tee time and the port through which it is stored. This capability establishes the canonical `TeeTime` schema (a pass-through of the scraped record for this slice), the transport-agnostic `TeeTimeRepository` port, snapshot-replace persistence semantics keyed by `(courseId, date)`, and the DynamoDB store's key design and TTL-based eviction of past slots.
+Defining the public, persisted representation of a tee time and the port through which it is stored. This capability establishes the canonical `TeeTime` schema (a pass-through of the scraped record for this slice), the transport-agnostic `TeeTimeWriter` port, snapshot-replace persistence semantics keyed by `(courseId, date)`, and the DynamoDB store's key design and TTL-based eviction of past slots.
 
 ## Requirements
 
@@ -16,14 +16,14 @@ The system SHALL define a canonical `TeeTime` schema — the public, persisted r
 - **THEN** the resulting `TeeTime.pricePerPlayer` equals the scraped `dynamicPrice` (including null when it was null)
 - **AND** the `TeeTime` carries all shared fields (start, course, holes, routing, group sizes, booking URLs) unchanged
 
-### Requirement: Tee-time repository port
+### Requirement: Tee-time writer port
 
-The system SHALL define a `TeeTimeRepository` port that persistence adapters implement, exposing an operation to replace the stored tee times for a given `(courseId, date)` unit with a supplied set of `TeeTime` records. The port SHALL be transport-agnostic so the domain does not depend on any specific data store.
+The system SHALL define a `TeeTimeWriter` port that persistence adapters implement, exposing an operation to replace the stored tee times for a given `(courseId, date)` unit with a supplied set of `TeeTime` records. The port SHALL be transport-agnostic so the domain does not depend on any specific data store. The port name uses `Writer` (rather than `Repository`) to name the write side of persistence explicitly, leaving room for a future read-side port without a lopsided naming pair.
 
-#### Scenario: Repository exposes a snapshot-replace operation keyed by course and date
+#### Scenario: Writer exposes a snapshot-replace operation keyed by course and date
 
 - **WHEN** the ingestion pipeline needs to persist a unit's scraped result
-- **THEN** it calls the repository with the `(courseId, date)` unit and that unit's complete current `TeeTime` set
+- **THEN** it calls the writer with the `(courseId, date)` unit and that unit's complete current `TeeTime` set
 - **AND** the domain depends only on the port, not on any concrete data store
 
 ### Requirement: Snapshot-replace persistence semantics
