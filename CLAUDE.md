@@ -13,7 +13,7 @@ Note: This list is preliminary and not exhaustive; I am open to exploring other 
 | Codebase | pnpm workspaces & turborepo monorepo                             |
 | Scrapers | TypeScript, `fetch`, Cheerio, Playwright, Zod                    |
 | API      | TypeScript, Node.js, Hono                                        |
-| Frontend | TypeScript, Next.js (static export), TailwindCSS, TanStack Query |
+| Frontend | TypeScript, Next.js (static export), TailwindCSS, SWR              |
 | Database | AWS DynamoDB                                                     |
 | Testing  | Vitest                                                           |
 

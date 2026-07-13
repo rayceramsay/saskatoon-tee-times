@@ -135,7 +135,7 @@ Note: the following technologies do not have to strictly be everything that is i
 | -------- | ---------------------------------------------------------------- |
 | Scrapers | TypeScript, `fetch`, Cheerio, Playwright, Zod                    |
 | API      | TypeScript, Node.js, Hono                                        |
-| Frontend | TypeScript, Next.js (static export), TailwindCSS, TanStack Query |
+| Frontend | TypeScript, Next.js (static export), TailwindCSS, SWR              |
 | Database | AWS DynamoDB                                                     |
 | Testing  | Vitest                                                           |
 
