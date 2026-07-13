@@ -1,11 +1,11 @@
 ## 1. Tooling & foundation
 
-- [ ] 1.1 Add dependencies to `apps/web`: `tailwindcss` (v4) + PostCSS wiring, `swr`, `zod`
-- [ ] 1.2 Configure Tailwind v4 and replace `globals.css` reset with the `@theme` token block mapping DESIGN.md colors, spacing, radius, and type tokens (accent `#2e6b47`, ink/line/bg scale, rem sizing, px hairlines)
-- [ ] 1.3 Add Zod-validated client config reading `NEXT_PUBLIC_API_BASE_URL` (env-config-style, `prettifyError`); add `.env.example`
-- [ ] 1.4 Add a `<Suspense>` boundary around the client tree so `useSearchParams` works under static export (SWR needs no provider; add an `SWRConfig` only if a shared fetcher/config is warranted)
-- [ ] 1.5 Add the `America/Regina` timezone constant with a documented "future multi-city override point" note
-- [ ] 1.6 Add a `MAX_ADVANCE_DAYS = 7` constant with a comment noting it as the flat advance window (per-course windows deferred to a future change)
+- [x] 1.1 Add dependencies to `apps/web`: `tailwindcss` (v4) + PostCSS wiring, `swr`, `zod`
+- [x] 1.2 Configure Tailwind v4 and replace `globals.css` reset with the `@theme` token block mapping DESIGN.md colors, spacing, radius, and type tokens (accent `#2e6b47`, ink/line/bg scale, rem sizing, px hairlines)
+- [x] 1.3 Add Zod-validated client config reading `NEXT_PUBLIC_API_BASE_URL` (env-config-style, `prettifyError`); add `.env.example`
+- [x] 1.4 Add a `<Suspense>` boundary around the client tree so `useSearchParams` works under static export (SWR needs no provider; add an `SWRConfig` only if a shared fetcher/config is warranted)
+- [x] 1.5 Add the `America/Regina` timezone constant with a documented "future multi-city override point" note
+- [x] 1.6 Add a `MAX_ADVANCE_DAYS = 7` constant with a comment noting it as the flat advance window (per-course windows deferred to a future change)
 
 ## 2. Data layer
 
