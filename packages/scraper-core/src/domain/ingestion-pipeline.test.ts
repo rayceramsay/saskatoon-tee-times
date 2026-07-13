@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { TeeTimeRepository } from '../persistence/tee-time-repository.port.js';
+import type { TeeTimeWriter } from '@stt/tee-time-domain/tee-time-writer';
 import { IngestionPipeline } from './ingestion-pipeline.js';
-import type { Logger } from './logger.port.js';
+import type { Logger } from '@stt/tee-time-domain/logger';
 import type { PricingEngine } from './pricing-engine.js';
 import type {
   ScaperOrchestrationResult,
   ScrapeUnitOutcome,
 } from './tee-time-orchestrator.js';
-import type { ScrapedTeeTime, TeeTime } from './tee-time.schema.js';
+import type { ScrapedTeeTime, TeeTime } from '@stt/tee-time-domain/tee-time-schema';
 
 const NOW = new Date('2026-07-08T12:00:00-06:00');
 
@@ -84,7 +84,7 @@ function spyLogger(): Logger {
   return { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 }
 
-function fakeRepository(): TeeTimeRepository {
+function fakeWriter(): TeeTimeWriter {
   return { replaceUnitTeeTimes: vi.fn().mockResolvedValue(undefined) };
 }
 
@@ -104,14 +104,14 @@ describe('IngestionPipeline', () => {
         return stubPricingStage.enrich(record);
       }),
     };
-    const repository: TeeTimeRepository = {
+    const writer: TeeTimeWriter = {
       replaceUnitTeeTimes: vi.fn(async () => {
         stageOrder.push('persist');
       }),
     };
     const pipeline = new IngestionPipeline(
       orchestrator,
-      repository,
+      writer,
       spyLogger(),
       pricingStage
     );
@@ -134,17 +134,17 @@ describe('IngestionPipeline', () => {
         ])
       ),
     };
-    const repository = fakeRepository();
+    const writer = fakeWriter();
     const pipeline = new IngestionPipeline(
       orchestrator,
-      repository,
+      writer,
       spyLogger(),
       stubPricingStage
     );
 
     await pipeline.run(NOW);
 
-    const calls = vi.mocked(repository.replaceUnitTeeTimes).mock.calls;
+    const calls = vi.mocked(writer.replaceUnitTeeTimes).mock.calls;
     const byUnit = new Map(
       calls.map(([unit, teeTimes]) => [`${unit.courseId}|${unit.date}`, teeTimes])
     );
@@ -162,17 +162,17 @@ describe('IngestionPipeline', () => {
         orchestrationResult([scraped('greenbryre', '2026-07-08')])
       ),
     };
-    const repository = fakeRepository();
+    const writer = fakeWriter();
     const pipeline = new IngestionPipeline(
       orchestrator,
-      repository,
+      writer,
       spyLogger(),
       stubPricingStage
     );
 
     await pipeline.run(NOW);
 
-    const [firstCall] = vi.mocked(repository.replaceUnitTeeTimes).mock.calls;
+    const [firstCall] = vi.mocked(writer.replaceUnitTeeTimes).mock.calls;
     const teeTime = firstCall?.[1][0];
     expect(teeTime).toMatchObject({ pricePerPlayer: 42.5 });
     expect(teeTime && 'dynamicPrice' in teeTime).toBe(false);
@@ -183,17 +183,17 @@ describe('IngestionPipeline', () => {
       planUnitCount: vi.fn(() => 0),
       scrapeAllBookable: vi.fn(async () => orchestrationResult([])),
     };
-    const repository = fakeRepository();
+    const writer = fakeWriter();
     const pipeline = new IngestionPipeline(
       orchestrator,
-      repository,
+      writer,
       spyLogger(),
       stubPricingStage
     );
 
     await pipeline.run(NOW);
 
-    expect(repository.replaceUnitTeeTimes).not.toHaveBeenCalled();
+    expect(writer.replaceUnitTeeTimes).not.toHaveBeenCalled();
   });
 
   it('emits run started before scraping begins, reporting the planned queued-unit count', async () => {
@@ -213,7 +213,7 @@ describe('IngestionPipeline', () => {
     };
     const pipeline = new IngestionPipeline(
       orchestrator,
-      fakeRepository(),
+      fakeWriter(),
       logger,
       stubPricingStage
     );
@@ -249,7 +249,7 @@ describe('IngestionPipeline', () => {
     const logger = spyLogger();
     const pipeline = new IngestionPipeline(
       orchestrator,
-      fakeRepository(),
+      fakeWriter(),
       logger,
       stubPricingStage
     );
@@ -281,7 +281,7 @@ describe('IngestionPipeline', () => {
     const logger = spyLogger();
     const pipeline = new IngestionPipeline(
       orchestrator,
-      fakeRepository(),
+      fakeWriter(),
       logger,
       stubPricingStage
     );

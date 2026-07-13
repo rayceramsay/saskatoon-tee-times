@@ -4,9 +4,12 @@ import {
   type BatchWriteCommandInput,
   type DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb';
-import type { CourseId } from '../domain/primitives.schema.js';
-import type { TeeTime } from '../domain/tee-time.schema.js';
-import type { ScrapeUnitKey, TeeTimeRepository } from './tee-time-repository.port.js';
+import type { CourseId } from '@stt/tee-time-domain/primitives-schema';
+import type { TeeTime } from '@stt/tee-time-domain/tee-time-schema';
+import type {
+  ScrapeUnitKey,
+  TeeTimeWriter,
+} from '@stt/tee-time-domain/tee-time-writer';
 import {
   TEE_TIME_TABLE_PARTITION_KEY,
   TEE_TIME_TABLE_SORT_KEY,
@@ -42,7 +45,7 @@ type ItemKey = Record<string, string>;
  * current keys, deletes those absent from the new set, and writes the new set in
  * chunked `BatchWriteItem` calls, retrying any `UnprocessedItems`.
  */
-export class DynamoDbTeeTimeRepository implements TeeTimeRepository {
+export class DynamoDbTeeTimeWriter implements TeeTimeWriter {
   constructor(
     private readonly client: DynamoDBDocumentClient,
     private readonly tableName: string

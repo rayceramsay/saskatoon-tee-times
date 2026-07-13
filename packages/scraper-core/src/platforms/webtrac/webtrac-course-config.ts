@@ -1,4 +1,4 @@
-import type { CourseConfig } from '../../domain/course-config.base.js';
+import type { CourseConfig } from '@stt/tee-time-domain/course-config';
 
 /**
  * Configuration for a course booked through the WebTrac platform.

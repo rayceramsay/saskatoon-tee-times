@@ -1,5 +1,5 @@
-import type { CourseId } from '../domain/primitives.schema.js';
-import type { TeeTime } from '../domain/tee-time.schema.js';
+import type { CourseId } from './primitives.schema.js';
+import type { TeeTime } from './tee-time.schema.js';
 
 /**
  * Identifies a single unit of work: one course on one local calendar date.
@@ -19,7 +19,7 @@ export interface ScrapeUnitKey {
  * Transport-agnostic by design: the domain depends only on this interface, so
  * the concrete data store never leaks inward.
  */
-export interface TeeTimeRepository {
+export interface TeeTimeWriter {
   /**
    * Replace a unit's stored tee times with the supplied complete set.
    *
@@ -34,7 +34,7 @@ export interface TeeTimeRepository {
    *
    * @example
    * ```typescript
-   * await repository.replaceUnitTeeTimes({ courseId: 'greenbryre', date: '2026-07-10' }, teeTimes);
+   * await writer.replaceUnitTeeTimes({ courseId: 'greenbryre', date: '2026-07-10' }, teeTimes);
    * ```
    */
   replaceUnitTeeTimes(unit: ScrapeUnitKey, teeTimes: readonly TeeTime[]): Promise<void>;

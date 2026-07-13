@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import type { ScrapedTeeTime } from '../../domain/tee-time.schema.js';
+import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
 import type { TextFetcher } from '../../transport/text-fetcher.port.js';
 import { WebtracScraper } from './webtrac-scraper.adapter.js';
 import type { WebtracCourseConfig } from './webtrac-course-config.js';

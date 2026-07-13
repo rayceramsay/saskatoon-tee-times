@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import type { BookingPlatformScraper } from '../../domain/booking-platform-scraper.port.js';
-import type { CourseId, GroupSize } from '../../domain/primitives.schema.js';
-import type { ScrapedTeeTime } from '../../domain/tee-time.schema.js';
-import { bestBookingUrl } from '../../domain/best-booking-url.util.js';
-import { buildLocalStartInstant } from '../../domain/local-start-instant.util.js';
+import type { CourseId, GroupSize } from '@stt/tee-time-domain/primitives-schema';
+import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
+import { bestBookingUrl } from '@stt/tee-time-domain/best-booking-url';
+import { buildLocalStartInstant } from '@stt/tee-time-domain/local-start-instant';
 import type { JsonFetcher } from '../../transport/json-fetcher.port.js';
 import type {
   ChronogolfV1CourseConfig,

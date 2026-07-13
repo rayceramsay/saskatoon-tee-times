@@ -1,0 +1,31 @@
+{
+  "name": "@stt/tee-time-domain",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./tee-time-schema": "./src/tee-time.schema.ts",
+    "./primitives-schema": "./src/primitives.schema.ts",
+    "./course-config": "./src/course-config.base.ts",
+    "./logger": "./src/logger.port.ts",
+    "./tee-time-writer": "./src/tee-time-writer.port.ts",
+    "./bookable-dates": "./src/bookable-dates.util.ts",
+    "./local-start-instant": "./src/local-start-instant.util.ts",
+    "./best-booking-url": "./src/best-booking-url.util.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@stt/eslint-config": "workspace:^",
+    "@stt/typescript-config": "workspace:^",
+    "eslint": "^9.39.1",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.10"
+  }
+}

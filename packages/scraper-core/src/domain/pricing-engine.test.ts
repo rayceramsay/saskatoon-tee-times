@@ -6,7 +6,7 @@ import {
   resolveStatic,
   type CoursePricingConfig,
 } from './pricing-engine.js';
-import type { ScrapedTeeTime } from './tee-time.schema.js';
+import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
 
 const scraped: ScrapedTeeTime = {
   startInstant: '2026-07-11T06:00:00-06:00',

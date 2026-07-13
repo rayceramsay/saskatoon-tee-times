@@ -6,9 +6,9 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { GenericContainer, type StartedTestContainer } from 'testcontainers';
-import type { TeeTime } from '../domain/tee-time.schema.js';
-import type { ScrapeUnitKey } from './tee-time-repository.port.js';
-import { DynamoDbTeeTimeRepository } from './dynamodb-tee-time-repository.adapter.js';
+import type { TeeTime } from '@stt/tee-time-domain/tee-time-schema';
+import type { ScrapeUnitKey } from '@stt/tee-time-domain/tee-time-writer';
+import { DynamoDbTeeTimeWriter } from './dynamodb-tee-time-writer.adapter.js';
 import {
   TEE_TIME_TABLE_PARTITION_KEY,
   TEE_TIME_TABLE_SORT_KEY,
@@ -38,10 +38,10 @@ function teeTime(overrides: Partial<TeeTime> = {}): TeeTime {
   };
 }
 
-describe('DynamoDbTeeTimeRepository (local DynamoDB)', () => {
+describe('DynamoDbTeeTimeWriter (local DynamoDB)', () => {
   let container: StartedTestContainer;
   let client: DynamoDBDocumentClient;
-  let repository: DynamoDbTeeTimeRepository;
+  let writer: DynamoDbTeeTimeWriter;
 
   beforeAll(async () => {
     container = await new GenericContainer('amazon/dynamodb-local')
@@ -56,7 +56,7 @@ describe('DynamoDbTeeTimeRepository (local DynamoDB)', () => {
         credentials: { accessKeyId: 'local', secretAccessKey: 'local' },
       })
     );
-    repository = new DynamoDbTeeTimeRepository(client, TABLE_NAME);
+    writer = new DynamoDbTeeTimeWriter(client, TABLE_NAME);
   });
 
   afterAll(async () => {
@@ -99,9 +99,9 @@ describe('DynamoDbTeeTimeRepository (local DynamoDB)', () => {
   it('removes slots that vanish between replaces', async () => {
     const early = teeTime({ startInstant: '2026-07-10T06:00:00-06:00' });
     const later = teeTime({ startInstant: '2026-07-10T06:10:00-06:00' });
-    await repository.replaceUnitTeeTimes(unit, [early, later]);
+    await writer.replaceUnitTeeTimes(unit, [early, later]);
 
-    await repository.replaceUnitTeeTimes(unit, [early]);
+    await writer.replaceUnitTeeTimes(unit, [early]);
 
     const items = await storedItems();
     expect(items).toHaveLength(1);
@@ -112,7 +112,7 @@ describe('DynamoDbTeeTimeRepository (local DynamoDB)', () => {
     const front = teeTime({ routing: ['Front'] });
     const back = teeTime({ routing: ['Back'] });
 
-    await repository.replaceUnitTeeTimes(unit, [front, back]);
+    await writer.replaceUnitTeeTimes(unit, [front, back]);
 
     const items = await storedItems();
     expect(items).toHaveLength(2);
@@ -123,7 +123,7 @@ describe('DynamoDbTeeTimeRepository (local DynamoDB)', () => {
   });
 
   it('marshals a numeric TTL equal to the start instant in epoch seconds', async () => {
-    await repository.replaceUnitTeeTimes(unit, [teeTime()]);
+    await writer.replaceUnitTeeTimes(unit, [teeTime()]);
 
     const items = await storedItems();
     const expectedTtl = Math.floor(

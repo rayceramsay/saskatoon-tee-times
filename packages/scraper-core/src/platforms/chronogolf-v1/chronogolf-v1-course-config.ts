@@ -1,4 +1,4 @@
-import type { CourseConfig } from '../../domain/course-config.base.js';
+import type { CourseConfig } from '@stt/tee-time-domain/course-config';
 
 /**
  * A single bookable product within a Chronogolf V1 course.

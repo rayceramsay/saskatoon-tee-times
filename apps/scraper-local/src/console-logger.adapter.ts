@@ -1,4 +1,4 @@
-import type { Logger } from '@stt/scraper-core/domain/logger';
+import type { Logger } from '@stt/tee-time-domain/logger';
 
 /** The severity levels a {@link ConsoleLogger} understands, ordered least to most severe. */
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';

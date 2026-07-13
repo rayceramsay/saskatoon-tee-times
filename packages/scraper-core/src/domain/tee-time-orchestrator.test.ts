@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { BookingPlatformScraper } from './booking-platform-scraper.port.js';
-import type { CourseConfig } from './course-config.base.js';
-import type { CourseId } from './primitives.schema.js';
-import type { ScrapedTeeTime } from './tee-time.schema.js';
-import type { Logger } from './logger.port.js';
+import type { CourseConfig } from '@stt/tee-time-domain/course-config';
+import type { CourseId } from '@stt/tee-time-domain/primitives-schema';
+import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
+import type { Logger } from '@stt/tee-time-domain/logger';
 import { TeeTimeOrchestrator } from './tee-time-orchestrator.js';
 
 // Past 06:00 release with a 1-day window, so each course expands to two dates.

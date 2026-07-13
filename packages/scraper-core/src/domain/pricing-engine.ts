@@ -1,5 +1,5 @@
-import type { CourseId } from './primitives.schema.js';
-import type { ScrapedTeeTime, TeeTime } from './tee-time.schema.js';
+import type { CourseId } from '@stt/tee-time-domain/primitives-schema';
+import type { ScrapedTeeTime, TeeTime } from '@stt/tee-time-domain/tee-time-schema';
 
 /**
  * How a course's scraped dynamic price relates to tax.

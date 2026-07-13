@@ -1,11 +1,11 @@
 import type {
   ScrapeUnitKey,
-  TeeTimeRepository,
-} from '../persistence/tee-time-repository.port.js';
-import type { Logger } from './logger.port.js';
+  TeeTimeWriter,
+} from '@stt/tee-time-domain/tee-time-writer';
+import type { Logger } from '@stt/tee-time-domain/logger';
 import type { PricingEngine } from './pricing-engine.js';
 import type { TeeTimeOrchestrator } from './tee-time-orchestrator.js';
-import type { TeeTime } from './tee-time.schema.js';
+import type { TeeTime } from '@stt/tee-time-domain/tee-time-schema';
 
 /** The scraper orchestration stage, narrowed to the methods the pipeline drives. */
 type ScraperOrchestrationStage = Pick<
@@ -32,12 +32,12 @@ interface ScrapeUnitGroup {
  *
  * The price stage finalizes each scraped record's price into the canonical tee time.
  * Persistence is snapshot-replace per `(course, date)` unit, so the flat scraped result
- * is regrouped by unit before being handed to the repository.
+ * is regrouped by unit before being handed to the writer.
  */
 export class IngestionPipeline {
   constructor(
     private readonly orchestrator: ScraperOrchestrationStage,
-    private readonly repository: TeeTimeRepository,
+    private readonly writer: TeeTimeWriter,
     private readonly logger: Logger,
     private readonly pricingStage: PricingStage
   ) {}
@@ -91,7 +91,7 @@ export class IngestionPipeline {
     });
     await Promise.all(
       teeTimeGroups.map(async (group) => {
-        await this.repository.replaceUnitTeeTimes(group.unitKey, group.teeTimes);
+        await this.writer.replaceUnitTeeTimes(group.unitKey, group.teeTimes);
         this.logger.debug('Wrote tee time group', {
           courseId: group.unitKey.courseId,
           date: group.unitKey.date,

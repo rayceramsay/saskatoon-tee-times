@@ -1,6 +1,6 @@
-import type { CourseId, PlatformId } from './primitives.schema.js';
-import type { ScrapedTeeTime } from './tee-time.schema.js';
-import type { CourseConfig } from './course-config.base.js';
+import type { CourseId, PlatformId } from '@stt/tee-time-domain/primitives-schema';
+import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
+import type { CourseConfig } from '@stt/tee-time-domain/course-config';
 
 /**
  * The contract every platform scraper implements.

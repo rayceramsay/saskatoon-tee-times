@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { beforeAll, describe, expect, it } from 'vitest';
-import type { GroupSize } from '../../domain/primitives.schema.js';
-import type { ScrapedTeeTime } from '../../domain/tee-time.schema.js';
+import type { GroupSize } from '@stt/tee-time-domain/primitives-schema';
+import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
 import type { JsonFetcher } from '../../transport/json-fetcher.port.js';
 import { ChronogolfV1Scraper } from './chronogolf-v1-scraper.adapter.js';
 import type { ChronogolfV1CourseConfig } from './chronogolf-v1-course-config.js';

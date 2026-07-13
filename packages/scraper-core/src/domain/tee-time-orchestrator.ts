@@ -1,8 +1,8 @@
 import type { BookingPlatformScraper } from './booking-platform-scraper.port.js';
-import type { CourseId, PlatformId } from './primitives.schema.js';
-import type { ScrapedTeeTime } from './tee-time.schema.js';
-import type { Logger } from './logger.port.js';
-import { bookableDates } from './bookable-dates.util.js';
+import type { CourseId, PlatformId } from '@stt/tee-time-domain/primitives-schema';
+import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
+import type { Logger } from '@stt/tee-time-domain/logger';
+import { bookableDates } from '@stt/tee-time-domain/bookable-dates';
 
 /**
  * A single unit of scraping work: one scraper, one of its courses, one date.

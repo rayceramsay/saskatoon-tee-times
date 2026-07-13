@@ -1,7 +1,7 @@
 import { IngestionPipeline } from '@stt/scraper-core/domain/ingestion-pipeline';
 import { PricingEngine } from '@stt/scraper-core/domain/pricing-engine';
 import { TeeTimeOrchestrator } from '@stt/scraper-core/domain/tee-time-orchestrator';
-import { DynamoDbTeeTimeRepository } from '@stt/scraper-core/persistence/dynamodb-tee-time-repository';
+import { DynamoDbTeeTimeWriter } from '@stt/tee-time-persistence/dynamodb-tee-time-writer';
 import { ChronogolfV1Scraper } from '@stt/scraper-core/platforms/chronogolf-v1';
 import {
   greenbryreConfig,
@@ -30,10 +30,11 @@ import { HttpTextFetcher } from '@stt/scraper-core/transport/http-text-fetcher';
 import { HostLimitedTextFetcher } from '@stt/scraper-core/transport/host-limited-text-fetcher';
 import { BottleneckRequestLimiter } from '@stt/scraper-core/transport/bottleneck-request-limiter';
 import cron from 'node-cron';
+import { createDynamoDbClient } from '@stt/tee-time-persistence/dynamodb-client-factory';
 import { loadConfig, type ScraperLocalConfig } from './config.js';
 import { ConsoleLogger } from './console-logger.adapter.js';
-import { createDynamoDbClient, ensureTeeTimeTable } from './dynamodb-setup.js';
-import { type Logger } from '@stt/scraper-core/domain/logger';
+import { ensureTeeTimeTable } from './dynamodb-setup.js';
+import { type Logger } from '@stt/tee-time-domain/logger';
 import { type DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
 /**
@@ -47,7 +48,10 @@ async function main(): Promise<void> {
 
   const logger = new ConsoleLogger(config.LOG_LEVEL);
 
-  const { client, documentClient } = createDynamoDbClient(config.DYNAMODB_ENDPOINT);
+  const { client, documentClient } = createDynamoDbClient({
+    mode: 'local',
+    endpoint: config.DYNAMODB_ENDPOINT,
+  });
   await ensureTeeTimeTable(client, config.DYNAMODB_TABLE_NAME);
 
   const limiterConfig = {
@@ -89,10 +93,7 @@ async function main(): Promise<void> {
     [chronogolfScraper, webtracScraper],
     logger
   );
-  const repository = new DynamoDbTeeTimeRepository(
-    documentClient,
-    config.DYNAMODB_TABLE_NAME
-  );
+  const writer = new DynamoDbTeeTimeWriter(documentClient, config.DYNAMODB_TABLE_NAME);
   const pricingEngine = new PricingEngine(
     new Map([
       [greenbryreConfig.courseId, greenbryrePricingConfig],
@@ -102,12 +103,7 @@ async function main(): Promise<void> {
       [wildwoodConfig.courseId, wildwoodPricingConfig],
     ])
   );
-  const pipeline = new IngestionPipeline(
-    orchestrator,
-    repository,
-    logger,
-    pricingEngine
-  );
+  const pipeline = new IngestionPipeline(orchestrator, writer, logger, pricingEngine);
 
   setupAndStartIngestionPipelineCronSchedule(config, pipeline, logger, fetcher, client);
 }

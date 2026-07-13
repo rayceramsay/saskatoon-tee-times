@@ -1,8 +1,8 @@
 import * as cheerio from 'cheerio';
 import type { BookingPlatformScraper } from '../../domain/booking-platform-scraper.port.js';
-import type { CourseId, GroupSize } from '../../domain/primitives.schema.js';
-import type { ScrapedTeeTime } from '../../domain/tee-time.schema.js';
-import { buildLocalStartInstant } from '../../domain/local-start-instant.util.js';
+import type { CourseId, GroupSize } from '@stt/tee-time-domain/primitives-schema';
+import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
+import { buildLocalStartInstant } from '@stt/tee-time-domain/local-start-instant';
 import type { TextFetcher } from '../../transport/text-fetcher.port.js';
 import type { WebtracCourseConfig } from './webtrac-course-config.js';
 
