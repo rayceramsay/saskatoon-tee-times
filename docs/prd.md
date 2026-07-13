@@ -131,13 +131,13 @@ Technical depth and design decisions that are architecture or implementation spe
 
 Note: the following technologies do not have to strictly be everything that is included; I am open to other libraries/technologies as needed. Treat this as preliminary assessment.
 
-| Layer    | Technologies                                                     |
-| -------- | ---------------------------------------------------------------- |
-| Scrapers | TypeScript, `fetch`, Cheerio, Playwright, Zod                    |
-| API      | TypeScript, Node.js, Hono                                        |
-| Frontend | TypeScript, Next.js (static export), TailwindCSS, SWR              |
-| Database | AWS DynamoDB                                                     |
-| Testing  | Vitest                                                           |
+| Layer    | Technologies                                          |
+| -------- | ----------------------------------------------------- |
+| Scrapers | TypeScript, `fetch`, Cheerio, Playwright, Zod         |
+| API      | TypeScript, Node.js, Hono                             |
+| Frontend | TypeScript, Next.js (static export), TailwindCSS, SWR |
+| Database | AWS DynamoDB                                          |
+| Testing  | Vitest                                                |
 
 #### Infrastructure & Deployment
 

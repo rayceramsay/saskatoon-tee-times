@@ -8,14 +8,14 @@ This project scrapes all the public tee times in Saskatoon and displays them in 
 
 Note: This list is preliminary and not exhaustive; I am open to exploring other tools and libraries as the project requires.
 
-| Layer    | Technologies                                                     |
-| -------- | ---------------------------------------------------------------- |
-| Codebase | pnpm workspaces & turborepo monorepo                             |
-| Scrapers | TypeScript, `fetch`, Cheerio, Playwright, Zod                    |
-| API      | TypeScript, Node.js, Hono                                        |
-| Frontend | TypeScript, Next.js (static export), TailwindCSS, SWR              |
-| Database | AWS DynamoDB                                                     |
-| Testing  | Vitest                                                           |
+| Layer    | Technologies                                          |
+| -------- | ----------------------------------------------------- |
+| Codebase | pnpm workspaces & turborepo monorepo                  |
+| Scrapers | TypeScript, `fetch`, Cheerio, Playwright, Zod         |
+| API      | TypeScript, Node.js, Hono                             |
+| Frontend | TypeScript, Next.js (static export), TailwindCSS, SWR |
+| Database | AWS DynamoDB                                          |
+| Testing  | Vitest                                                |
 
 ### Infrastructure & Deployment
 
