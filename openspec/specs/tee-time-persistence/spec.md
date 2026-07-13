@@ -3,9 +3,7 @@
 ## Purpose
 
 Defining the public, persisted representation of a tee time and the port through which it is stored. This capability establishes the canonical `TeeTime` schema (a pass-through of the scraped record for this slice), the transport-agnostic `TeeTimeWriter` port, snapshot-replace persistence semantics keyed by `(courseId, date)`, and the DynamoDB store's key design and TTL-based eviction of past slots.
-
 ## Requirements
-
 ### Requirement: Canonical persisted TeeTime schema
 
 The system SHALL define a canonical `TeeTime` schema — the public, persisted representation — extending the shared tee-time shape with `pricePerPlayer` (nullable). For this slice `TeeTime` SHALL be produced as a pass-through of `ScrapedTeeTime`, mapping `pricePerPlayer` directly from `dynamicPrice` with no tax normalization or static-rule resolution. The mapping SHALL preserve the seam's shape so a later pricing engine can replace the pass-through without changing the persisted type or the repository.
@@ -55,3 +53,37 @@ The DynamoDB-backed store SHALL key items with a partition key of the local date
 - **WHEN** a `TeeTime` is written
 - **THEN** it carries a numeric TTL attribute equal to its start instant expressed as epoch seconds
 - **AND** once that instant has passed the item is eligible for automatic eviction
+
+### Requirement: Tee-time reader port
+
+The system SHALL define a `TeeTimeReader` port that persistence adapters implement, exposing an operation to read all stored `TeeTime` records for a given local calendar date (`YYYY-MM-DD`). The port SHALL be transport-agnostic so the domain and API depend only on the interface, not on any specific data store. The `Reader`/`Writer` pair names the read and write sides of persistence explicitly.
+
+#### Scenario: Reader exposes a per-date read operation
+
+- **WHEN** a consumer needs the tee times for a date
+- **THEN** it calls the reader with that `YYYY-MM-DD` date and receives that date's complete `TeeTime` set
+- **AND** it depends only on the port, not on any concrete data store
+
+### Requirement: DynamoDB per-date read
+
+The DynamoDB-backed reader SHALL return a date's tee times with a single `Query` on the date partition key, reconstructing each `TeeTime` from the stored item. Because all courses' times for a date share one partition, the read SHALL NOT require a scan or secondary index. The reader SHALL page through the query until the full partition is returned.
+
+#### Scenario: All of a date's courses returned from one partition
+
+- **WHEN** the reader is asked for a date whose partition holds tee times across multiple courses
+- **THEN** it queries the single date partition and returns every course's tee times for that date
+
+#### Scenario: Large partitions are fully paged
+
+- **WHEN** a date's partition exceeds a single query page
+- **THEN** the reader continues paging until all items for that date are returned
+
+### Requirement: Missing table reads as empty
+
+When the underlying table does not exist, the reader SHALL resolve to an empty tee time set rather than raising an error, so that a read side started before the table is provisioned degrades gracefully instead of crashing.
+
+#### Scenario: Reading before the table exists
+
+- **WHEN** the reader queries a date but the table has not yet been created
+- **THEN** it returns an empty tee time set without raising an error
+
