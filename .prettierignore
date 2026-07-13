@@ -25,6 +25,7 @@ out
 .vercel
 .cache
 **/.cache
+next-env.d.ts
 
 # Coverage / test artifacts
 coverage
