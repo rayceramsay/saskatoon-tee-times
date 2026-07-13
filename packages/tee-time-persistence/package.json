@@ -6,6 +6,7 @@
   "exports": {
     "./tee-time-table": "./src/dynamodb-tee-time-table.ts",
     "./dynamodb-tee-time-writer": "./src/dynamodb-tee-time-writer.adapter.ts",
+    "./dynamodb-tee-time-reader": "./src/dynamodb-tee-time-reader.adapter.ts",
     "./dynamodb-client-factory": "./src/dynamodb-client.factory.ts"
   },
   "scripts": {

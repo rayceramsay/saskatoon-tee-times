@@ -1,14 +1,14 @@
 ## 1. Read-side port (domain)
 
-- [ ] 1.1 Add `tee-time-reader.port.ts` to `@stt/tee-time-domain` defining `TeeTimeReader` with `readTeeTimesForDate(date: string): Promise<readonly TeeTime[]>`, documented in the JSDoc house style
-- [ ] 1.2 Add the `./tee-time-reader` entry to the domain package's `exports` map
+- [x] 1.1 Add `tee-time-reader.port.ts` to `@stt/tee-time-domain` defining `TeeTimeReader` with `readTeeTimesForDate(date: string): Promise<readonly TeeTime[]>`, documented in the JSDoc house style
+- [x] 1.2 Add the `./tee-time-reader` entry to the domain package's `exports` map
 
 ## 2. DynamoDB reader adapter (persistence)
 
-- [ ] 2.1 Add `dynamodb-tee-time-reader.adapter.ts` implementing `TeeTimeReader` via a single paged `QueryCommand` on `TEE_TIME_TABLE_PARTITION_KEY`, reconstructing each `TeeTime` by parsing the item through the `TeeTime` schema (dropping `PK`/`SK`/`ttl`)
-- [ ] 2.2 Resolve `ResourceNotFoundException` to an empty list; let other errors propagate
-- [ ] 2.3 Add the `./dynamodb-tee-time-reader` entry to the persistence package's `exports` map
-- [ ] 2.4 Add an integration test (mirroring the writer's testcontainers setup) covering: multi-course date returns all items, empty date returns `[]`, large partition is fully paged, and missing table returns `[]`
+- [x] 2.1 Add `dynamodb-tee-time-reader.adapter.ts` implementing `TeeTimeReader` via a single paged `QueryCommand` on `TEE_TIME_TABLE_PARTITION_KEY`, reconstructing each `TeeTime` by parsing the item through the `TeeTime` schema (dropping `PK`/`SK`/`ttl`)
+- [x] 2.2 Resolve `ResourceNotFoundException` to an empty list; let other errors propagate
+- [x] 2.3 Add the `./dynamodb-tee-time-reader` entry to the persistence package's `exports` map
+- [x] 2.4 Add an integration test (mirroring the writer's testcontainers setup) covering: multi-course date returns all items, empty date returns `[]`, large partition is fully paged, and missing table returns `[]`
 
 ## 3. API app scaffolding
 
