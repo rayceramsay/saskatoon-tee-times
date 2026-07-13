@@ -12,9 +12,9 @@
 
 ## 3. API app scaffolding
 
-- [ ] 3.1 Flesh out `apps/api/package.json`: scripts (`dev`, `start`, `test`, `check-types`, `lint`) mirroring `scraper-local`; dependencies `hono`, `@hono/node-server`, `@stt/tee-time-domain`, `@stt/tee-time-persistence`, `zod`; matching devDependencies (tsx, vitest, eslint/ts configs, `@types/node`)
-- [ ] 3.2 Add `apps/api/tsconfig.json`, `eslint.config.js`, `vitest.config.ts`, and `.env.example` following the `scraper-local` conventions
-- [ ] 3.3 Add `apps/api/src/config.ts`: Zod env schema (`PORT`, `DYNAMODB_ENDPOINT`, `DYNAMODB_TABLE_NAME`, `LOG_LEVEL`) with inline defaults, `safeParse` + `z.prettifyError`, exported `loadConfig()` and config type
+- [x] 3.1 Flesh out `apps/api/package.json`: scripts (`dev`, `start`, `test`, `check-types`, `lint`) mirroring `scraper-local`; dependencies `hono`, `@hono/node-server`, `@stt/tee-time-domain`, `@stt/tee-time-persistence`, `zod`; matching devDependencies (tsx, vitest, eslint/ts configs, `@types/node`)
+- [x] 3.2 Add `apps/api/tsconfig.json`, `eslint.config.js`, `vitest.config.ts`, and `.env.example` following the `scraper-local` conventions
+- [x] 3.3 Add `apps/api/src/config.ts`: Zod env schema (`PORT`, `DYNAMODB_ENDPOINT`, `DYNAMODB_TABLE_NAME`, `LOG_LEVEL`) with inline defaults, `safeParse` + `z.prettifyError`, exported `loadConfig()` and config type
 
 ## 4. HTTP app and endpoint
 
