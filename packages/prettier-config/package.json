@@ -5,5 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./base.js"
+  },
+  "devDependencies": {
+    "prettier-plugin-tailwindcss": "^0.8.0"
   }
 }
