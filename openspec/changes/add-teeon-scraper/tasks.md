@@ -4,11 +4,11 @@
 
 ## 2. Captured-JSON transport stack
 
-- [ ] 2.1 Add `transport/captured-json-fetcher.port.ts` defining `CapturedJsonFetcher { capture(pageUrl, responseUrlPrefix): Promise<unknown> }`
-- [ ] 2.2 Add `transport/playwright-captured-json-fetcher.adapter.ts` (`PlaywrightCapturedJsonFetcher`): lazily launch/share a headless chromium browser + context with a `close()`; in `capture`, register `page.waitForResponse` on the URL-prefix match before `page.goto(pageUrl)`, then read the matched response — throw `TransportError(status, parsedRetryAfter, url)` on non-OK, return parsed JSON on OK (reuse a `parseRetryAfter` mirroring the JSON adapter's)
-- [ ] 2.3 Add `transport/host-limited-captured-json-fetcher.adapter.ts` (`HostLimitedCapturedJsonFetcher` implementing `CapturedJsonFetcher`), scheduling by the page URL's host through the injected `RequestLimiter`
-- [ ] 2.4 Add unit tests: adapter capture-and-return (OK → parsed JSON; non-OK → `TransportError` with status/retry-after) driven by a stubbed page/response, and the host-limited decorator (schedules under the page URL host, substitutable)
-- [ ] 2.5 Add the three transport files to the `@stt/scraper-core` `package.json` `exports` map
+- [x] 2.1 Add `transport/captured-json-fetcher.port.ts` defining `CapturedJsonFetcher { capture(pageUrl, responseUrlPrefix): Promise<unknown> }`
+- [x] 2.2 Add `transport/playwright-captured-json-fetcher.adapter.ts` (`PlaywrightCapturedJsonFetcher`): lazily launch/share a headless chromium browser + context with a `close()`; in `capture`, register `page.waitForResponse` on the URL-prefix match before `page.goto(pageUrl)`, then read the matched response — throw `TransportError(status, parsedRetryAfter, url)` on non-OK, return parsed JSON on OK (reuse a `parseRetryAfter` mirroring the JSON adapter's)
+- [x] 2.3 Add `transport/host-limited-captured-json-fetcher.adapter.ts` (`HostLimitedCapturedJsonFetcher` implementing `CapturedJsonFetcher`), scheduling by the page URL's host through the injected `RequestLimiter`
+- [x] 2.4 Add unit tests: adapter capture-and-return (OK → parsed JSON; non-OK → `TransportError` with status/retry-after) driven by a stubbed page/response, and the host-limited decorator (schedules under the page URL host, substitutable)
+- [x] 2.5 Add the three transport files to the `@stt/scraper-core` `package.json` `exports` map
 
 ## 3. TeeOn platform
 
