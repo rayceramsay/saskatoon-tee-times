@@ -17,8 +17,8 @@
 
 ## 3. Course + pricing config
 
-- [ ] 3.1 Add `platforms/chronogolf-v2/courses/the-willows.ts` exporting a `ChronogolfV2CourseConfig` (`courseId 'the-willows'`, `courseName 'The Willows'`, three physical-loop UUIDs + `'18'` in `courseIds`, `slug`, `affiliationTypeId` per the verified capture, `America/Regina`, `bookingPortalUrl`, `maxAdvanceDays 5`, `releaseTime '07:00'`), with a comment explaining the `'18'` entry is a combined-round toggle that adds no rows
-- [ ] 3.2 Export a `CoursePricingConfig` for The Willows grossing the pre-tax scraped fee up by `0.11` (`tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 }`, `rules: []`); add both exports to the `package.json` `exports` map
+- [x] 3.1 Add `platforms/chronogolf-v2/courses/the-willows.ts` exporting a `ChronogolfV2CourseConfig` (`courseId 'the-willows'`, `courseName 'The Willows'`, three physical-loop UUIDs + `'18'` in `courseIds`, `slug`, `affiliationTypeId` per the verified capture, `America/Regina`, `bookingPortalUrl`, `maxAdvanceDays 5`, `releaseTime '07:00'`), with a comment explaining the `'18'` entry is a combined-round toggle that adds no rows
+- [x] 3.2 Export a `CoursePricingConfig` for The Willows grossing the pre-tax scraped fee up by `0.11` (`tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 }`, `rules: []`); add both exports to the `package.json` `exports` map
 
 ## 4. Wiring
 
