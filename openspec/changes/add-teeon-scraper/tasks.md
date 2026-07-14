@@ -12,13 +12,13 @@
 
 ## 3. TeeOn platform
 
-- [ ] 3.1 Add `platforms/teeon/teeon-course-config.ts` (`TeeOnCourseConfig extends CourseConfig` with `facilityId: number` and `portalUrl: string`)
-- [ ] 3.2 Add `platforms/teeon/teeon-scraper.adapter.ts` (`TeeOnScraper implements BookingPlatformScraper`, `platform = 'teeon'`, private configs, injected `CapturedJsonFetcher`): build the portal URL with `?date=`, capture the guest `tee-time` response by its `guest/tee-time?facility_id=<id>&date=<date>` prefix, parse, and return records; emit `dynamicPrice: null`
-- [ ] 3.3 Implement response parsing (Zod): validate the guest array modeling only consumed fields (`start_time`, `date`, `quantity_remaining`, `division_title`, `turn_division_title`, `turn_tee_time`, `blocked_type`); drop rows unless `blocked_type === 'open'` and `quantity_remaining >= 1`
-- [ ] 3.4 Implement per-start fan-out: always a 9-hole record (`routing: [division_title]`); an 18-hole record (`routing: [division_title, turn_division_title]`) only when `turn_tee_time` is present and `turn_division_title` is non-null
-- [ ] 3.5 Implement `groupSizes = [1 .. min(quantity_remaining, 4)]`, `startInstant` via the shared local-start-instant util, `onlineBookable: true`, and per-group-size `bookingUrls` all set to `portalUrl?date=<date>`
-- [ ] 3.6 Add scraper/parser tests driven by the committed fixtures, asserting 9/18-hole fan-out, late-day 9-only, dropped (blocked/full) rows, contiguous group sizes, routing, `onlineBookable: true`, `dynamicPrice: null`, and the shared portal-with-date booking URLs
-- [ ] 3.7 Add the TeeOn scraper adapter to the `@stt/scraper-core` `package.json` `exports` map
+- [x] 3.1 Add `platforms/teeon/teeon-course-config.ts` (`TeeOnCourseConfig extends CourseConfig` with `facilityId: number` and `portalUrl: string`)
+- [x] 3.2 Add `platforms/teeon/teeon-scraper.adapter.ts` (`TeeOnScraper implements BookingPlatformScraper`, `platform = 'teeon'`, private configs, injected `CapturedJsonFetcher`): build the portal URL with `?date=`, capture the guest `tee-time` response by its `guest/tee-time?facility_id=<id>&date=<date>` prefix, parse, and return records; emit `dynamicPrice: null`
+- [x] 3.3 Implement response parsing (Zod): validate the guest array modeling only consumed fields (`start_time`, `date`, `quantity_remaining`, `division_title`, `turn_division_title`, `turn_tee_time`, `blocked_type`); drop rows unless `blocked_type === 'open'` and `quantity_remaining >= 1`
+- [x] 3.4 Implement per-start fan-out: always a 9-hole record (`routing: [division_title]`); an 18-hole record (`routing: [division_title, turn_division_title]`) only when `turn_tee_time` is present and `turn_division_title` is non-null
+- [x] 3.5 Implement `groupSizes = [1 .. min(quantity_remaining, 4)]`, `startInstant` via the shared local-start-instant util, `onlineBookable: true`, and per-group-size `bookingUrls` all set to `portalUrl?date=<date>`
+- [x] 3.6 Add scraper/parser tests driven by the committed fixtures, asserting 9/18-hole fan-out, late-day 9-only, dropped (blocked/full) rows, contiguous group sizes, routing, `onlineBookable: true`, `dynamicPrice: null`, and the shared portal-with-date booking URLs
+- [x] 3.7 Add the TeeOn scraper adapter to the `@stt/scraper-core` `package.json` `exports` map
 
 ## 4. Course + pricing config
 
