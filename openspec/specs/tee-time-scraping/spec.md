@@ -88,6 +88,13 @@ A Chronogolf V1 course SHALL be configured as one or more listings, each pinning
 - **AND** records from the North listing carry routing `["North"]` while main-course records carry routing `[]`
 - **AND** each record's `holes` equals the `nb_holes` of the listing it came from
 
+#### Scenario: Dakota Dunes fans out over its single course id at 18 and 9 holes
+
+- **WHEN** Dakota Dunes is scraped for a date
+- **THEN** the scraper queries its single Chronogolf `course_id` at 18 holes and at 9 holes, each across group sizes 1–4
+- **AND** every resulting record carries empty routing (`[]`)
+- **AND** each record's `holes` equals the `nb_holes` of the listing it came from
+
 ### Requirement: Booking URL resolves to a per-slot deep link
 
 Each Chronogolf V1 scraped tee time SHALL carry, for each valid group size, a rung-1 reservation-review deep link that targets that exact slot and player count — not the general portal fallback. The deep link SHALL be built inside the scraper from the tee-time `id` already present in the parsed response (zero extra requests), the listing's Chronogolf `course_id` and `nb_holes`, and the course config's `slug`, repeating `affiliation_type_ids` once per player for the group size. The deep link's host SHALL be the course's canonical user-facing booking host (config `bookingTld`), which SHALL be independent of the scrape `tld` mirror so that rate-limit mirror choices never leak into user-facing links. The trivial "first available candidate" policy SHALL still select the deep link over the portal fallback.
@@ -115,6 +122,18 @@ A Chronogolf V1 course config SHALL declare a `slug` (the club's booking URL slu
 - **THEN** it exposes a `slug` and a `bookingTld` used to build its deep links
 - **AND** its scrape `tld` remains free to be tuned as a rate-limit mirror without changing the booking links
 
+#### Scenario: Dakota Dunes config carries a slug and canonical booking host
+
+- **WHEN** the Dakota Dunes Chronogolf V1 config is loaded
+- **THEN** it exposes a `slug` and a `bookingTld` used to build reservation-review deep links carrying each slot's `teetime_id`, `course_id`, `nb_holes`, and date
+- **AND** its scrape `tld` — a mirror distinct from every other Chronogolf V1 course — never appears in any user-facing booking URL
+
+#### Scenario: Dakota Dunes is served as a second Chronogolf V1 course alongside Greenbryre
+
+- **WHEN** the Chronogolf V1 scraper is constructed with the Dakota Dunes configuration
+- **THEN** it reports Dakota Dunes among its served courses alongside Greenbryre
+- **AND** `scrape` for Dakota Dunes returns `ScrapedTeeTime` records with no change to the Chronogolf V1 scraper, transport, canonical schema, or persistence
+
 ### Requirement: Course booking-window configuration
 
 The universal `CourseConfig` SHALL carry the course's booking window: `maxAdvanceDays` (the number of days ahead, beyond today, that are bookable) and `releaseTime` (the local `HH:MM` time of day at which the furthest-out date becomes bookable). These fields are platform-independent booking facts and SHALL be populated for every course. Greenbryre's configuration SHALL be updated to declare its booking window.
@@ -129,6 +148,11 @@ The universal `CourseConfig` SHALL carry the course's booking window: `maxAdvanc
 
 - **WHEN** the Greenbryre course configuration is loaded
 - **THEN** it exposes `maxAdvanceDays` and `releaseTime` values reflecting Greenbryre's booking policy
+
+#### Scenario: Dakota Dunes declares a concrete booking window
+
+- **WHEN** the Dakota Dunes course configuration is loaded
+- **THEN** it exposes `maxAdvanceDays` 7 and `releaseTime` `00:00`
 
 ### Requirement: WebTrac platform scraper
 

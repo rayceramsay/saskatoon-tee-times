@@ -36,6 +36,13 @@ Pricing SHALL be a shared engine parameterized by per-course configuration `{ ta
 - **THEN** the configured tax rule marks the scraped price as not tax-inclusive with the course's tax rate
 - **AND** `pricePerPlayer` equals the scraped price grossed up by that tax rate, rounded to cents
 
+#### Scenario: Dakota Dunes is configured with a pre-tax dynamic tax rule
+
+- **WHEN** the pricing engine enriches a Dakota Dunes tee time whose scraped green fee is pre-tax
+- **THEN** the configured tax rule marks the scraped price as not tax-inclusive with the course's `0.11` tax rate
+- **AND** `pricePerPlayer` equals the scraped price grossed up by that tax rate, rounded to cents
+- **AND** no static pricing rule is consulted
+
 ### Requirement: Tax normalization fails loud on misconfiguration
 
 Tax normalization SHALL apply the course's tax rule: a tax-inclusive scraped price passes through, and a non-inclusive scraped price is grossed up by the tax rate and rounded to two decimals. When a non-null dynamic price is enriched for a course with no configured tax rule, the engine SHALL throw rather than guess.
