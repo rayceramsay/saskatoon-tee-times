@@ -415,7 +415,7 @@ interface FilterSectionsProps extends FilterControlsProps {
   calendarMode: 'popup' | 'inline';
 }
 
-/** All filter controls in DESIGN.md order, shared by the sidebar and the sheet. */
+/** All filter controls, shared by the sidebar and the sheet. */
 export function FilterSections({ calendarMode, ...props }: FilterSectionsProps) {
   return (
     <div className="flex flex-col gap-4">
