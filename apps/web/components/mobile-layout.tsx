@@ -23,7 +23,7 @@ function GroupHeader({ group, now }: { group: CourseGroup; now: Date }) {
       <span className="text-ink-2 flex-1 text-[11px] font-bold tracking-[0.05em] uppercase">
         {group.name}
       </span>
-      <span className="text-ink-3 text-[11px]">{group.teeTimes.length} slots</span>
+      <span className="text-ink-3 text-[11px]">{group.teeTimes.length} tee times</span>
       <FreshnessIndicator state={freshnessState(latestScrapedAt(group), now)} />
     </div>
   );
