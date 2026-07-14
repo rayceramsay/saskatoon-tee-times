@@ -22,8 +22,8 @@
 
 ## 4. Course + pricing config
 
-- [ ] 4.1 Add `platforms/teeon/courses/the-legends.ts` exporting a `TeeOnCourseConfig` (`courseId 'the-legends'`, `courseName 'The Legends'`, `facilityId 477`, portal URL, `America/Regina`, `maxAdvanceDays 5`, `releaseTime '06:00'`) and an empty `CoursePricingConfig` (`{ rules: [] }`); add both to the `package.json` `exports` map
-- [ ] 4.2 Add a comment on the empty pricing config flagging that TeeOn pricing is deferred to the follow-up change (per-slot variant resolution unsolved)
+- [x] 4.1 Add `platforms/teeon/courses/the-legends.ts` exporting a `TeeOnCourseConfig` (`courseId 'the-legends'`, `courseName 'The Legends'`, `facilityId 477`, portal URL, `America/Regina`, `maxAdvanceDays 5`, `releaseTime '06:00'`) and an empty `CoursePricingConfig` (`{ rules: [] }`); add both to the `package.json` `exports` map
+- [x] 4.2 Add a comment on the empty pricing config flagging that TeeOn pricing is deferred to the follow-up change (per-slot variant resolution unsolved)
 
 ## 5. Wiring
 

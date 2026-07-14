@@ -15,6 +15,7 @@
     "./platforms/webtrac/courses/silverwood": "./src/platforms/webtrac/courses/silverwood.ts",
     "./platforms/webtrac/courses/wildwood": "./src/platforms/webtrac/courses/wildwood.ts",
     "./platforms/teeon": "./src/platforms/teeon/teeon-scraper.adapter.ts",
+    "./platforms/teeon/courses/the-legends": "./src/platforms/teeon/courses/the-legends.ts",
     "./transport/playwright-json-fetcher": "./src/transport/playwright-json-fetcher.adapter.ts",
     "./transport/host-limited-json-fetcher": "./src/transport/host-limited-json-fetcher.adapter.ts",
     "./transport/captured-json-fetcher": "./src/transport/captured-json-fetcher.port.ts",
