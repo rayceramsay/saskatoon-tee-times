@@ -7,6 +7,11 @@ import {
   greenbryreConfig,
   greenbryrePricingConfig,
 } from '@stt/scraper-core/platforms/chronogolf-v1/courses/greenbryre';
+import { ChronogolfV2Scraper } from '@stt/scraper-core/platforms/chronogolf-v2';
+import {
+  theWillowsConfig,
+  theWillowsPricingConfig,
+} from '@stt/scraper-core/platforms/chronogolf-v2/courses/the-willows';
 import { WebtracScraper } from '@stt/scraper-core/platforms/webtrac';
 import {
   holidayParkChampionshipConfig,
@@ -81,6 +86,10 @@ async function main(): Promise<void> {
   const fetcher = new PlaywrightJsonFetcher();
   const limitedFetcher = new HostLimitedJsonFetcher(fetcher, browserLimiter);
   const chronogolfScraper = new ChronogolfV1Scraper([greenbryreConfig], limitedFetcher);
+  const chronogolfV2Scraper = new ChronogolfV2Scraper(
+    [theWillowsConfig],
+    limitedFetcher
+  );
 
   const capturedFetcher = new PlaywrightCapturedJsonFetcher();
   const limitedCapturedFetcher = new HostLimitedCapturedJsonFetcher(
@@ -106,13 +115,14 @@ async function main(): Promise<void> {
   );
 
   const orchestrator = new TeeTimeOrchestrator(
-    [chronogolfScraper, webtracScraper, teeOnScraper],
+    [chronogolfScraper, chronogolfV2Scraper, webtracScraper, teeOnScraper],
     logger
   );
   const writer = new DynamoDbTeeTimeWriter(documentClient, config.DYNAMODB_TABLE_NAME);
   const pricingEngine = new PricingEngine(
     new Map([
       [greenbryreConfig.courseId, greenbryrePricingConfig],
+      [theWillowsConfig.courseId, theWillowsPricingConfig],
       [holidayParkChampionshipConfig.courseId, holidayParkChampionshipPricingConfig],
       [holidayParkExecutive9Config.courseId, holidayParkExecutive9PricingConfig],
       [silverwoodConfig.courseId, silverwoodPricingConfig],
