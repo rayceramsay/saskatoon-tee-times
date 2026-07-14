@@ -56,7 +56,7 @@ export function DesktopLayout(props: LayoutProps) {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="border-line bg-panel w-[264px] shrink-0 overflow-visible border-r p-3.5">
+        <aside className="border-line bg-panel w-[264px] shrink-0 overflow-x-visible overflow-y-auto border-r p-3.5">
           <FilterSections {...props} calendarMode="popup" />
         </aside>
 
