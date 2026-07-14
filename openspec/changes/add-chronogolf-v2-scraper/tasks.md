@@ -5,15 +5,15 @@
 
 ## 2. Chronogolf V2 platform
 
-- [ ] 2.1 Add `platforms/chronogolf-v2/chronogolf-v2-course-config.ts` (`ChronogolfV2CourseConfig extends CourseConfig` with `courseIds: string[]`, `slug: string`, `affiliationTypeId: number`, `tld: string`)
-- [ ] 2.2 Add `platforms/chronogolf-v2/chronogolf-v2-scraper.adapter.ts` (`ChronogolfV2Scraper implements BookingPlatformScraper`, `platform = 'chronogolf-v2'`, private configs, injected `JsonFetcher`): resolve the course, then walk `page=1,2,3…` sequentially — building each URL from `start_date`, comma-joined `course_ids`, and `page` — stopping when a page's `teetimes` is empty, then parse and concatenate the pages
-- [ ] 2.3 Implement response parsing (Zod) modeling only consumed fields (`teetimes[]` with `id`, `course.name`, `course.bookable_holes`, `start_time`, `date`, `min_player_size`, `max_player_size`, `default_price` nullable with `green_fee` + `bookable_holes`); validate against the committed fixture so a shape change fails loudly
-- [ ] 2.4 Implement `groupSizes` as the inline contiguous range `[min_player_size .. max_player_size]`, dropping any tee time whose range is empty
-- [ ] 2.5 Implement the per-hole-count fan-out: one record per `course.bookable_holes` entry, each `routing: [course.name]`, `holes` from the entry; `startInstant` via the shared local-start-instant util from `date` + `start_time` + course time zone; `onlineBookable: true`
-- [ ] 2.6 Implement `dynamicPrice`: `default_price.green_fee` only when `default_price.bookable_holes` equals the record's hole count, else `null` (no tax applied)
-- [ ] 2.7 Implement per-group-size `bookingUrls`: build a reservation-review deep link `…/club/<slug>/booking/?source=chronogolf&medium=profile#/teetime/review?affiliation_type_ids=<id×players>&teetime_id=<id>&nb_holes=<holes>&engine=2`, selected via `bestBookingUrl(deepLink, config.bookingPortalUrl)`
-- [ ] 2.8 Add scraper/parser tests driven by the committed fixtures asserting: pagination stops at the empty page; inline contiguous group sizes; 9/18 hole fan-out with single-element routing; two distinct records at one `startInstant` for same-time-different-loop starts; `dynamicPrice` set on the 9-hole record and `null` on the 18-hole record; per-size deep links repeating `affiliation_type_ids` per player; `onlineBookable: true`; course-config attribution over payload labels
-- [ ] 2.9 Add the scraper adapter to the `@stt/scraper-core` `package.json` `exports` map
+- [x] 2.1 Add `platforms/chronogolf-v2/chronogolf-v2-course-config.ts` (`ChronogolfV2CourseConfig extends CourseConfig` with `courseIds: string[]`, `slug: string`, `affiliationTypeId: number`, `tld: string`)
+- [x] 2.2 Add `platforms/chronogolf-v2/chronogolf-v2-scraper.adapter.ts` (`ChronogolfV2Scraper implements BookingPlatformScraper`, `platform = 'chronogolf-v2'`, private configs, injected `JsonFetcher`): resolve the course, then walk `page=1,2,3…` sequentially — building each URL from `start_date`, comma-joined `course_ids`, and `page` — stopping when a page's `teetimes` is empty, then parse and concatenate the pages
+- [x] 2.3 Implement response parsing (Zod) modeling only consumed fields (`teetimes[]` with `id`, `course.name`, `course.bookable_holes`, `start_time`, `date`, `min_player_size`, `max_player_size`, `default_price` nullable with `green_fee` + `bookable_holes`); validate against the committed fixture so a shape change fails loudly
+- [x] 2.4 Implement `groupSizes` as the inline contiguous range `[min_player_size .. max_player_size]`, dropping any tee time whose range is empty
+- [x] 2.5 Implement the per-hole-count fan-out: one record per `course.bookable_holes` entry, each `routing: [course.name]`, `holes` from the entry; `startInstant` via the shared local-start-instant util from `date` + `start_time` + course time zone; `onlineBookable: true`
+- [x] 2.6 Implement `dynamicPrice`: `default_price.green_fee` only when `default_price.bookable_holes` equals the record's hole count, else `null` (no tax applied)
+- [x] 2.7 Implement per-group-size `bookingUrls`: build a reservation-review deep link `…/club/<slug>/booking/?source=chronogolf&medium=profile#/teetime/review?affiliation_type_ids=<id×players>&teetime_id=<id>&nb_holes=<holes>&engine=2`, selected via `bestBookingUrl(deepLink, config.bookingPortalUrl)`
+- [x] 2.8 Add scraper/parser tests driven by the committed fixtures asserting: pagination stops at the empty page; inline contiguous group sizes; 9/18 hole fan-out with single-element routing; two distinct records at one `startInstant` for same-time-different-loop starts; `dynamicPrice` set on the 9-hole record and `null` on the 18-hole record; per-size deep links repeating `affiliation_type_ids` per player; `onlineBookable: true`; course-config attribution over payload labels
+- [x] 2.9 Add the scraper adapter to the `@stt/scraper-core` `package.json` `exports` map
 
 ## 3. Course + pricing config
 
