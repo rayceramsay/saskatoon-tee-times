@@ -1,12 +1,15 @@
 import type { TeeTimeReader } from '@stt/tee-time-domain/tee-time-reader';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import { z } from 'zod';
 
 /** Collaborators the HTTP app depends on, supplied by the composition root. */
 export interface AppDeps {
   reader: TeeTimeReader;
+  /** When true, 500 responses include the error's message and stack. Defaults off in production. */
+  exposeErrorDetails: boolean;
 }
 
 const teeTimesQuerySchema = z.object({
@@ -24,7 +27,7 @@ const teeTimesQuerySchema = z.object({
  * const app = createApp({ reader });
  * ```
  */
-export function createApp({ reader }: AppDeps): Hono {
+export function createApp({ reader, exposeErrorDetails }: AppDeps): Hono {
   const app = new Hono();
 
   app.use('*', cors());
@@ -45,6 +48,24 @@ export function createApp({ reader }: AppDeps): Hono {
     );
 
     return c.json({ date, teeTimes, lastUpdatedAt });
+  });
+
+  app.onError((err, c) => {
+    if (err instanceof HTTPException) {
+      return err.getResponse();
+    }
+
+    console.error(err);
+
+    const body: { error: string; message?: string; stack?: string } = {
+      error: 'Unexpected error',
+    };
+    if (exposeErrorDetails && err instanceof Error) {
+      body.message = err.message;
+      body.stack = err.stack;
+    }
+
+    return c.json(body, 500);
   });
 
   return app;

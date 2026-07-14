@@ -19,7 +19,7 @@ function main(): void {
   });
   const reader = new DynamoDbTeeTimeReader(documentClient, config.DYNAMODB_TABLE_NAME);
 
-  const app = createApp({ reader });
+  const app = createApp({ reader, exposeErrorDetails: config.EXPOSE_ERROR_DETAILS });
 
   const server = serve({ fetch: app.fetch, port: config.PORT });
 

@@ -9,6 +9,8 @@ const environmentSchema = z.object({
   DYNAMODB_TABLE_NAME: z.string().min(1).default('tee-times-local'),
   // Minimum severity the HTTP access logger emits.
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+  // Whether 500 responses include the error's message and stack; defaults off so prod fails closed.
+  EXPOSE_ERROR_DETAILS: z.stringbool().default(false),
 });
 
 /** Runtime configuration for the local API entrypoint. */
