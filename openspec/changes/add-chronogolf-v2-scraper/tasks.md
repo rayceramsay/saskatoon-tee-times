@@ -1,7 +1,7 @@
 ## 1. Fixtures
 
-- [ ] 1.1 Capture a real Chronogolf V2 `/marketplace/v2/teetimes` response for The Willows by navigating a browser to the JSON URL (all three loop UUIDs + `18` in `course_ids`, a future `start_date`, `page=1`), and commit under `packages/scraper-core/src/platforms/chronogolf-v2/__fixtures__/` — include a page exhibiting multiple loops, a same-start-time-on-two-loops pair, a spread of `min_player_size`/`max_player_size`, and `default_price.bookable_holes === 9`, plus a `README.md` documenting how it was captured (URL, course_ids, date)
-- [ ] 1.2 Capture the empty terminal page (a later `page=N` whose `teetimes` is `[]`) as a second fixture so the pagination stop condition is fixture-backed
+- [x] 1.1 Capture a real Chronogolf V2 `/marketplace/v2/teetimes` response for The Willows by navigating a browser to the JSON URL (all three loop UUIDs + `18` in `course_ids`, a future `start_date`, `page=1`), and commit under `packages/scraper-core/src/platforms/chronogolf-v2/__fixtures__/` — include a page exhibiting multiple loops, a same-start-time-on-two-loops pair, a spread of `min_player_size`/`max_player_size`, and `default_price.bookable_holes === 9`, plus a `README.md` documenting how it was captured (URL, course_ids, date)
+- [x] 1.2 Capture the empty terminal page (a later `page=N` whose `teetimes` is `[]`) as a second fixture so the pagination stop condition is fixture-backed
 
 ## 2. Chronogolf V2 platform
 

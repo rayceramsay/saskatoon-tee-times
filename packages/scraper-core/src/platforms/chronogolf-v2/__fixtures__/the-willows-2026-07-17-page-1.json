@@ -1,0 +1,530 @@
+{
+  "status": "open",
+  "teetimes": [
+    {
+      "id": 564932886,
+      "uuid": "71e4d849-4206-4835-8df0-10fd0d3b6e05",
+      "course": {
+        "id": 23005,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Bridges",
+        "uuid": "25664982-9496-4843-8b9d-581b981d698c"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-17T13:03:00Z",
+      "start_time": "7:03",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 564932887,
+      "uuid": "ee104188-38fa-43ca-96c6-2b21360f6ea6",
+      "course": {
+        "id": 23005,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Bridges",
+        "uuid": "25664982-9496-4843-8b9d-581b981d698c"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-17T13:12:00Z",
+      "start_time": "7:12",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 565758248,
+      "uuid": "0726b602-6e3a-4c85-bff8-be5e33760d28",
+      "course": {
+        "id": 23004,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Lakes",
+        "uuid": "2e7ff0bb-4cc8-4b85-85be-2a4f9a2813d0"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-17T13:57:00Z",
+      "start_time": "7:57",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 564932896,
+      "uuid": "02a1b241-dcf0-4aae-81c7-9ed8a8a418b3",
+      "course": {
+        "id": 23005,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Bridges",
+        "uuid": "25664982-9496-4843-8b9d-581b981d698c"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-17T14:33:00Z",
+      "start_time": "8:33",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 565758267,
+      "uuid": "d9e358fc-0ea6-4c20-9276-83bd5c0c82b6",
+      "course": {
+        "id": 23004,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Lakes",
+        "uuid": "2e7ff0bb-4cc8-4b85-85be-2a4f9a2813d0"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-17T16:50:00Z",
+      "start_time": "10:50",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 565758209,
+      "uuid": "df383ab7-ba12-45cf-b295-06be4fd1fe8c",
+      "course": {
+        "id": 23003,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Xena",
+        "uuid": "5fdf8123-a394-4533-aa03-ae11d9d60650"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-17T17:30:00Z",
+      "start_time": "11:30",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 565758273,
+      "uuid": "9c43f42e-4e2e-4b62-9aac-96d32e53ad17",
+      "course": {
+        "id": 23004,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Lakes",
+        "uuid": "2e7ff0bb-4cc8-4b85-85be-2a4f9a2813d0"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-17T17:50:00Z",
+      "start_time": "11:50",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 565758215,
+      "uuid": "d9517a59-f34a-4a0f-b236-803745f6c218",
+      "course": {
+        "id": 23003,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Xena",
+        "uuid": "5fdf8123-a394-4533-aa03-ae11d9d60650"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-17T18:30:00Z",
+      "start_time": "12:30",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 564932897,
+      "uuid": "d8cae1a7-a8a4-49c4-ba74-98ec805b0cf0",
+      "course": {
+        "id": 23005,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Bridges",
+        "uuid": "25664982-9496-4843-8b9d-581b981d698c"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-17T21:10:00Z",
+      "start_time": "15:10",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 565758231,
+      "uuid": "9efaf467-c03d-451a-b0e8-4c23637ebe8a",
+      "course": {
+        "id": 23003,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Xena",
+        "uuid": "5fdf8123-a394-4533-aa03-ae11d9d60650"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 2,
+      "starts_at": "2026-07-17T21:10:00Z",
+      "start_time": "15:10",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 564932903,
+      "uuid": "1c9c92ee-a825-4587-bfd6-45877d5a7d12",
+      "course": {
+        "id": 23005,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Bridges",
+        "uuid": "25664982-9496-4843-8b9d-581b981d698c"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 2,
+      "starts_at": "2026-07-17T22:10:00Z",
+      "start_time": "16:10",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 564932907,
+      "uuid": "85ef0983-d13c-4a11-9ed7-424e23f79c1c",
+      "course": {
+        "id": 23005,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Bridges",
+        "uuid": "25664982-9496-4843-8b9d-581b981d698c"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 2,
+      "starts_at": "2026-07-17T22:50:00Z",
+      "start_time": "16:50",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 49.55,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 49.55,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 564932919,
+      "uuid": "98bd2833-6a2f-4572-bd37-acd7adab4dd3",
+      "course": {
+        "id": 23005,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Bridges",
+        "uuid": "25664982-9496-4843-8b9d-581b981d698c"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 1,
+      "starts_at": "2026-07-18T00:50:00Z",
+      "start_time": "18:50",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 27.03,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 27.03,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 564932921,
+      "uuid": "82e23d7b-9093-4262-9804-212e25516747",
+      "course": {
+        "id": 23005,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Bridges",
+        "uuid": "25664982-9496-4843-8b9d-581b981d698c"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 4,
+      "starts_at": "2026-07-18T01:10:00Z",
+      "start_time": "19:10",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 27.03,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 27.03,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    },
+    {
+      "id": 565758280,
+      "uuid": "a4e3300c-209f-44cb-a6af-ac9b8143b8fc",
+      "course": {
+        "id": 23004,
+        "bookable_holes": [
+          9,
+          18
+        ],
+        "holes": 18,
+        "name": "Lakes",
+        "uuid": "2e7ff0bb-4cc8-4b85-85be-2a4f9a2813d0"
+      },
+      "hole": 1,
+      "has_cart": false,
+      "min_player_size": 1,
+      "max_player_size": 3,
+      "starts_at": "2026-07-18T01:20:00Z",
+      "start_time": "19:20",
+      "date": "2026-07-17",
+      "event_id": null,
+      "has_deal": true,
+      "default_price": {
+        "green_fee": 27.03,
+        "half_cart": 13.51,
+        "one_person_cart": null,
+        "player_type_id": 110161,
+        "subtotal": 27.03,
+        "bookable_holes": 9,
+        "affiliation_type": "Public Adult"
+      },
+      "departure": null,
+      "format": "normal",
+      "frozen": false
+    }
+  ]
+}
