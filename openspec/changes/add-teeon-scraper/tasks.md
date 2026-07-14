@@ -27,12 +27,12 @@
 
 ## 5. Wiring
 
-- [ ] 5.1 In `apps/scraper-local/src/main.ts`, hoist the browser `BottleneckRequestLimiter` to a shared variable and construct `PlaywrightCapturedJsonFetcher` → `HostLimitedCapturedJsonFetcher` backed by that **same** limiter instance as the Playwright JSON fetcher (shared global page ceiling; per-host caps stay independent by hostname); ensure the captured fetcher's `close()` runs on shutdown alongside the existing fetcher
-- [ ] 5.2 Construct `TeeOnScraper` with The Legends config + the captured-JSON fetcher and add it to the orchestrator's scraper array
-- [ ] 5.3 Add The Legends' (empty) pricing config to the `PricingEngine` course-config map
+- [x] 5.1 In `apps/scraper-local/src/main.ts`, hoist the browser `BottleneckRequestLimiter` to a shared variable and construct `PlaywrightCapturedJsonFetcher` → `HostLimitedCapturedJsonFetcher` backed by that **same** limiter instance as the Playwright JSON fetcher (shared global page ceiling; per-host caps stay independent by hostname); ensure the captured fetcher's `close()` runs on shutdown alongside the existing fetcher
+- [x] 5.2 Construct `TeeOnScraper` with The Legends config + the captured-JSON fetcher and add it to the orchestrator's scraper array
+- [x] 5.3 Add The Legends' (empty) pricing config to the `PricingEngine` course-config map
 
 ## 6. Verify
 
-- [ ] 6.1 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix all errors
-- [ ] 6.2 Run the full test suite green
-- [ ] 6.3 Run `apps/scraper-local` against local DynamoDB and confirm The Legends records land for a future date (9- and 18-hole, `onlineBookable: true`, `pricePerPlayer: null`)
+- [x] 6.1 Run `pnpm format`, `pnpm check-types`, and `pnpm lint`; fix all errors
+- [x] 6.2 Run the full test suite green
+- [x] 6.3 Run `apps/scraper-local` against local DynamoDB and confirm The Legends records land for a future date (9- and 18-hole, `onlineBookable: true`, `pricePerPlayer: null`)

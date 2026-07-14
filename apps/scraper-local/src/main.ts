@@ -24,8 +24,15 @@ import {
   wildwoodConfig,
   wildwoodPricingConfig,
 } from '@stt/scraper-core/platforms/webtrac/courses/wildwood';
+import { TeeOnScraper } from '@stt/scraper-core/platforms/teeon';
+import {
+  theLegendsConfig,
+  theLegendsPricingConfig,
+} from '@stt/scraper-core/platforms/teeon/courses/the-legends';
 import { PlaywrightJsonFetcher } from '@stt/scraper-core/transport/playwright-json-fetcher';
 import { HostLimitedJsonFetcher } from '@stt/scraper-core/transport/host-limited-json-fetcher';
+import { PlaywrightCapturedJsonFetcher } from '@stt/scraper-core/transport/playwright-captured-json-fetcher';
+import { HostLimitedCapturedJsonFetcher } from '@stt/scraper-core/transport/host-limited-captured-json-fetcher';
 import { HttpTextFetcher } from '@stt/scraper-core/transport/http-text-fetcher';
 import { HostLimitedTextFetcher } from '@stt/scraper-core/transport/host-limited-text-fetcher';
 import { BottleneckRequestLimiter } from '@stt/scraper-core/transport/bottleneck-request-limiter';
@@ -66,12 +73,21 @@ async function main(): Promise<void> {
     },
   };
 
+  // One limiter instance for the whole browser stack: its global ceiling models
+  // the number of Playwright pages open at once, a budget shared across every
+  // browser-driven scraper. Per-host caps stay independent by hostname within it.
+  const browserLimiter = new BottleneckRequestLimiter(limiterConfig);
+
   const fetcher = new PlaywrightJsonFetcher();
-  const limitedFetcher = new HostLimitedJsonFetcher(
-    fetcher,
-    new BottleneckRequestLimiter(limiterConfig)
-  );
+  const limitedFetcher = new HostLimitedJsonFetcher(fetcher, browserLimiter);
   const chronogolfScraper = new ChronogolfV1Scraper([greenbryreConfig], limitedFetcher);
+
+  const capturedFetcher = new PlaywrightCapturedJsonFetcher();
+  const limitedCapturedFetcher = new HostLimitedCapturedJsonFetcher(
+    capturedFetcher,
+    browserLimiter
+  );
+  const teeOnScraper = new TeeOnScraper([theLegendsConfig], limitedCapturedFetcher);
 
   // WebTrac serves plain HTML over fetch and gets its own limiter instance: its
   // global ceiling models plain-fetch fan-out, distinct from the browser stack.
@@ -90,7 +106,7 @@ async function main(): Promise<void> {
   );
 
   const orchestrator = new TeeTimeOrchestrator(
-    [chronogolfScraper, webtracScraper],
+    [chronogolfScraper, webtracScraper, teeOnScraper],
     logger
   );
   const writer = new DynamoDbTeeTimeWriter(documentClient, config.DYNAMODB_TABLE_NAME);
@@ -101,11 +117,19 @@ async function main(): Promise<void> {
       [holidayParkExecutive9Config.courseId, holidayParkExecutive9PricingConfig],
       [silverwoodConfig.courseId, silverwoodPricingConfig],
       [wildwoodConfig.courseId, wildwoodPricingConfig],
+      [theLegendsConfig.courseId, theLegendsPricingConfig],
     ])
   );
   const pipeline = new IngestionPipeline(orchestrator, writer, logger, pricingEngine);
 
-  setupAndStartIngestionPipelineCronSchedule(config, pipeline, logger, fetcher, client);
+  setupAndStartIngestionPipelineCronSchedule(
+    config,
+    pipeline,
+    logger,
+    fetcher,
+    capturedFetcher,
+    client
+  );
 }
 
 function setupAndStartIngestionPipelineCronSchedule(
@@ -113,6 +137,7 @@ function setupAndStartIngestionPipelineCronSchedule(
   pipeline: IngestionPipeline,
   logger: Logger,
   fetcher: PlaywrightJsonFetcher,
+  capturedFetcher: PlaywrightCapturedJsonFetcher,
   client: DynamoDBClient
 ) {
   const task = cron.schedule(config.SCRAPE_CRON, () => pipeline.run(new Date()), {
@@ -128,7 +153,7 @@ function setupAndStartIngestionPipelineCronSchedule(
 
   const shutdown = async (): Promise<void> => {
     await task.destroy();
-    await fetcher.close();
+    await Promise.all([fetcher.close(), capturedFetcher.close()]);
     client.destroy();
   };
   process.once('SIGINT', () => void shutdown().finally(() => process.exit(0)));
