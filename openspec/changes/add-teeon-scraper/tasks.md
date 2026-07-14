@@ -1,6 +1,6 @@
 ## 1. Fixtures
 
-- [ ] 1.1 Capture real TeeOn guest `tee-time` JSON for The Legends (facility 477) by driving the portal page, and commit under `packages/scraper-core/src/platforms/teeon/__fixtures__/` — include a page exhibiting both 9- and 18-hole starts (rows with `turn_tee_time` + `turn_division_title`) and at least one late-day start lacking `turn_tee_time`, plus a `README.md` documenting how they were captured (portal URL, facility id, date)
+- [x] 1.1 Capture real TeeOn guest `tee-time` JSON for The Legends (facility 477) by driving the portal page, and commit under `packages/scraper-core/src/platforms/teeon/__fixtures__/` — include a page exhibiting both 9- and 18-hole starts (rows with `turn_tee_time` + `turn_division_title`) and at least one late-day start lacking `turn_tee_time`, plus a `README.md` documenting how they were captured (portal URL, facility id, date)
 
 ## 2. Captured-JSON transport stack
 
