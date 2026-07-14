@@ -7,6 +7,10 @@ import {
   greenbryreConfig,
   greenbryrePricingConfig,
 } from '@stt/scraper-core/platforms/chronogolf-v1/courses/greenbryre';
+import {
+  dakotaDunesConfig,
+  dakotaDunesPricingConfig,
+} from '@stt/scraper-core/platforms/chronogolf-v1/courses/dakota-dunes';
 import { ChronogolfV2Scraper } from '@stt/scraper-core/platforms/chronogolf-v2';
 import {
   theWillowsConfig,
@@ -85,7 +89,10 @@ async function main(): Promise<void> {
 
   const fetcher = new PlaywrightJsonFetcher();
   const limitedFetcher = new HostLimitedJsonFetcher(fetcher, browserLimiter);
-  const chronogolfScraper = new ChronogolfV1Scraper([greenbryreConfig], limitedFetcher);
+  const chronogolfScraper = new ChronogolfV1Scraper(
+    [greenbryreConfig, dakotaDunesConfig],
+    limitedFetcher
+  );
   const chronogolfV2Scraper = new ChronogolfV2Scraper(
     [theWillowsConfig],
     limitedFetcher
@@ -122,6 +129,7 @@ async function main(): Promise<void> {
   const pricingEngine = new PricingEngine(
     new Map([
       [greenbryreConfig.courseId, greenbryrePricingConfig],
+      [dakotaDunesConfig.courseId, dakotaDunesPricingConfig],
       [theWillowsConfig.courseId, theWillowsPricingConfig],
       [holidayParkChampionshipConfig.courseId, holidayParkChampionshipPricingConfig],
       [holidayParkExecutive9Config.courseId, holidayParkExecutive9PricingConfig],

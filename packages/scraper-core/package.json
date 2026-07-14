@@ -9,6 +9,7 @@
     "./domain/pricing-engine": "./src/domain/pricing-engine.ts",
     "./platforms/chronogolf-v1": "./src/platforms/chronogolf-v1/chronogolf-v1-scraper.adapter.ts",
     "./platforms/chronogolf-v1/courses/greenbryre": "./src/platforms/chronogolf-v1/courses/greenbryre.ts",
+    "./platforms/chronogolf-v1/courses/dakota-dunes": "./src/platforms/chronogolf-v1/courses/dakota-dunes.ts",
     "./platforms/chronogolf-v2": "./src/platforms/chronogolf-v2/chronogolf-v2-scraper.adapter.ts",
     "./platforms/chronogolf-v2/courses/the-willows": "./src/platforms/chronogolf-v2/courses/the-willows.ts",
     "./platforms/webtrac": "./src/platforms/webtrac/webtrac-scraper.adapter.ts",
