@@ -106,7 +106,7 @@ export function PlayersFilter({ viewState, onFilterChange }: FilterControlsProps
   );
 }
 
-/** Data-driven multi-select course filter with select/deselect-all. */
+/** Static-catalog multi-select course filter with select/deselect-all. */
 export function CourseFilter({
   viewState,
   courses,

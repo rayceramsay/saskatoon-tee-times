@@ -46,6 +46,43 @@ describe('applyView', () => {
     expect(result.teeTimes.map((t) => t.courseId)).toEqual(['the-willows']);
   });
 
+  it('honors a catalog course with no tee times today, yielding the empty state', () => {
+    const willows = makeTeeTime({ courseId: 'the-willows', courseName: 'The Willows' });
+
+    const result = applyView([willows], viewState({ courses: ['wildwood'] }), NOW);
+
+    expect(result.teeTimes).toEqual([]);
+  });
+
+  it('falls back to all courses when the selection is entirely unknown slugs', () => {
+    const willows = makeTeeTime({ courseId: 'the-willows', courseName: 'The Willows' });
+
+    const result = applyView(
+      [willows],
+      viewState({ courses: ['not-a-real-course'] }),
+      NOW
+    );
+
+    expect(result.teeTimes.map((t) => t.courseId)).toEqual(['the-willows']);
+  });
+
+  it('drops unknown slugs but keeps known catalog selections', () => {
+    const willows = makeTeeTime({ courseId: 'the-willows', courseName: 'The Willows' });
+    const legends = makeTeeTime({
+      courseId: 'the-legends',
+      courseName: 'The Legends',
+      startInstant: '2026-07-13T09:00:00-06:00',
+    });
+
+    const result = applyView(
+      [willows, legends],
+      viewState({ courses: ['the-willows', 'not-a-real-course'] }),
+      NOW
+    );
+
+    expect(result.teeTimes.map((t) => t.courseId)).toEqual(['the-willows']);
+  });
+
   it('matches holes by equality', () => {
     const nine = makeTeeTime({ holes: 9 });
     const eighteen = makeTeeTime({

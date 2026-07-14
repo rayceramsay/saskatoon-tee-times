@@ -1,30 +1,10 @@
 import { EARLIEST_START_FLOOR, type ViewState } from './view-state.util';
 import type { GroupSize, TeeTime } from './tee-time-response.schema';
 
-/** A course as offered by the data-driven Course filter. */
-export interface CourseOption {
-  id: string;
-  name: string;
-}
+export type { CourseOption } from './courses';
 
 /**
- * The distinct courses present in a day's results, sorted by name.
- *
- * @param teeTimes - The day's fetched tee times.
- * @returns Unique courses, ordered by display name.
- */
-export function availableCourses(teeTimes: readonly TeeTime[]): CourseOption[] {
-  const byId = new Map<string, string>();
-  for (const teeTime of teeTimes) {
-    if (!byId.has(teeTime.courseId)) byId.set(teeTime.courseId, teeTime.courseName);
-  }
-  return [...byId.entries()]
-    .map(([id, name]) => ({ id, name }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-/**
- * Resolve the selected course set for filtering against the day's real courses.
+ * Resolve the selected course set for filtering against the course catalog.
  *
  * Null (param absent) means "all". Unknown slugs are dropped; if a non-empty
  * selection was entirely unknown it falls back to "all" (a malformed link reads
@@ -32,7 +12,7 @@ export function availableCourses(teeTimes: readonly TeeTime[]): CourseOption[] {
  * every course yields the empty state.
  *
  * @param courses - The view state's raw course slugs, or null for "all".
- * @param availableIds - The course ids present in the day's results.
+ * @param availableIds - The known course ids to validate against (the catalog).
  * @returns The resolved id set, or null for "all courses".
  */
 export function resolveSelectedCourseIds(

@@ -4,7 +4,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useOptimistic, useState, useTransition } from 'react';
 import { applyView } from '../lib/apply-view.util';
 import { todayInCourseTz } from '../lib/course-local-time.util';
-import { availableCourses, freshnessState } from '../lib/derived.util';
+import { ALL_COURSES } from '../lib/courses';
+import { freshnessState } from '../lib/derived.util';
 import type { TeeTime } from '../lib/tee-time-response.schema';
 import { useTeeTimes } from '../lib/use-tee-times';
 import {
@@ -78,7 +79,6 @@ export function Dashboard() {
   const { data, error, isLoading, isValidating, mutate } = useTeeTimes(viewState.date);
 
   const teeTimes = data?.teeTimes ?? NO_TEE_TIMES;
-  const courses = useMemo(() => availableCourses(teeTimes), [teeTimes]);
   const result = useMemo(
     () => applyView(teeTimes, viewState, now),
     [teeTimes, viewState, now]
@@ -118,7 +118,7 @@ export function Dashboard() {
 
   const layoutProps: LayoutProps = {
     viewState: optimisticViewState,
-    courses,
+    courses: ALL_COURSES,
     today,
     now,
     displayedDate: data?.date ?? viewState.date,

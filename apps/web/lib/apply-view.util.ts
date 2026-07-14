@@ -1,5 +1,6 @@
 import { isPast, startLocalTime } from './course-local-time.util';
-import { availableCourses, resolveSelectedCourseIds } from './derived.util';
+import { ALL_COURSES } from './courses';
+import { resolveSelectedCourseIds } from './derived.util';
 import type { ViewState } from './view-state.util';
 import type { TeeTime } from './tee-time-response.schema';
 
@@ -36,8 +37,8 @@ export function applyView(
   viewState: ViewState,
   now: Date
 ): ViewResult {
-  const availableIds = availableCourses(teeTimes).map((course) => course.id);
-  const selectedCourseIds = resolveSelectedCourseIds(viewState.courses, availableIds);
+  const catalogIds = ALL_COURSES.map((course) => course.id);
+  const selectedCourseIds = resolveSelectedCourseIds(viewState.courses, catalogIds);
 
   const filtered = teeTimes.filter((teeTime) => {
     if (isPast(teeTime.startInstant, now)) return false;
