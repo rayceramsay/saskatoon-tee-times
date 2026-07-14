@@ -33,18 +33,21 @@ function GroupHeader({ group, now }: { group: CourseGroup; now: Date }) {
 export function MobileLayout(props: LayoutProps) {
   const {
     viewState,
+    displayedDate,
     courses,
     today,
     result,
     status,
+    listingPending,
     freshness,
     freshnessLoading,
     now,
   } = props;
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  const showPending = status === 'ready' && listingPending;
   const count = result.teeTimes.length;
-  const todayLabel = viewState.date === today ? ' today' : '';
+  const todayLabel = displayedDate === today ? ' today' : '';
   const summary = `${count} tee times${todayLabel} · ${courseSummary(viewState.courses, courses)}`;
   const badge = activeFilterCount(viewState, today);
 
@@ -81,8 +84,8 @@ export function MobileLayout(props: LayoutProps) {
 
       <main
         id="listings"
-        aria-busy={status === 'skeleton'}
-        className="flex-1 overflow-y-auto pb-[72px]"
+        aria-busy={status === 'skeleton' || showPending}
+        className={`flex-1 overflow-y-auto pb-[72px] ${showPending ? 'not-motion-safe:opacity-60 motion-safe:animate-pulse' : ''}`}
       >
         <div
           role="status"

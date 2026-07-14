@@ -23,7 +23,7 @@ The dashboard SHALL be a single page with no client-side routing. The complete v
 
 ### Requirement: Immediate filter-control feedback
 
-Filter controls SHALL reflect a user's interaction in the same frame as the interaction, independent of the URL update and the results-list recompute. A control's visual state (a course checkbox's checked state, a toggle's active state, the earliest-start slider position, the group switch, and Select all / Deselect all) SHALL NOT wait for the URL to change or for the filtered/sorted/grouped results to be recomputed before updating. The results list MAY briefly show a pending treatment while it catches up to the newly applied filters.
+Filter controls SHALL reflect a user's interaction in the same frame as the interaction, independent of the URL update and the results-list recompute. A control's visual state (a course checkbox's checked state, a toggle's active state, the earliest-start slider position, the group switch, and Select all / Deselect all) SHALL NOT wait for the URL to change or for the filtered/sorted/grouped results to be recomputed before updating. While the list catches up it SHALL show the pending treatment defined in the **Results-list pending treatment** requirement.
 
 #### Scenario: Checkbox reflects click before list updates
 
@@ -44,3 +44,27 @@ Filter controls SHALL reflect a user's interaction in the same frame as the inte
 
 - **WHEN** the user toggles several course checkboxes in quick succession
 - **THEN** each toggle is applied on top of the prior optimistic state (never a stale value) and the final control state and results match the resulting URL
+
+### Requirement: Results-list pending treatment
+
+While the displayed results do not yet reflect the current selection, the results list SHALL show a pending treatment — a subtle dimming carrying a gentle opacity oscillation, identical for client-side filter changes and date changes — and SHALL clear it only once the fully-resolved results for the current selection (including any date fetch) are displayed. The treatment SHALL appear only after a short buffer, so a change that resolves near-instantly does not flash it. The full skeleton placeholder SHALL be shown only when no results have been loaded at all; once results have loaded, a subsequent change SHALL keep the prior results visible under the pending treatment rather than replacing them with the skeleton.
+
+#### Scenario: Date change keeps prior results under the pending treatment
+
+- **WHEN** the user changes the date and the new date's tee times require a network fetch
+- **THEN** the prior date's results stay visible under the pending treatment for the full duration of the fetch, and are replaced by the new date's results the moment they load, at which point the treatment clears
+
+#### Scenario: Skeleton only before any results have loaded
+
+- **WHEN** the user changes the date after results have already loaded at least once
+- **THEN** the full skeleton placeholder is not shown; only the initial load, with no results yet, shows the skeleton
+
+#### Scenario: Pending treatment clears with the final results
+
+- **WHEN** a filter or date change settles
+- **THEN** the pending treatment clears in the same moment the fully-resolved results for the current selection appear, without exposing an intermediate un-dimmed state
+
+#### Scenario: Near-instant change does not flash the treatment
+
+- **WHEN** a change resolves within the short buffer (e.g. a client-side filter, or a date whose results are already cached)
+- **THEN** the pending treatment is not shown

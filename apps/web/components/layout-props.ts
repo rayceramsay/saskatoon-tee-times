@@ -11,8 +11,12 @@ export interface LayoutProps {
   courses: CourseOption[];
   today: string;
   now: Date;
+  /** Date of the tee times currently rendered; lags `viewState.date` while a date change loads so the summary only flips once the new day's slots are present. */
+  displayedDate: string;
   result: ViewResult;
   status: ListingStatus;
+  /** The results list is catching up to a newly applied filter (optimistic controls already updated). */
+  listingPending: boolean;
   freshness: FreshnessState;
   freshnessLoading: boolean;
   /** Date changes push a history entry; other filters replace it in place. */

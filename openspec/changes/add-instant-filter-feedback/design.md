@@ -51,9 +51,29 @@ Feed the results list a deferred view of the computed result (`useDeferredValue`
 
 - Memoization keeps the sort/group work from re-running when unrelated state (e.g. the per-minute `now` tick) changes without affecting the filtered set.
 
+### Decision 4: The pending treatment tracks resolved results, not the transition
+
+The first cut tied the list's pending treatment to `useTransition`'s `isPending`. That is right for client-side filters — the transition spans the URL write and the `applyView` recompute — but wrong for a date change: `router.push` for a query-param change commits in ~a frame, well before the network fetch it triggers, and `keepPreviousData: true` keeps `status === 'ready'` (the prior date's rows at full opacity) throughout that fetch. The observed result was a dim that flashed on and cleared during the URL write, then a multi-second gap where stale data sat un-dimmed until the fetch resolved — never showing the skeleton (it only appears when `data === undefined`, i.e. the very first load).
+
+Instead, drive the treatment from whether the displayed results match the current selection:
+
+```
+busy = isPending                                          // client recompute not committed
+     || (data !== undefined && data.date !== viewState.date) // fetched date's data not in hand yet
+```
+
+- `isPending` covers the client-side catch-up; `data.date !== viewState.date` stays true for the entire date fetch — it reads the date the response carries (robust, not dependent on SWR's flag timing) — and chains onto `isPending` with no gap.
+- **Undim only when `busy` is fully false**, i.e. the rows on screen are the final answer for the selection. Because we never clear on a partial signal, no intermediate un-dimmed state is exposed: the client-side recompute and the network result are revealed together, in the same commit that clears the treatment.
+- **Debounced on-delay (~150ms), zero off-delay:** the treatment appears only if the wait outlasts the buffer (near-instant or already-cached changes never flash it) and clears the instant it settles.
+- **One treatment for both cases:** a subtle dim carrying a gentle opacity oscillation — a pulse in the spirit of the skeleton's shimmer (which sweeps `--color-line`↔`--color-line-2`), applied to real content rather than placeholder bars — so it reads as "loading" without a layout change.
+- **Skeleton only when `data === undefined`:** with `keepPreviousData` that is the initial load alone; every later change keeps the prior rows under the pulse. A deliberate consequence, not a special case.
+- Set `aria-busy` on the listing region while pending, so assistive tech hears the fetch too, not only the initial skeleton.
+
 ## Risks / Trade-offs
 
 - **Optimistic state diverging from the URL on Back/Forward** → `useOptimistic` reverts to the base (URL-derived) value once the transition completes, so canonical always wins; verify with a browser Back test after a filter change.
 - **Brief inconsistency window** (controls show new state while the list still shows old) → this is the intended, and desirable, decoupling; bound it with a visible pending treatment so it reads as "loading," not "broken."
 - **`courses` overlay correctness** → the course filter's null-vs-array semantics (all-selected = `null`, `toggle` collapsing to `null` at full set, `derived.util` resolution) must be applied against the optimistic value, not the URL value, or a rapid multi-toggle could compute from stale state. Apply patches to the optimistic base.
 - **Over-deferring** → if the list is deferred too aggressively it can feel disconnected; keep it one commit behind, not debounced.
+- **Dimmed stale data during a slow date fetch** → the prior date's rows stay visible (dimmed, pulsing) for the fetch duration instead of a skeleton; the pulse plus the spinning freshness badge communicate "loading," and the ~150ms buffer keeps fast/cached date changes from flashing it.
+- **`data.date` staleness signal** → depends on the response carrying its `date` (it does; validated at the fetch boundary). If a date change ever returned data without a matching `date`, the treatment could hang or clear early — the fetch-boundary schema guarantees the field.

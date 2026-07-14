@@ -98,7 +98,6 @@ interface ErrorStateProps {
 export function ErrorState({ onRetry }: ErrorStateProps) {
   return (
     <StateCard>
-      <div className="text-4xl">⚠️</div>
       <div className="mt-3 text-body-primary text-ink">Something went wrong</div>
       <p className="mt-2 text-[13px] leading-normal text-ink-3">
         Couldn&apos;t load tee times. Check your connection and try again.
@@ -106,7 +105,7 @@ export function ErrorState({ onRetry }: ErrorStateProps) {
       <button
         type="button"
         onClick={onRetry}
-        className="mt-4 flex min-h-[36px] items-center justify-center rounded-md bg-accent px-4 text-[13px] font-semibold text-white hover:bg-accent-dark"
+        className="mt-4 mx-auto flex min-h-[36px] items-center justify-center rounded-md bg-accent px-4 text-[13px] font-semibold text-white hover:bg-accent-dark"
       >
         Try again
       </button>

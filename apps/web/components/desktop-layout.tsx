@@ -23,7 +23,7 @@ function GroupHeader({ group, now }: { group: CourseGroup; now: Date }) {
       <span className="flex-1 text-[11px] font-bold uppercase tracking-[0.05em] text-ink-2">
         {group.name}
       </span>
-      <span className="text-[11px] text-ink-3">{group.teeTimes.length} slots</span>
+      <span className="text-[11px] text-ink-3">{group.teeTimes.length} tee times</span>
       <FreshnessIndicator state={freshness} />
     </div>
   );
@@ -31,10 +31,20 @@ function GroupHeader({ group, now }: { group: CourseGroup; now: Date }) {
 
 /** The desktop dashboard: 264px filter sidebar + scrollable listings table. */
 export function DesktopLayout(props: LayoutProps) {
-  const { viewState, result, status, freshness, freshnessLoading, now } = props;
+  const {
+    viewState,
+    displayedDate,
+    result,
+    status,
+    listingPending,
+    freshness,
+    freshnessLoading,
+    now,
+  } = props;
+  const showPending = status === 'ready' && listingPending;
   const count = result.teeTimes.length;
   const summary = `${count} tee times · ${courseSummary(viewState.courses, props.courses)} · ${formatDateSummary(
-    viewState.date
+    displayedDate
   )}`;
 
   return (
@@ -52,12 +62,14 @@ export function DesktopLayout(props: LayoutProps) {
 
         <section
           id="listings"
-          aria-label={`Tee times for ${formatDateSummary(viewState.date)}`}
-          aria-busy={status === 'skeleton'}
+          aria-label={`Tee times for ${formatDateSummary(displayedDate)}`}
+          aria-busy={status === 'skeleton' || showPending}
           className="flex-1 overflow-auto bg-bg"
         >
           {/* The 612px min-width is just the sum of all column tracks (84+120+52+118+80+62+96) */}
-          <div className="min-w-[612px]">
+          <div
+            className={`min-w-[612px] ${showPending ? 'not-motion-safe:opacity-60 motion-safe:animate-pulse' : ''}`}
+          >
             <div className="sticky top-0 z-10">
               <div
                 role="status"
