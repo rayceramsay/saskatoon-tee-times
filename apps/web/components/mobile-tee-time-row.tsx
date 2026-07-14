@@ -15,30 +15,30 @@ export function MobileTeeTimeRow({ slot, players }: MobileTeeTimeRowProps) {
   const price = slot.pricePerPlayer !== null ? formatPrice(slot.pricePerPlayer) : null;
 
   return (
-    <div className="grid grid-cols-[46px_1fr_58px] items-center gap-3 border-b border-line-2 bg-panel px-4 py-3">
+    <div className="border-line-2 bg-panel grid grid-cols-[46px_1fr_58px] items-center gap-3 border-b px-4 py-3">
       <div>
         <span className="text-display-time text-ink">{time}</span>
-        <span className="mt-[3px] block text-[10px] font-semibold text-ink-2">
+        <span className="text-ink-2 mt-[3px] block text-[10px] font-semibold">
           {ampm}
         </span>
       </div>
       <div className="min-w-0">
         <div className="text-body-primary text-ink">{slot.courseName}</div>
-        <div className="mt-[3px] text-meta text-ink-2">
-          <span className="font-semibold text-ink">{slot.holes} holes</span>
+        <div className="text-meta text-ink-2 mt-[3px]">
+          <span className="text-ink font-semibold">{slot.holes} holes</span>
           {routing !== null && (
             <>
-              <span className="mx-1 text-ink-3">·</span>
+              <span className="text-ink-3 mx-1">·</span>
               {routing}
             </>
           )}
         </div>
-        <div className="mt-0.5 text-meta text-ink-2">
+        <div className="text-meta text-ink-2 mt-0.5">
           <span>up to {slotMaxGroupSize(slot)}</span>
           {price !== null && (
             <>
-              <span className="mx-1 text-ink-3">·</span>
-              <span className="font-bold text-ink">{price}</span>
+              <span className="text-ink-3 mx-1">·</span>
+              <span className="text-ink font-bold">{price}</span>
             </>
           )}
         </div>

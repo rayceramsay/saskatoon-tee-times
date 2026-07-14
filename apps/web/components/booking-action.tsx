@@ -17,7 +17,7 @@ export function BookingAction({ slot, players, variant }: BookingActionProps) {
   const href = bookingUrlFor(slot, players);
 
   if (!slot.onlineBookable || href === undefined) {
-    return <span className="whitespace-nowrap text-meta text-ink-2">Call to book</span>;
+    return <span className="text-meta text-ink-2 whitespace-nowrap">Call to book</span>;
   }
 
   const label = `Book ${format12Hour(startLocalTime(slot.startInstant))} at ${slot.courseName}`;
@@ -32,7 +32,7 @@ export function BookingAction({ slot, players, variant }: BookingActionProps) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className={`flex w-full items-center justify-center font-semibold text-white bg-accent hover:bg-accent-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${sizing}`}
+      className={`bg-accent hover:bg-accent-dark focus-visible:outline-accent flex w-full items-center justify-center font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 ${sizing}`}
     >
       Book
     </a>

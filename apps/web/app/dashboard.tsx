@@ -149,7 +149,7 @@ export function Dashboard() {
     <>
       <a
         href="#listings"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-panel focus:px-3 focus:py-2 focus:text-body-primary"
+        className="focus:bg-panel focus:text-body-primary sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:px-3 focus:py-2"
       >
         Skip to tee times
       </a>

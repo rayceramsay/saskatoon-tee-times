@@ -19,11 +19,11 @@ function latestScrapedAt(group: CourseGroup): string {
 function GroupHeader({ group, now }: { group: CourseGroup; now: Date }) {
   const freshness = freshnessState(latestScrapedAt(group), now);
   return (
-    <div className="flex items-center gap-2.5 border-y border-line bg-bg px-2.5 py-[7px]">
-      <span className="flex-1 text-[11px] font-bold uppercase tracking-[0.05em] text-ink-2">
+    <div className="border-line bg-bg flex items-center gap-2.5 border-y px-2.5 py-[7px]">
+      <span className="text-ink-2 flex-1 text-[11px] font-bold tracking-[0.05em] uppercase">
         {group.name}
       </span>
-      <span className="text-[11px] text-ink-3">{group.teeTimes.length} tee times</span>
+      <span className="text-ink-3 text-[11px]">{group.teeTimes.length} tee times</span>
       <FreshnessIndicator state={freshness} />
     </div>
   );
@@ -49,14 +49,14 @@ export function DesktopLayout(props: LayoutProps) {
 
   return (
     <div className="flex h-screen flex-col">
-      <header className="flex h-[50px] shrink-0 items-center gap-4 border-b border-line bg-panel px-5">
+      <header className="border-line bg-panel flex h-[50px] shrink-0 items-center gap-4 border-b px-5">
         <span className="text-[15px] font-bold">Saskatoon Tee Times</span>
         <span className="flex-1" />
         <FreshnessIndicator state={freshness} loading={freshnessLoading} />
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="w-[264px] shrink-0 overflow-visible border-r border-line bg-panel p-3.5">
+        <aside className="border-line bg-panel w-[264px] shrink-0 overflow-visible border-r p-3.5">
           <FilterSections {...props} calendarMode="popup" />
         </aside>
 
@@ -64,7 +64,7 @@ export function DesktopLayout(props: LayoutProps) {
           id="listings"
           aria-label={`Tee times for ${formatDateSummary(displayedDate)}`}
           aria-busy={status === 'skeleton' || showPending}
-          className="flex-1 overflow-auto bg-bg"
+          className="bg-bg flex-1 overflow-auto"
         >
           {/* The 612px min-width is just the sum of all column tracks (84+120+52+118+80+62+96) */}
           <div
@@ -74,15 +74,15 @@ export function DesktopLayout(props: LayoutProps) {
               <div
                 role="status"
                 aria-live="polite"
-                className="border-b border-line-2 bg-bg px-4 py-1.5 text-meta text-ink-3"
+                className="border-line-2 bg-bg text-meta text-ink-3 border-b px-4 py-1.5"
               >
                 {status === 'ready' ? summary : ' '}
               </div>
-              <div className={`${DESKTOP_GRID} border-b border-line bg-panel`}>
+              <div className={`${DESKTOP_GRID} border-line bg-panel border-b`}>
                 {COLUMN_HEADERS.map((header, index) => (
                   <div
                     key={index}
-                    className="border-r border-line-2 px-2.5 py-2.5 text-label-caps uppercase tracking-[0.06em] text-ink-3 last:border-r-0"
+                    className="border-line-2 text-label-caps text-ink-3 border-r px-2.5 py-2.5 tracking-[0.06em] uppercase last:border-r-0"
                   >
                     {header}
                   </div>

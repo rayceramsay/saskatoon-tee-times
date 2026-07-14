@@ -34,13 +34,13 @@ export function DesktopTeeTimeRow({ slot, players }: DesktopTeeTimeRowProps) {
 
   return (
     <div
-      className={`${DESKTOP_GRID} min-h-[42px] items-center border-b border-line-2 bg-panel hover:bg-panel-hover`}
+      className={`${DESKTOP_GRID} border-line-2 bg-panel hover:bg-panel-hover min-h-[42px] items-center border-b`}
     >
       <div className={`${CELL} whitespace-nowrap`}>
-        <span className="text-[14px] font-bold tracking-[-0.2px] text-ink">{time}</span>
-        <span className="ml-0.5 text-[10px] font-semibold text-ink-3">{ampm}</span>
+        <span className="text-ink text-[14px] font-bold tracking-[-0.2px]">{time}</span>
+        <span className="text-ink-3 ml-0.5 text-[10px] font-semibold">{ampm}</span>
       </div>
-      <div className={`${CELL} text-body-primary leading-snug text-ink`}>
+      <div className={`${CELL} text-body-primary text-ink leading-snug`}>
         {slot.courseName}
       </div>
       <div className={`${CELL} text-body-secondary text-ink-2`}>{slot.holes}</div>
@@ -52,7 +52,7 @@ export function DesktopTeeTimeRow({ slot, players }: DesktopTeeTimeRowProps) {
       </div>
       <div className={`${CELL} text-body-secondary`}>
         {price !== null ? (
-          <span className="font-bold text-ink">{price}</span>
+          <span className="text-ink font-bold">{price}</span>
         ) : (
           <NotAvailable />
         )}

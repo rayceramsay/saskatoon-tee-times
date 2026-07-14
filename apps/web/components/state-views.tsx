@@ -21,7 +21,7 @@ export function DesktopSkeletonRows() {
       {DESKTOP_SKELETON_WIDTHS.map((widths, index) => (
         <div
           key={index}
-          className={`${DESKTOP_GRID} min-h-[42px] items-center border-b border-line-2 bg-panel`}
+          className={`${DESKTOP_GRID} border-line-2 bg-panel min-h-[42px] items-center border-b`}
         >
           {widths.map((width, cell) => (
             <div key={cell} className="flex items-center px-2.5 py-2.5">
@@ -44,7 +44,7 @@ export function MobileSkeletonRows() {
       {DESKTOP_SKELETON_WIDTHS.map((widths, index) => (
         <div
           key={index}
-          className="grid grid-cols-[46px_1fr_58px] items-center gap-3 border-b border-line-2 bg-panel px-4 py-3"
+          className="border-line-2 bg-panel grid grid-cols-[46px_1fr_58px] items-center gap-3 border-b px-4 py-3"
         >
           <Bar width="40px" />
           <div className="flex flex-col gap-1.5">
@@ -75,14 +75,14 @@ export function EmptyState({ onReset }: EmptyStateProps) {
   return (
     <StateCard>
       <div className="text-4xl">⛳</div>
-      <div className="mt-3 text-body-primary text-ink">No tee times found</div>
-      <p className="mt-2 text-[13px] leading-normal text-ink-3">
+      <div className="text-body-primary text-ink mt-3">No tee times found</div>
+      <p className="text-ink-3 mt-2 text-[13px] leading-normal">
         There&apos;s nothing available for this date with your current filters.
       </p>
       <button
         type="button"
         onClick={onReset}
-        className="mt-4 text-[13px] text-ink-2 underline underline-offset-2"
+        className="text-ink-2 mt-4 text-[13px] underline underline-offset-2"
       >
         Reset filters
       </button>
@@ -98,14 +98,14 @@ interface ErrorStateProps {
 export function ErrorState({ onRetry }: ErrorStateProps) {
   return (
     <StateCard>
-      <div className="mt-3 text-body-primary text-ink">Something went wrong</div>
-      <p className="mt-2 text-[13px] leading-normal text-ink-3">
+      <div className="text-body-primary text-ink mt-3">Something went wrong</div>
+      <p className="text-ink-3 mt-2 text-[13px] leading-normal">
         Couldn&apos;t load tee times. Check your connection and try again.
       </p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-4 mx-auto flex min-h-[36px] items-center justify-center rounded-md bg-accent px-4 text-[13px] font-semibold text-white hover:bg-accent-dark"
+        className="bg-accent hover:bg-accent-dark mx-auto mt-4 flex min-h-[36px] items-center justify-center rounded-md px-4 text-[13px] font-semibold text-white"
       >
         Try again
       </button>

@@ -36,7 +36,7 @@ export function FreshnessIndicator({ state, loading }: FreshnessIndicatorProps) 
   }
 
   return (
-    <span className={`flex items-center gap-1.5 text-meta ${TEXT_COLOR[state.level]}`}>
+    <span className={`text-meta flex items-center gap-1.5 ${TEXT_COLOR[state.level]}`}>
       <span
         className={`h-[7px] w-[7px] shrink-0 rounded-full ${DOT_COLOR[state.level]}`}
       />

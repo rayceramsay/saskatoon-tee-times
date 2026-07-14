@@ -19,11 +19,11 @@ function latestScrapedAt(group: CourseGroup): string {
 
 function GroupHeader({ group, now }: { group: CourseGroup; now: Date }) {
   return (
-    <div className="flex items-center gap-2.5 border-y border-line bg-bg px-4 py-2">
-      <span className="flex-1 text-[11px] font-bold uppercase tracking-[0.05em] text-ink-2">
+    <div className="border-line bg-bg flex items-center gap-2.5 border-y px-4 py-2">
+      <span className="text-ink-2 flex-1 text-[11px] font-bold tracking-[0.05em] uppercase">
         {group.name}
       </span>
-      <span className="text-[11px] text-ink-3">{group.teeTimes.length} slots</span>
+      <span className="text-ink-3 text-[11px]">{group.teeTimes.length} slots</span>
       <FreshnessIndicator state={freshnessState(latestScrapedAt(group), now)} />
     </div>
   );
@@ -75,7 +75,7 @@ export function MobileLayout(props: LayoutProps) {
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden">
-      <header className="shrink-0 border-b border-line bg-panel px-4 pb-2.5 pt-3">
+      <header className="border-line bg-panel shrink-0 border-b px-4 pt-3 pb-2.5">
         <div className="text-[15px] font-bold">Saskatoon Tee Times</div>
         <div className="mt-0.5">
           <FreshnessIndicator state={freshness} loading={freshnessLoading} />
@@ -90,7 +90,7 @@ export function MobileLayout(props: LayoutProps) {
         <div
           role="status"
           aria-live="polite"
-          className="px-4 pb-1 pt-2 text-meta text-ink-3"
+          className="text-meta text-ink-3 px-4 pt-2 pb-1"
         >
           {status === 'ready' ? summary : ' '}
         </div>
@@ -100,11 +100,11 @@ export function MobileLayout(props: LayoutProps) {
         {status === 'ready' && count > 0 && rows}
       </main>
 
-      <div className="absolute inset-x-0 bottom-0 z-10 flex items-center gap-2.5 border-t border-line bg-panel px-4 pb-4 pt-2.5">
+      <div className="border-line bg-panel absolute inset-x-0 bottom-0 z-10 flex items-center gap-2.5 border-t px-4 pt-2.5 pb-4">
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="flex flex-1 items-center gap-1.5 rounded-lg border border-line bg-bg px-3 py-2 text-[14px] font-semibold text-ink"
+          className="border-line bg-bg text-ink flex flex-1 items-center gap-1.5 rounded-lg border px-3 py-2 text-[14px] font-semibold"
         >
           <span aria-hidden>📅</span>
           {formatDateChip(viewState.date)}
@@ -112,11 +112,11 @@ export function MobileLayout(props: LayoutProps) {
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="flex min-h-[44px] items-center gap-1.5 rounded-lg border border-line bg-bg px-3.5 text-[13px] font-semibold text-ink"
+          className="border-line bg-bg text-ink flex min-h-[44px] items-center gap-1.5 rounded-lg border px-3.5 text-[13px] font-semibold"
         >
           Filters
           {badge > 0 && (
-            <span className="rounded-[10px] bg-ink px-1.5 text-[10px] font-bold text-white">
+            <span className="bg-ink rounded-[10px] px-1.5 text-[10px] font-bold text-white">
               {badge}
             </span>
           )}
@@ -131,8 +131,8 @@ export function MobileLayout(props: LayoutProps) {
             onClick={() => setSheetOpen(false)}
             className="absolute inset-0 z-20 bg-black/35"
           />
-          <div className="absolute inset-x-0 bottom-0 z-30 max-h-[88%] overflow-y-auto rounded-t-2xl bg-panel pb-8">
-            <div className="mx-auto mt-2.5 h-1 w-9 rounded-full bg-line" />
+          <div className="bg-panel absolute inset-x-0 bottom-0 z-30 max-h-[88%] overflow-y-auto rounded-t-2xl pb-8">
+            <div className="bg-line mx-auto mt-2.5 h-1 w-9 rounded-full" />
             <div className="px-4 pt-3.5 text-[16px] font-bold">Filters</div>
             <div className="px-4 pt-4">
               <FilterSections {...props} calendarMode="inline" />

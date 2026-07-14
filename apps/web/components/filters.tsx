@@ -127,11 +127,11 @@ export function CourseFilter({
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-label-caps uppercase text-ink-3">Course</span>
+        <span className="text-label-caps text-ink-3 uppercase">Course</span>
         <button
           type="button"
           onClick={() => onFilterChange({ courses: allChecked ? [] : null })}
-          className="text-[11px] text-ink-3 underline underline-offset-2"
+          className="text-ink-3 text-[11px] underline underline-offset-2"
         >
           {allChecked ? 'Deselect all' : 'Select all'}
         </button>
@@ -140,13 +140,13 @@ export function CourseFilter({
         {courses.map((course) => (
           <label
             key={course.id}
-            className="flex cursor-pointer items-start gap-2 text-xs leading-snug text-ink-2"
+            className="text-ink-2 flex cursor-pointer items-start gap-2 text-xs leading-snug"
           >
             <input
               type="checkbox"
               checked={resolved === null || resolved.has(course.id)}
               onChange={() => toggle(course.id)}
-              className="mt-px h-3.5 w-3.5 shrink-0 accent-accent"
+              className="accent-accent mt-px h-3.5 w-3.5 shrink-0"
             />
             <span>{course.name}</span>
           </label>
@@ -165,7 +165,7 @@ export function EarliestStartControl({
   return (
     <div>
       <span className={SECTION_LABEL}>Earliest start</span>
-      <div className="mb-2 text-[13px] font-semibold text-ink">
+      <div className="text-ink mb-2 text-[13px] font-semibold">
         {earliestStartLabel(viewState.from)}
       </div>
       <input
@@ -178,9 +178,9 @@ export function EarliestStartControl({
         onChange={(event) =>
           onFilterChange({ from: EARLIEST_START_STOPS[Number(event.target.value)] })
         }
-        className="w-full accent-accent"
+        className="accent-accent w-full"
       />
-      <div className="mt-1.5 flex justify-between text-[10px] text-ink-3">
+      <div className="text-ink-3 mt-1.5 flex justify-between text-[10px]">
         <span>5 AM</span>
         <span>9 PM</span>
       </div>
@@ -195,7 +195,7 @@ export function GroupByCourseSwitch({
 }: FilterControlsProps) {
   const on = viewState.group;
   return (
-    <div className="flex items-center justify-between text-[13px] text-ink-2">
+    <div className="text-ink-2 flex items-center justify-between text-[13px]">
       <span>Group by course</span>
       <button
         type="button"
@@ -253,18 +253,18 @@ function Calendar({ selected, today, onSelect }: CalendarProps) {
           type="button"
           onClick={() => stepMonth(-1)}
           aria-label="Previous month"
-          className="flex h-6 w-6 items-center justify-center rounded-sm border border-line text-ink-2"
+          className="border-line text-ink-2 flex h-6 w-6 items-center justify-center rounded-sm border"
         >
           ‹
         </button>
-        <span className="text-[13px] font-semibold text-ink">
+        <span className="text-ink text-[13px] font-semibold">
           {formatMonthYear(view.year, view.monthIndex)}
         </span>
         <button
           type="button"
           onClick={() => stepMonth(1)}
           aria-label="Next month"
-          className="flex h-6 w-6 items-center justify-center rounded-sm border border-line text-ink-2"
+          className="border-line text-ink-2 flex h-6 w-6 items-center justify-center rounded-sm border"
         >
           ›
         </button>
@@ -273,7 +273,7 @@ function Calendar({ selected, today, onSelect }: CalendarProps) {
         {DAY_OF_WEEK.map((day) => (
           <div
             key={day}
-            className="py-1 text-center text-[10px] font-semibold text-ink-3"
+            className="text-ink-3 py-1 text-center text-[10px] font-semibold"
           >
             {day}
           </div>
@@ -296,7 +296,7 @@ function Calendar({ selected, today, onSelect }: CalendarProps) {
                   ? 'bg-accent font-bold text-white'
                   : navigable
                     ? 'text-ink hover:bg-line-2'
-                    : 'cursor-default text-line'
+                    : 'text-line cursor-default'
               }`}
             >
               {day}
@@ -361,12 +361,12 @@ export function DateSection({
             onClick={() => setOpen((value) => !value)}
             aria-haspopup="dialog"
             aria-expanded={open}
-            className="flex-1 rounded-md px-1.5 py-1 text-center text-[14px] font-semibold text-ink hover:bg-line-2"
+            className="text-ink hover:bg-line-2 flex-1 rounded-md px-1.5 py-1 text-center text-[14px] font-semibold"
           >
             {formatDateChip(viewState.date)}
           </button>
         ) : (
-          <span className="flex-1 text-center text-[15px] font-semibold text-ink">
+          <span className="text-ink flex-1 text-center text-[15px] font-semibold">
             {formatDateChip(viewState.date)}
           </span>
         )}
@@ -391,7 +391,7 @@ export function DateSection({
         <div
           role="dialog"
           aria-label="Choose date"
-          className="absolute left-0 top-full z-50 mt-1 w-[236px] rounded-lg border border-line bg-panel p-3 shadow-[0_8px_28px_rgba(0,0,0,0.14)]"
+          className="border-line bg-panel absolute top-full left-0 z-50 mt-1 w-[236px] rounded-lg border p-3 shadow-[0_8px_28px_rgba(0,0,0,0.14)]"
         >
           <Calendar
             selected={viewState.date}
