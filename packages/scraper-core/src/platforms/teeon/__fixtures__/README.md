@@ -46,6 +46,17 @@ The parser currently emits `[1 .. min(quantity_remaining, 4)]` for every row, so
 it wrongly advertises a 1-player booking for `14:48`. Deriving the floor needs
 both `size` (unmodeled today) and the facility `single_bookings` rule.
 
+### Booking-size rules — `the-legends-settings-tee-sheet.json`
+
+The `guest/facility/settings/tee-sheet?facility_id=477` response, the source of
+the group-size floor above. It is **date-independent** (no date param), so one
+capture applies to every date. The four consumed fields are
+`single_bookings`/`twosome_bookings`/`threesome_bookings`/`foursome_bookings`;
+here they are `"allow_within_group"`, `"allow"`, `"allow"`, `"allow"`. The full
+response is kept so a shape drift or a new rule value surfaces as a failing test.
+The SPA fires this request on the same portal navigation as `tee-time`, so it is
+captured alongside it rather than by a separate page load.
+
 ## Re-capturing
 
 TeeOn's guest API is session-gated (its key is injected by the portal SPA; a
@@ -56,7 +67,9 @@ page, not requested directly:
    `https://admin.teeon.com/portal/thelegendsgolfclub/teetimes/thelegendsgolfclub?date=<YYYY-MM-DD>`
 2. Capture the response whose URL starts with
    `https://admin.teeon.com/api/2024-04/guest/tee-time?facility_id=477&date=<YYYY-MM-DD>`
-   (facility `477`), which the SPA issues on load.
+   (facility `477`), which the SPA issues on load. The same navigation also fires
+   `https://admin.teeon.com/api/2024-04/guest/facility/settings/tee-sheet?facility_id=477`
+   — capture it in the same page load to refresh `the-legends-settings-tee-sheet.json`.
 
 Pick a date inside the 5-day booking window that has both 18-hole starts and a
 late-day 9-only start.
