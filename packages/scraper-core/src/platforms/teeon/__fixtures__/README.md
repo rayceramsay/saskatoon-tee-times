@@ -28,6 +28,24 @@ The guest feed only ever returns bookable rows (`blocked_type: "open"`,
 blocked/full rows — so the parser's drop guard is exercised by a modified row in
 the parser tests rather than a live capture.
 
+### Restricted single-booking set — `2026-07-15` (a Wednesday)
+
+Three open starts (12:00, 14:24, 14:48) that expose a floor the `tee-time` feed
+does **not** encode: a single booking is not always allowed. The facility's
+`single_bookings` rule (from `guest/facility/settings/tee-sheet`, not this feed)
+is `"allow_within_group"`, meaning a solo player may only join a partially-filled
+group, never start a new one on an empty tee time. So the minimum group size is
+derived per row from `quantity_remaining` vs `size`:
+
+- `12:00` and `14:24` — `quantity_remaining: 1`, `size: 4` (3 already booked) →
+  a single joins the existing group → **min 1** (TeeOn UI: "1 Player").
+- `14:48` — `quantity_remaining: 4`, `size: 4` (empty) → a single would start a
+  new group → disallowed → **min 2** (TeeOn UI: "2 - 4 Players").
+
+The parser currently emits `[1 .. min(quantity_remaining, 4)]` for every row, so
+it wrongly advertises a 1-player booking for `14:48`. Deriving the floor needs
+both `size` (unmodeled today) and the facility `single_bookings` rule.
+
 ## Re-capturing
 
 TeeOn's guest API is session-gated (its key is injected by the portal SPA; a
