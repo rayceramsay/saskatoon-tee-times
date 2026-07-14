@@ -9,14 +9,21 @@ vi.mock('playwright-core', () => ({
 }));
 
 const pageUrl = 'https://admin.teeon.com/portal?facility_id=477&date=2026-07-20';
-const responseUrlPrefix =
+const teeTimePrefix =
   'https://admin.teeon.com/api/2024-04/guest/tee-time?facility_id=477&date=2026-07-20';
+const settingsPrefix =
+  'https://admin.teeon.com/api/2024-04/guest/facility/settings/tee-sheet?facility_id=477';
 
-// Wire chromium.launch → browser → context → page so `capture` resolves the
-// response matched by `page.waitForResponse` once `page.goto` is called.
-function stubBrowser(response: Response): { page: Page } {
+// Wire chromium.launch → browser → context → page so `capture` resolves each
+// target: `page.waitForResponse` routes a call to the first stubbed response its
+// predicate matches, mirroring how Playwright matches by URL prefix.
+function stubBrowser(responses: Response[]): { page: Page } {
   const page = {
-    waitForResponse: vi.fn().mockResolvedValue(response),
+    waitForResponse: vi
+      .fn()
+      .mockImplementation((predicate: (response: Response) => boolean) =>
+        Promise.resolve(responses.find((response) => predicate(response)))
+      ),
     goto: vi.fn().mockResolvedValue(null),
     close: vi.fn().mockResolvedValue(undefined),
   } as unknown as Page;
@@ -30,9 +37,9 @@ function stubBrowser(response: Response): { page: Page } {
   return { page };
 }
 
-function okResponse(body: unknown): Response {
+function okResponse(url: string, body: unknown): Response {
   return {
-    url: () => `${responseUrlPrefix}&extended=true`,
+    url: () => url,
     ok: () => true,
     status: () => 200,
     headers: () => ({}),
@@ -41,9 +48,13 @@ function okResponse(body: unknown): Response {
   } as unknown as Response;
 }
 
-function failedResponse(status: number, headers: Record<string, string>): Response {
+function failedResponse(
+  url: string,
+  status: number,
+  headers: Record<string, string>
+): Response {
   return {
-    url: () => `${responseUrlPrefix}&extended=true`,
+    url: () => url,
     ok: () => false,
     status: () => status,
     headers: () => headers,
@@ -57,30 +68,70 @@ describe('PlaywrightCapturedJsonFetcher', () => {
     vi.clearAllMocks();
   });
 
-  it('captures the matching response and returns its parsed JSON body', async () => {
+  it('captures a single target and returns its parsed JSON body under its label', async () => {
     const payload = { teeTimes: [{ start_time: '08:00', quantity_remaining: 4 }] };
-    const { page } = stubBrowser(okResponse(payload));
+    const { page } = stubBrowser([
+      okResponse(`${teeTimePrefix}&extended=true`, payload),
+    ]);
     const fetcher = new PlaywrightCapturedJsonFetcher();
 
-    const result = await fetcher.capture(pageUrl, responseUrlPrefix);
+    const result = await fetcher.capture(pageUrl, { teeTime: teeTimePrefix });
 
-    expect(result).toEqual(payload);
+    expect(result).toEqual({ teeTime: payload });
     expect(page.goto).toHaveBeenCalledWith(pageUrl, { waitUntil: 'domcontentloaded' });
-    expect(page.waitForResponse).toHaveBeenCalled();
+    expect(page.waitForResponse).toHaveBeenCalledTimes(1);
   });
 
-  it('matches the captured response by url prefix', async () => {
-    const { page } = stubBrowser(okResponse({}));
+  it('captures multiple targets from one navigation, keyed by label', async () => {
+    const teeTimeBody = { teeTimes: [1, 2, 3] };
+    const settingsBody = { single_bookings: 'allow_within_group' };
+    const { page } = stubBrowser([
+      okResponse(`${teeTimePrefix}&extended=true`, teeTimeBody),
+      okResponse(`${settingsPrefix}&locale=en`, settingsBody),
+    ]);
     const fetcher = new PlaywrightCapturedJsonFetcher();
 
-    await fetcher.capture(pageUrl, responseUrlPrefix);
+    const result = await fetcher.capture(pageUrl, {
+      teeTime: teeTimePrefix,
+      settings: settingsPrefix,
+    });
+
+    expect(result).toEqual({ teeTime: teeTimeBody, settings: settingsBody });
+    expect(page.goto).toHaveBeenCalledTimes(1);
+    expect(page.waitForResponse).toHaveBeenCalledTimes(2);
+  });
+
+  it('registers every waiter before navigating so load-time responses are not missed', async () => {
+    const { page } = stubBrowser([
+      okResponse(`${teeTimePrefix}&extended=true`, {}),
+      okResponse(`${settingsPrefix}&locale=en`, {}),
+    ]);
+    const fetcher = new PlaywrightCapturedJsonFetcher();
+
+    await fetcher.capture(pageUrl, {
+      teeTime: teeTimePrefix,
+      settings: settingsPrefix,
+    });
+
+    const waitOrder = vi.mocked(page.waitForResponse).mock.invocationCallOrder;
+    const gotoOrder = vi.mocked(page.goto).mock.invocationCallOrder[0]!;
+    for (const order of waitOrder) {
+      expect(order).toBeLessThan(gotoOrder);
+    }
+  });
+
+  it('matches each captured response by its target url prefix', async () => {
+    const { page } = stubBrowser([okResponse(`${teeTimePrefix}&extended=true`, {})]);
+    const fetcher = new PlaywrightCapturedJsonFetcher();
+
+    await fetcher.capture(pageUrl, { teeTime: teeTimePrefix });
 
     const predicate = vi.mocked(page.waitForResponse).mock.calls[0]?.[0] as (
       response: Response
     ) => boolean;
-    expect(
-      predicate({ url: () => `${responseUrlPrefix}&extended=true` } as Response)
-    ).toBe(true);
+    expect(predicate({ url: () => `${teeTimePrefix}&extended=true` } as Response)).toBe(
+      true
+    );
     expect(
       predicate({ url: () => 'https://admin.teeon.com/api/2024-04/other' } as Response)
     ).toBe(false);
@@ -88,22 +139,25 @@ describe('PlaywrightCapturedJsonFetcher', () => {
 
   it('falls back to parsing the response text when json() throws', async () => {
     const payload = { teeTimes: [] };
-    const response = okResponse(payload);
+    const response = okResponse(`${teeTimePrefix}&extended=true`, payload);
     vi.mocked(response.json).mockRejectedValue(new Error('not json'));
-    stubBrowser(response);
+    stubBrowser([response]);
     const fetcher = new PlaywrightCapturedJsonFetcher();
 
-    const result = await fetcher.capture(pageUrl, responseUrlPrefix);
+    const result = await fetcher.capture(pageUrl, { teeTime: teeTimePrefix });
 
-    expect(result).toEqual(payload);
+    expect(result).toEqual({ teeTime: payload });
   });
 
-  it('rejects with a TransportError exposing status and retryAfterSeconds', async () => {
-    stubBrowser(failedResponse(429, { 'retry-after': '60' }));
+  it('rejects with a TransportError when any captured target is non-OK', async () => {
+    stubBrowser([
+      okResponse(`${teeTimePrefix}&extended=true`, {}),
+      failedResponse(`${settingsPrefix}&locale=en`, 429, { 'retry-after': '60' }),
+    ]);
     const fetcher = new PlaywrightCapturedJsonFetcher();
 
     const error = await fetcher
-      .capture(pageUrl, responseUrlPrefix)
+      .capture(pageUrl, { teeTime: teeTimePrefix, settings: settingsPrefix })
       .catch((e: unknown) => e);
 
     expect(error).toBeInstanceOf(TransportError);
@@ -111,11 +165,11 @@ describe('PlaywrightCapturedJsonFetcher', () => {
   });
 
   it('rejects with a TransportError carrying status but no retryAfterSeconds when the header is absent', async () => {
-    stubBrowser(failedResponse(503, {}));
+    stubBrowser([failedResponse(`${teeTimePrefix}&extended=true`, 503, {})]);
     const fetcher = new PlaywrightCapturedJsonFetcher();
 
     const error = await fetcher
-      .capture(pageUrl, responseUrlPrefix)
+      .capture(pageUrl, { teeTime: teeTimePrefix })
       .catch((e: unknown) => e);
 
     expect(error).toBeInstanceOf(TransportError);

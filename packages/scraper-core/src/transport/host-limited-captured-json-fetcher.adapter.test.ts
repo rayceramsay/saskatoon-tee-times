@@ -4,8 +4,12 @@ import { HostLimitedCapturedJsonFetcher } from './host-limited-captured-json-fet
 import type { RequestLimiter } from './request-limiter.port.js';
 
 const pageUrl = 'https://admin.teeon.com/portal?facility_id=477&date=2026-07-20';
-const responseUrlPrefix =
-  'https://admin.teeon.com/api/2024-04/guest/tee-time?facility_id=477&date=2026-07-20';
+const targets = {
+  teeTime:
+    'https://admin.teeon.com/api/2024-04/guest/tee-time?facility_id=477&date=2026-07-20',
+  settings:
+    'https://admin.teeon.com/api/2024-04/guest/facility/settings/tee-sheet?facility_id=477',
+};
 
 // A limiter that records the host it was scheduled under and runs the work.
 function recordingLimiter(): { limiter: RequestLimiter; hosts: string[] } {
@@ -20,24 +24,24 @@ function recordingLimiter(): { limiter: RequestLimiter; hosts: string[] } {
 }
 
 describe('HostLimitedCapturedJsonFetcher', () => {
-  it('schedules the inner capture under the hostname parsed from the page url', async () => {
+  it('schedules the inner capture under the hostname parsed from the page url regardless of target count', async () => {
     const { limiter, hosts } = recordingLimiter();
     const inner: CapturedJsonFetcher = { capture: vi.fn().mockResolvedValue({}) };
     const decorator = new HostLimitedCapturedJsonFetcher(inner, limiter);
 
-    await decorator.capture(pageUrl, responseUrlPrefix);
+    await decorator.capture(pageUrl, targets);
 
     expect(hosts).toEqual(['admin.teeon.com']);
-    expect(inner.capture).toHaveBeenCalledWith(pageUrl, responseUrlPrefix);
+    expect(inner.capture).toHaveBeenCalledWith(pageUrl, targets);
   });
 
   it('returns the inner fetcher result unchanged', async () => {
     const { limiter } = recordingLimiter();
-    const payload = { teeTimes: [1, 2, 3] };
+    const payload = { teeTime: [1, 2, 3], settings: { single_bookings: 'allow' } };
     const inner: CapturedJsonFetcher = { capture: vi.fn().mockResolvedValue(payload) };
     const decorator = new HostLimitedCapturedJsonFetcher(inner, limiter);
 
-    const result = await decorator.capture(pageUrl, responseUrlPrefix);
+    const result = await decorator.capture(pageUrl, targets);
 
     expect(result).toBe(payload);
   });
@@ -48,7 +52,7 @@ describe('HostLimitedCapturedJsonFetcher', () => {
     const blockingLimiter: RequestLimiter = { schedule: () => new Promise(() => {}) };
     const decorator = new HostLimitedCapturedJsonFetcher(inner, blockingLimiter);
 
-    void decorator.capture(pageUrl, responseUrlPrefix);
+    void decorator.capture(pageUrl, targets);
     await Promise.resolve();
 
     expect(inner.capture).not.toHaveBeenCalled();

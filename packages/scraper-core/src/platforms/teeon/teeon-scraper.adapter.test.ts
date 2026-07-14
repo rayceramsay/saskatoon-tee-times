@@ -10,16 +10,23 @@ const PORTAL_URL =
   'https://admin.teeon.com/portal/thelegendsgolfclub/teetimes/thelegendsgolfclub';
 const PORTAL_WITH_DATE = `${PORTAL_URL}?date=${DATE}`;
 
-const fixture: unknown = JSON.parse(
-  readFileSync(
-    new URL(`./__fixtures__/the-legends-${DATE}.json`, import.meta.url),
-    'utf-8'
-  )
-);
+function loadFixture(name: string): unknown {
+  return JSON.parse(
+    readFileSync(new URL(`./__fixtures__/${name}`, import.meta.url), 'utf-8')
+  );
+}
 
-const fixtureFetcher: CapturedJsonFetcher = {
-  capture: () => Promise.resolve(fixture),
-};
+const fixture = loadFixture(`the-legends-${DATE}.json`);
+const settingsFixture = loadFixture('the-legends-settings-tee-sheet.json');
+
+// A fetcher that resolves the two captured targets from committed fixtures; the
+// scrape reads its `teeTime` and `settings` bodies from the returned map.
+function fixtureFetcher(
+  teeTime: unknown = fixture,
+  settings: unknown = settingsFixture
+): CapturedJsonFetcher {
+  return { capture: () => Promise.resolve({ teeTime, settings }) };
+}
 
 const testConfig: TeeOnCourseConfig = {
   courseId: 'the-legends',
@@ -39,6 +46,7 @@ function rawRow(overrides: Record<string, unknown> = {}): Record<string, unknown
     start_time: '07:00',
     date: DATE,
     quantity_remaining: 2,
+    size: 4,
     division_title: 'Front',
     turn_division_title: 'Back',
     turn_tee_time: null,
@@ -49,26 +57,26 @@ function rawRow(overrides: Record<string, unknown> = {}): Record<string, unknown
 
 describe('TeeOnScraper', () => {
   it('exposes its platform and courses', () => {
-    const scraper = new TeeOnScraper([testConfig], fixtureFetcher);
+    const scraper = new TeeOnScraper([testConfig], fixtureFetcher());
 
     expect(scraper.platform).toBe('teeon');
     expect(scraper.courses).toHaveLength(1);
   });
 
   it('throws for a course it does not serve', async () => {
-    const scraper = new TeeOnScraper([testConfig], fixtureFetcher);
+    const scraper = new TeeOnScraper([testConfig], fixtureFetcher());
 
     await expect(scraper.scrape('unknown-course', DATE)).rejects.toThrow(
       /unknown course/
     );
   });
 
-  it('drives the portal page for the date and captures by facility+date prefix', async () => {
-    const calls: { pageUrl: string; prefix: string }[] = [];
+  it('drives the portal page once, capturing tee-time and settings by prefix', async () => {
+    const calls: { pageUrl: string; targets: Record<string, string> }[] = [];
     const spyFetcher: CapturedJsonFetcher = {
-      capture: (pageUrl, prefix) => {
-        calls.push({ pageUrl, prefix });
-        return Promise.resolve(fixture);
+      capture: (pageUrl, targets) => {
+        calls.push({ pageUrl, targets });
+        return Promise.resolve({ teeTime: fixture, settings: settingsFixture });
       },
     };
     const scraper = new TeeOnScraper([testConfig], spyFetcher);
@@ -78,31 +86,44 @@ describe('TeeOnScraper', () => {
     expect(calls).toEqual([
       {
         pageUrl: PORTAL_WITH_DATE,
-        prefix:
-          'https://admin.teeon.com/api/2024-04/guest/tee-time?facility_id=477&date=2026-07-17',
+        targets: {
+          teeTime:
+            'https://admin.teeon.com/api/2024-04/guest/tee-time?facility_id=477&date=2026-07-17',
+          settings:
+            'https://admin.teeon.com/api/2024-04/guest/facility/settings/tee-sheet?facility_id=477',
+        },
       },
     ]);
   });
 
-  it('rejects a response whose shape no longer matches', async () => {
-    const brokenFetcher: CapturedJsonFetcher = {
-      capture: () => Promise.resolve([{ start_time: 5 }]),
+  it('rejects a tee-time response whose shape no longer matches', async () => {
+    const scraper = new TeeOnScraper([testConfig], fixtureFetcher([{ start_time: 5 }]));
+
+    await expect(scraper.scrape('the-legends', DATE)).rejects.toThrow();
+  });
+
+  it('rejects a settings response carrying an unrecognized rule value', async () => {
+    const brokenSettings = {
+      ...(settingsFixture as object),
+      single_bookings: 'sometimes',
     };
-    const scraper = new TeeOnScraper([testConfig], brokenFetcher);
+    const scraper = new TeeOnScraper(
+      [testConfig],
+      fixtureFetcher(fixture, brokenSettings)
+    );
 
     await expect(scraper.scrape('the-legends', DATE)).rejects.toThrow();
   });
 
   it('drops blocked and full starts', async () => {
-    const droppingFetcher: CapturedJsonFetcher = {
-      capture: () =>
-        Promise.resolve([
-          rawRow({ start_time: '06:00', blocked_type: 'crossover' }),
-          rawRow({ start_time: '06:30', quantity_remaining: 0 }),
-          rawRow({ start_time: '08:00' }),
-        ]),
-    };
-    const scraper = new TeeOnScraper([testConfig], droppingFetcher);
+    const scraper = new TeeOnScraper(
+      [testConfig],
+      fixtureFetcher([
+        rawRow({ start_time: '06:00', blocked_type: 'crossover' }),
+        rawRow({ start_time: '06:30', quantity_remaining: 0 }),
+        rawRow({ start_time: '08:00' }),
+      ])
+    );
 
     const teeTimes = await scraper.scrape('the-legends', DATE);
 
@@ -115,7 +136,7 @@ describe('TeeOnScraper fan-out (through scrape)', () => {
   let teeTimes: ScrapedTeeTime[];
 
   beforeAll(async () => {
-    const scraper = new TeeOnScraper([testConfig], fixtureFetcher);
+    const scraper = new TeeOnScraper([testConfig], fixtureFetcher());
     teeTimes = await scraper.scrape('the-legends', DATE);
   });
 
@@ -152,18 +173,19 @@ describe('TeeOnScraper fan-out (through scrape)', () => {
     }
   });
 
-  it('builds contiguous group sizes from remaining quantity', () => {
-    // The 18:56 start reports quantity_remaining 4.
-    const fourSlots = teeTimes.find((teeTime) =>
+  it('derives group sizes from the facility booking-size rules', () => {
+    // single_bookings is allow_within_group, so an empty start excludes size 1.
+    // The 18:56 start is empty (quantity_remaining 4 == size 4).
+    const emptyStart = teeTimes.find((teeTime) =>
       teeTime.startInstant.startsWith('2026-07-17T18:56')
     );
-    // The 13:28 start reports quantity_remaining 1.
-    const oneSlot = teeTimes.find((teeTime) =>
+    // The 13:28 start is partially filled (quantity_remaining 1 < size 4).
+    const joinableSingle = teeTimes.find((teeTime) =>
       teeTime.startInstant.startsWith('2026-07-17T13:28')
     );
 
-    expect(fourSlots?.groupSizes).toEqual([1, 2, 3, 4]);
-    expect(oneSlot?.groupSizes).toEqual([1]);
+    expect(emptyStart?.groupSizes).toEqual([2, 3, 4]);
+    expect(joinableSingle?.groupSizes).toEqual([1]);
   });
 
   it('is always online-bookable with no scraped price', () => {
@@ -183,6 +205,42 @@ describe('TeeOnScraper fan-out (through scrape)', () => {
       for (const url of Object.values(teeTime.bookingUrls)) {
         expect(url).toBe(PORTAL_WITH_DATE);
       }
+    }
+  });
+});
+
+describe('TeeOnScraper restricted single bookings (2026-07-15)', () => {
+  const RESTRICTED_DATE = '2026-07-15';
+  const restrictedFixture = loadFixture(`the-legends-${RESTRICTED_DATE}.json`);
+  let teeTimes: ScrapedTeeTime[];
+
+  beforeAll(async () => {
+    const scraper = new TeeOnScraper(
+      [testConfig],
+      fixtureFetcher(restrictedFixture, settingsFixture)
+    );
+    teeTimes = await scraper.scrape('the-legends', RESTRICTED_DATE);
+  });
+
+  it('lifts the single-booking floor to 2 on the empty 14:48 start', () => {
+    const emptyStart = teeTimes.filter((teeTime) =>
+      teeTime.startInstant.startsWith(`${RESTRICTED_DATE}T14:48`)
+    );
+
+    expect(emptyStart.length).toBeGreaterThan(0);
+    for (const teeTime of emptyStart) {
+      expect(teeTime.groupSizes).toEqual([2, 3, 4]);
+    }
+  });
+
+  it('allows a single booking on the partially-filled 12:00 start', () => {
+    const joinableStart = teeTimes.filter((teeTime) =>
+      teeTime.startInstant.startsWith(`${RESTRICTED_DATE}T12:00`)
+    );
+
+    expect(joinableStart.length).toBeGreaterThan(0);
+    for (const teeTime of joinableStart) {
+      expect(teeTime.groupSizes).toEqual([1]);
     }
   });
 });

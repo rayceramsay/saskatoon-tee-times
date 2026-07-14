@@ -16,10 +16,11 @@ export class HostLimitedCapturedJsonFetcher implements CapturedJsonFetcher {
     private readonly limiter: RequestLimiter
   ) {}
 
-  capture(pageUrl: string, responseUrlPrefix: string): Promise<unknown> {
+  capture(
+    pageUrl: string,
+    targets: Record<string, string>
+  ): Promise<Record<string, unknown>> {
     const host = new URL(pageUrl).host;
-    return this.limiter.schedule(host, () =>
-      this.inner.capture(pageUrl, responseUrlPrefix)
-    );
+    return this.limiter.schedule(host, () => this.inner.capture(pageUrl, targets));
   }
 }
