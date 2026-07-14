@@ -25,7 +25,9 @@ const fixtureFetcher: JsonFetcher = {
   },
 };
 
-// The scrape/link host (tld) and player affiliation match the captured fixture
+// The scrape `tld` (com) deliberately differs from the user-facing `bookingTld`
+// (ca) so the deep-link tests can prove the scrape mirror never leaks into
+// booking URLs. The affiliation matches the captured fixture
 // (default_price.player_type_id 110161).
 const testConfig: ChronogolfV2CourseConfig = {
   courseId: 'the-willows',
@@ -42,7 +44,8 @@ const testConfig: ChronogolfV2CourseConfig = {
   ],
   slug: 'the-willows-golf-country-club',
   affiliationTypeId: 110161,
-  tld: 'ca',
+  tld: 'com',
+  bookingTld: 'ca',
 };
 
 describe('ChronogolfV2Scraper', () => {
@@ -184,6 +187,15 @@ describe('ChronogolfV2Scraper parsing (through scrape)', () => {
       expect(
         affiliationIds.every((id) => id === String(testConfig.affiliationTypeId))
       ).toBe(true);
+    }
+  });
+
+  it('builds deep links on the canonical booking host, never the scrape mirror', () => {
+    for (const teeTime of teeTimes) {
+      for (const url of Object.values(teeTime.bookingUrls)) {
+        expect(url).toContain(`https://www.chronogolf.${testConfig.bookingTld}/`);
+        expect(url).not.toContain(`chronogolf.${testConfig.tld}`);
+      }
     }
   });
 });

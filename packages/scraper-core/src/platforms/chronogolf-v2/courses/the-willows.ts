@@ -25,7 +25,8 @@ export const theWillowsConfig: ChronogolfV2CourseConfig = {
   ],
   slug: 'the-willows-golf-country-club-saskatchewan-saskatoon',
   affiliationTypeId: 110161,
-  tld: 'ca',
+  tld: 'de',
+  bookingTld: 'com',
 };
 
 /**

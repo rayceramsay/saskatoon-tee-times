@@ -64,7 +64,7 @@ Every Chronogolf V2 scraped record SHALL be `onlineBookable: true` — Chronogol
 
 ### Requirement: Chronogolf V2 booking URL per group size
 
-Each Chronogolf V2 scraped tee time SHALL carry, for each valid group size, a rung-1 reservation-review deep link that targets that exact slot and player count — not the general portal fallback. The deep link SHALL be built inside the scraper from the tee-time `id` already present in the parsed response (zero extra requests), the record's hole count (`nb_holes`), the course config's `slug`, and `engine=2`, repeating `affiliation_type_ids` once per player for the group size. The trivial "first available candidate" policy SHALL still select the deep link over the portal fallback.
+Each Chronogolf V2 scraped tee time SHALL carry, for each valid group size, a rung-1 reservation-review deep link that targets that exact slot and player count — not the general portal fallback. The deep link SHALL be built inside the scraper from the tee-time `id` already present in the parsed response (zero extra requests), the record's hole count (`nb_holes`), the course config's `slug`, and `engine=2`, repeating `affiliation_type_ids` once per player for the group size. The deep link's host SHALL be the course config's canonical `bookingTld`, never the scrape `tld` mirror, so mirror choices made for rate-limiting never reach user-facing links. The trivial "first available candidate" policy SHALL still select the deep link over the portal fallback.
 
 #### Scenario: Each valid group size gets a slot-and-size-specific deep link
 
@@ -75,7 +75,7 @@ Each Chronogolf V2 scraped tee time SHALL carry, for each valid group size, a ru
 
 ### Requirement: Chronogolf V2 course configuration
 
-A Chronogolf V2 course config SHALL extend the universal `CourseConfig` with the Chronogolf `courseIds` (the `course_ids` sent on every request), the club `slug` (used to build deep links), the `affiliationTypeId` (repeated per player in deep links), and the scrape `tld`. A single `scrape` SHALL send all configured `courseIds` on every page request. Adding a further Chronogolf V2 course SHALL be a configuration-only change — a new course config entry — with no scraper code change. The Willows SHALL be configured with its three physical-loop course UUIDs plus the `18` combined-round toggle in `courseIds`, its `slug` and `affiliationTypeId`, an `America/Regina` time zone, and its booking window (`maxAdvanceDays` 5, `releaseTime` `07:00`).
+A Chronogolf V2 course config SHALL extend the universal `CourseConfig` with the Chronogolf `courseIds` (the `course_ids` sent on every request), the club `slug` (used to build deep links), the `affiliationTypeId` (repeated per player in deep links), the scrape `tld` (the queried Chronogolf mirror, a rate-limit lever), and the canonical `bookingTld` (the user-facing deep-link host, independent of `tld`). A single `scrape` SHALL send all configured `courseIds` on every page request. Adding a further Chronogolf V2 course SHALL be a configuration-only change — a new course config entry — with no scraper code change. The Willows SHALL be configured with its three physical-loop course UUIDs plus the `18` combined-round toggle in `courseIds`, its `slug` and `affiliationTypeId`, an `America/Regina` time zone, and its booking window (`maxAdvanceDays` 5, `releaseTime` `07:00`).
 
 #### Scenario: The Willows is configured as a Chronogolf V2 course
 

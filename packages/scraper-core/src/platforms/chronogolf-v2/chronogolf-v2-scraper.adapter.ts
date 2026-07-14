@@ -135,9 +135,10 @@ function buildTeeTimesRequestUrl(
  *
  * The hash-fragment params are assembled by hand so `affiliation_type_ids` stays
  * a comma-joined list (repeated once per player) rather than URL-encoded. The V2
- * fragment omits V1's `date`/`course_id` and appends `engine=2`.
+ * fragment omits V1's `date`/`course_id` and appends `engine=2`. The host is the
+ * course's canonical `bookingTld`, never the scrape `tld` mirror.
  *
- * @param config - The course's Chronogolf V2 configuration (host, slug, affiliation).
+ * @param config - The course's Chronogolf V2 configuration (booking host, slug, affiliation).
  * @param teeTimeId - The slot's stable tee-time id.
  * @param holes - The record's hole count, sent as `nb_holes`.
  * @param groupSize - Party size; the affiliation id is repeated once per player.
@@ -154,7 +155,7 @@ function buildReservationDeepLink(
     () => config.affiliationTypeId
   ).join(',');
 
-  const base = `https://www.chronogolf.${config.tld}/club/${config.slug}/booking/?source=chronogolf&medium=profile`;
+  const base = `https://www.chronogolf.${config.bookingTld}/club/${config.slug}/booking/?source=chronogolf&medium=profile`;
   const fragment =
     `#/teetime/review?affiliation_type_ids=${affiliationTypeIds}` +
     `&teetime_id=${teeTimeId}` +
