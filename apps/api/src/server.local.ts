@@ -19,7 +19,11 @@ function main(): void {
   });
   const reader = new DynamoDbTeeTimeReader(documentClient, config.DYNAMODB_TABLE_NAME);
 
-  const app = createApp({ reader, exposeErrorDetails: config.EXPOSE_ERROR_DETAILS });
+  const app = createApp({
+    reader,
+    corsOrigin: config.CORS_ORIGIN,
+    exposeErrorDetails: config.EXPOSE_ERROR_DETAILS,
+  });
 
   const server = serve({ fetch: app.fetch, port: config.PORT });
 
@@ -37,7 +41,7 @@ function main(): void {
   });
 
   console.log(
-    `api started: reading from "${config.DYNAMODB_TABLE_NAME}" at ${config.DYNAMODB_ENDPOINT} on port ${config.PORT}`
+    `api started: reading from DynamoDB table "${config.DYNAMODB_TABLE_NAME}" at ${config.DYNAMODB_ENDPOINT} on port ${config.PORT}`
   );
 }
 

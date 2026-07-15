@@ -8,7 +8,7 @@ import { z } from 'zod';
 /** Collaborators the HTTP app depends on, supplied by the composition root. */
 export interface AppDeps {
   reader: TeeTimeReader;
-  /** When true, 500 responses include the error's message and stack. Defaults off in production. */
+  corsOrigin: string | null;
   exposeErrorDetails: boolean;
 }
 
@@ -27,10 +27,12 @@ const teeTimesQuerySchema = z.object({
  * const app = createApp({ reader });
  * ```
  */
-export function createApp({ reader, exposeErrorDetails }: AppDeps): Hono {
+export function createApp({ reader, corsOrigin, exposeErrorDetails }: AppDeps): Hono {
   const app = new Hono();
 
-  app.use('*', cors());
+  if (corsOrigin) {
+    app.use('*', cors({ origin: corsOrigin }));
+  }
   app.use('*', logger());
 
   app.get('/tee-times', async (c) => {
