@@ -24,8 +24,9 @@ export interface ViewResult {
  *
  * Composes pure predicates in order — hide past → course membership → holes
  * equality → players group-size membership → earliest-start — then sorts
- * chronologically and, when grouping is on, buckets by course (empty courses
- * omitted). No side effects, so it is unit-testable without React.
+ * chronologically and, when grouping is on, buckets by course in `ALL_COURSES`
+ * order (empty courses omitted). No side effects, so it is unit-testable
+ * without React.
  *
  * @param teeTimes - The day's fetched tee times.
  * @param viewState - The active filters and grouping.
@@ -64,16 +65,25 @@ export function applyView(
 }
 
 function groupByCourse(sorted: readonly TeeTime[]): CourseGroup[] {
-  const order: string[] = [];
+  const encounterOrder: string[] = [];
   const byId = new Map<string, CourseGroup>();
   for (const teeTime of sorted) {
     let group = byId.get(teeTime.courseId);
     if (!group) {
       group = { id: teeTime.courseId, name: teeTime.courseName, teeTimes: [] };
       byId.set(teeTime.courseId, group);
-      order.push(teeTime.courseId);
+      encounterOrder.push(teeTime.courseId);
     }
     group.teeTimes.push(teeTime);
   }
-  return order.map((id) => byId.get(id)!);
+
+  // Courses absent from the catalog sort last, keeping their encounter order.
+  const catalogIndex = new Map(ALL_COURSES.map((course, index) => [course.id, index]));
+  return encounterOrder
+    .map((id) => byId.get(id)!)
+    .sort(
+      (a, b) =>
+        (catalogIndex.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
+        (catalogIndex.get(b.id) ?? Number.MAX_SAFE_INTEGER)
+    );
 }
