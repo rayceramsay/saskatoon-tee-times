@@ -7,7 +7,15 @@ import { FreshnessIndicator } from './freshness-indicator';
 import type { LayoutProps } from './layout-props';
 import { DesktopSkeletonRows, EmptyState, ErrorState } from './state-views';
 
-const COLUMN_HEADERS = ['Time', 'Course', 'Holes', 'Routing', 'Slots', 'Price', ''];
+const COLUMN_HEADERS = [
+  'Time',
+  'Course',
+  'Holes',
+  'Routing',
+  'Slots',
+  '$ per player',
+  '',
+];
 
 function latestScrapedAt(group: CourseGroup): string {
   return group.teeTimes.reduce(
@@ -66,9 +74,9 @@ export function DesktopLayout(props: LayoutProps) {
           aria-busy={status === 'skeleton' || showPending}
           className="bg-bg flex-1 overflow-auto"
         >
-          {/* The 612px min-width is just the sum of all column tracks (84+120+52+118+80+62+96) */}
+          {/* The 660px min-width is just the sum of all column tracks (84+120+52+118+80+110+96) */}
           <div
-            className={`min-w-[612px] ${showPending ? 'not-motion-safe:opacity-60 motion-safe:animate-pulse' : ''}`}
+            className={`min-w-[660px] ${showPending ? 'not-motion-safe:opacity-60 motion-safe:animate-pulse' : ''}`}
           >
             <div className="sticky top-0 z-10">
               <div

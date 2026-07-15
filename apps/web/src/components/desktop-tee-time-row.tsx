@@ -9,7 +9,7 @@ import { BookingAction } from './booking-action';
  * size never depends on cell content, keeping every grid instance aligned.
  */
 export const DESKTOP_GRID =
-  'grid grid-cols-[84px_minmax(120px,1fr)_52px_118px_80px_62px_96px]';
+  'grid grid-cols-[84px_minmax(120px,1fr)_52px_118px_80px_110px_96px]';
 
 const CELL = 'flex items-center px-2.5 py-2.5 border-r border-line-2 last:border-r-0';
 
