@@ -2,7 +2,7 @@ import type { TeeTimeReader } from '@stt/tee-time-domain/tee-time-reader';
 import type { TeeTime } from '@stt/tee-time-domain/tee-time-schema';
 import { HTTPException } from 'hono/http-exception';
 import { describe, expect, it, vi } from 'vitest';
-import { createApp } from './app.js';
+import { createApp, type AppDeps } from './app.js';
 
 function teeTime(overrides: Partial<TeeTime> = {}): TeeTime {
   return {
@@ -32,6 +32,15 @@ function rejectingReader(error: Error): TeeTimeReader {
   };
 }
 
+function appDeps(overrides: Partial<AppDeps> = {}): AppDeps {
+  return {
+    reader: fakeReader([]),
+    corsOrigin: null,
+    exposeErrorDetails: false,
+    ...overrides,
+  };
+}
+
 describe('createApp GET /tee-times', () => {
   it('returns a 200 envelope whose lastUpdatedAt is the newest scrapedAt', async () => {
     const teeTimes = [
@@ -39,7 +48,7 @@ describe('createApp GET /tee-times', () => {
       teeTime({ scrapedAt: '2026-07-14T20:30:00Z' }),
       teeTime({ scrapedAt: '2026-07-14T12:00:00Z' }),
     ];
-    const app = createApp({ reader: fakeReader(teeTimes), exposeErrorDetails: false });
+    const app = createApp(appDeps({ reader: fakeReader(teeTimes) }));
 
     const response = await app.request('/tee-times?date=2026-07-15');
 
@@ -52,7 +61,7 @@ describe('createApp GET /tee-times', () => {
   });
 
   it('returns a null lastUpdatedAt for an empty result', async () => {
-    const app = createApp({ reader: fakeReader([]), exposeErrorDetails: false });
+    const app = createApp(appDeps());
 
     const response = await app.request('/tee-times?date=2026-07-15');
 
@@ -65,7 +74,7 @@ describe('createApp GET /tee-times', () => {
   });
 
   it('returns a 400 when the date parameter is missing', async () => {
-    const app = createApp({ reader: fakeReader([]), exposeErrorDetails: false });
+    const app = createApp(appDeps());
 
     const response = await app.request('/tee-times');
 
@@ -73,7 +82,7 @@ describe('createApp GET /tee-times', () => {
   });
 
   it('returns a 400 when the date parameter is not a real calendar date', async () => {
-    const app = createApp({ reader: fakeReader([]), exposeErrorDetails: false });
+    const app = createApp(appDeps());
 
     const response = await app.request('/tee-times?date=2026-13-40');
 
@@ -84,10 +93,9 @@ describe('createApp GET /tee-times', () => {
 describe('createApp error handling', () => {
   it('returns a generic 500 without error detail when exposure is disabled', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const app = createApp({
-      reader: rejectingReader(new Error('reader exploded')),
-      exposeErrorDetails: false,
-    });
+    const app = createApp(
+      appDeps({ reader: rejectingReader(new Error('reader exploded')) })
+    );
 
     const response = await app.request('/tee-times?date=2026-07-15');
 
@@ -100,7 +108,9 @@ describe('createApp error handling', () => {
   it('includes the error message and stack in the 500 body when exposure is enabled', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     const error = new Error('reader exploded');
-    const app = createApp({ reader: rejectingReader(error), exposeErrorDetails: true });
+    const app = createApp(
+      appDeps({ reader: rejectingReader(error), exposeErrorDetails: true })
+    );
 
     const response = await app.request('/tee-times?date=2026-07-15');
 
@@ -114,10 +124,12 @@ describe('createApp error handling', () => {
   });
 
   it('does not intercept the 400 validation path', async () => {
-    const app = createApp({
-      reader: rejectingReader(new Error('should not be reached')),
-      exposeErrorDetails: true,
-    });
+    const app = createApp(
+      appDeps({
+        reader: rejectingReader(new Error('should not be reached')),
+        exposeErrorDetails: true,
+      })
+    );
 
     const response = await app.request('/tee-times');
 
@@ -125,13 +137,48 @@ describe('createApp error handling', () => {
   });
 
   it('honors an HTTPException thrown while handling a request', async () => {
-    const app = createApp({
-      reader: rejectingReader(new HTTPException(404, { message: 'Not Found' })),
-      exposeErrorDetails: false,
-    });
+    const app = createApp(
+      appDeps({
+        reader: rejectingReader(new HTTPException(404, { message: 'Not Found' })),
+      })
+    );
 
     const response = await app.request('/tee-times?date=2026-07-15');
 
     expect(response.status).toBe(404);
+  });
+});
+
+describe('createApp CORS', () => {
+  it('allows the configured origin', async () => {
+    const app = createApp(appDeps({ corsOrigin: 'https://saskatoonteetimes.ca' }));
+
+    const response = await app.request('/tee-times?date=2026-07-15', {
+      headers: { Origin: 'https://saskatoonteetimes.ca' },
+    });
+
+    expect(response.headers.get('access-control-allow-origin')).toBe(
+      'https://saskatoonteetimes.ca'
+    );
+  });
+
+  it('does not allow an origin other than the configured one', async () => {
+    const app = createApp(appDeps({ corsOrigin: 'https://saskatoonteetimes.ca' }));
+
+    const response = await app.request('/tee-times?date=2026-07-15', {
+      headers: { Origin: 'https://evil.example.com' },
+    });
+
+    expect(response.headers.get('access-control-allow-origin')).toBeNull();
+  });
+
+  it('sends no CORS headers when no origin is configured', async () => {
+    const app = createApp(appDeps({ corsOrigin: null }));
+
+    const response = await app.request('/tee-times?date=2026-07-15', {
+      headers: { Origin: 'https://saskatoonteetimes.ca' },
+    });
+
+    expect(response.headers.get('access-control-allow-origin')).toBeNull();
   });
 });
