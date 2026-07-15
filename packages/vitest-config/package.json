@@ -1,0 +1,13 @@
+{
+  "name": "@stt/vitest-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./base": "./base.js",
+    "./integration": "./integration.js"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  }
+}

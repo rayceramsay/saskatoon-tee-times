@@ -1,10 +1,14 @@
 import { defineConfig } from 'vitest/config';
 
-export default defineConfig({
+/**
+ * A shared Vitest configuration for integration tests.
+ *
+ * @type {import('vitest/config').ViteUserConfig}
+ */
+export const integrationConfig = defineConfig({
   test: {
     include: ['src/**/*.integration.test.ts'],
     passWithNoTests: true,
-    // Container startup (and first-run image pull) is well beyond the default.
     hookTimeout: 180_000,
     testTimeout: 30_000,
   },

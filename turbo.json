@@ -17,7 +17,8 @@
       "dependsOn": ["^test"]
     },
     "test:integration": {
-      "dependsOn": ["^test:integration"]
+      "dependsOn": ["^test:integration"],
+      "cache": false
     },
     "dev": {
       "cache": false,

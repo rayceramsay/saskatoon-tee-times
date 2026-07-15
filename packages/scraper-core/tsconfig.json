@@ -1,8 +1,9 @@
 {
   "extends": "@stt/typescript-config/base.json",
   "compilerOptions": {
+    "rootDir": "src",
     "outDir": "dist"
   },
-  "include": ["src", "vitest.config.ts"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
