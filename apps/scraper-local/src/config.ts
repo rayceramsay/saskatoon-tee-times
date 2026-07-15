@@ -3,9 +3,9 @@ import { z } from 'zod';
 
 const environmentSchema = z.object({
   // Endpoint of the docker-compose `dynamodb-local` service.
-  DYNAMODB_ENDPOINT: z.url().default('http://localhost:8000'),
+  DYNAMODB_ENDPOINT: z.url(),
   // Table the entrypoint bootstraps and writes tee times to.
-  DYNAMODB_TABLE_NAME: z.string().min(1).default('tee-times-local'),
+  DYNAMODB_TABLE_NAME: z.string().min(1),
   // Cron expression controlling how often the ingestion pipeline runs. Defaults to every
   // 15 minutes (production's cadence); use e.g. '* * * * *' for fast local feedback.
   SCRAPE_CRON: z
@@ -13,11 +13,11 @@ const environmentSchema = z.object({
     .refine((value) => cron.validate(value), 'must be a valid cron expression')
     .default('*/15 * * * *'),
   // Global ceiling on concurrent jobs across all hosts, independent of transport.
-  SCRAPER_GLOBAL_MAX_CONCURRENT: z.coerce.number().int().positive().default(6),
+  SCRAPER_GLOBAL_MAX_CONCURRENT: z.coerce.number().int().positive().default(100),
   // Per-host concurrency budget applied to any host without an override.
-  SCRAPER_PER_HOST_MAX_CONCURRENT: z.coerce.number().int().positive().default(3),
+  SCRAPER_PER_HOST_MAX_CONCURRENT: z.coerce.number().int().positive().default(25),
   // Max attempts for a retryable (429/503) job before giving up.
-  SCRAPER_MAX_RETRY_ATTEMPTS: z.coerce.number().int().positive().default(3),
+  SCRAPER_MAX_RETRY_ATTEMPTS: z.coerce.number().int().positive().default(2),
   // Longest Retry-After (seconds) we will honor before giving up on the job.
   SCRAPER_MAX_RETRY_AFTER_SECONDS: z.coerce.number().int().positive().default(30),
   // Minimum severity the console logger emits.
