@@ -14,12 +14,12 @@ export interface CourseOption {
  * keep them in sync until the endpoint supersedes this list.
  */
 export const ALL_COURSES: CourseOption[] = [
+  { id: 'holiday-park-championship', name: 'Holiday Park Championship' },
+  { id: 'holiday-park-executive-9', name: 'Holiday Park Executive 9' },
+  { id: 'wildwood', name: 'Wildwood' },
+  { id: 'silverwood', name: 'Silverwood' },
+  { id: 'the-willows', name: 'The Willows' },
   { id: 'greenbryre', name: 'Greenbryre' },
   { id: 'dakota-dunes', name: 'Dakota Dunes' },
-  { id: 'the-willows', name: 'The Willows' },
   { id: 'the-legends', name: 'The Legends' },
-  { id: 'holiday-park-executive-9', name: 'Holiday Park Executive 9' },
-  { id: 'holiday-park-championship', name: 'Holiday Park Championship' },
-  { id: 'silverwood', name: 'Silverwood' },
-  { id: 'wildwood', name: 'Wildwood' },
 ];
