@@ -30,6 +30,27 @@ describe('freshnessState', () => {
     });
   });
 
+  it('still counts exact hours just under a day', () => {
+    expect(freshnessState(minutesAgo(23 * 60 + 59), NOW)).toEqual({
+      level: 'red',
+      label: 'Updated 23 hr ago',
+    });
+  });
+
+  it('caps the label at 24 hours', () => {
+    expect(freshnessState(minutesAgo(24 * 60), NOW)).toEqual({
+      level: 'red',
+      label: 'Updated 24+ hr ago',
+    });
+  });
+
+  it('keeps the capped label for ages well beyond a day', () => {
+    expect(freshnessState(minutesAgo(9 * 24 * 60), NOW)).toEqual({
+      level: 'red',
+      label: 'Updated 24+ hr ago',
+    });
+  });
+
   it('reports a dash when there is no timestamp', () => {
     expect(freshnessState(null, NOW)).toEqual({ level: 'none', label: '—' });
   });

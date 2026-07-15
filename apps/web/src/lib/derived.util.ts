@@ -95,10 +95,13 @@ export function freshnessState(
   const minutes = Math.floor(ageMs / 60_000);
 
   const level: FreshnessLevel = minutes < 20 ? 'fresh' : minutes < 60 ? 'amber' : 'red';
+  const hours = Math.floor(minutes / 60);
   const label =
     minutes < 60
       ? `Updated ${minutes} min ago`
-      : `Updated ${Math.floor(minutes / 60)} hr ago`;
+      : hours < 24
+        ? `Updated ${hours} hr ago`
+        : 'Updated 24+ hr ago';
 
   return { level, label };
 }
