@@ -74,7 +74,3 @@ Note: This list is preliminary and not exhaustive; I am open to exploring other 
 - Follow spec driven development via OpenSpec
 - Run `pnpm format`, `pnpm check-types`, and `pnpm lint` after every change. Fix any errors
 - Use Conventional Commits for commit messages
-
-## Other Notes
-
-- A technical spike was done in `.../saskatoon-tee-times/` to determine project feasability. This repository acts as its successor. While the end results will be similar, the spike's codebase was messy and hard to understand (spaghetti code). You can use it for a reference and additional context, but purely for filling in knowledge gaps; NEVER blindly copy code or logic or names from here; ALWAYS think through the projects goals from a fresh perspective and prioritize creating clean code that scales.
