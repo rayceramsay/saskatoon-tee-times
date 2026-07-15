@@ -104,7 +104,7 @@ export function MobileLayout(props: LayoutProps) {
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="border-line bg-bg text-ink flex flex-1 items-center gap-1.5 rounded-lg border px-3 py-2 text-[14px] font-semibold"
+          className="border-line bg-bg text-ink hover:bg-line-2 flex flex-1 cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-[14px] font-semibold motion-safe:transition-colors"
         >
           <span aria-hidden>📅</span>
           {formatDateChip(viewState.date)}
@@ -112,7 +112,7 @@ export function MobileLayout(props: LayoutProps) {
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="border-line bg-bg text-ink flex min-h-[44px] items-center gap-1.5 rounded-lg border px-3.5 text-[13px] font-semibold"
+          className="border-line bg-bg text-ink hover:bg-line-2 flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 text-[13px] font-semibold motion-safe:transition-colors"
         >
           Filters
           {badge > 0 && (

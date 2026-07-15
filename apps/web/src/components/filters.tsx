@@ -22,7 +22,7 @@ import {
 
 const SECTION_LABEL = 'mb-2 block text-label-caps uppercase text-ink-3';
 const ARROW =
-  'flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-line text-ink-2 disabled:opacity-40 disabled:cursor-default';
+  'flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-line text-ink-2 enabled:hover:bg-line-2 enabled:hover:text-ink motion-safe:transition-colors disabled:opacity-40 disabled:cursor-default';
 
 /** Callbacks and state every filter control shares. */
 export interface FilterControlsProps {
@@ -53,10 +53,10 @@ function ToggleGroup({ ariaLabel, options, value, onChange }: ToggleGroupProps) 
             type="button"
             aria-pressed={active}
             onClick={() => onChange(option.value)}
-            className={`flex-1 rounded-md border py-1.5 text-center text-xs font-medium whitespace-nowrap ${
+            className={`flex-1 cursor-pointer rounded-md border py-1.5 text-center text-xs font-medium whitespace-nowrap motion-safe:transition-colors ${
               active
-                ? 'border-accent bg-accent text-white'
-                : 'border-line bg-panel text-ink-2'
+                ? 'border-accent bg-accent hover:border-accent-dark hover:bg-accent-dark text-white'
+                : 'border-line bg-panel text-ink-2 hover:bg-line-2'
             }`}
           >
             {option.label}
@@ -131,7 +131,7 @@ export function CourseFilter({
         <button
           type="button"
           onClick={() => onFilterChange({ courses: allChecked ? [] : null })}
-          className="text-ink-3 text-[11px] underline underline-offset-2"
+          className="text-ink-3 hover:text-ink cursor-pointer text-[11px] underline underline-offset-2 motion-safe:transition-colors"
         >
           {allChecked ? 'Deselect all' : 'Select all'}
         </button>
@@ -140,13 +140,13 @@ export function CourseFilter({
         {courses.map((course) => (
           <label
             key={course.id}
-            className="text-ink-2 flex cursor-pointer items-start gap-2 text-xs leading-snug"
+            className="text-ink-2 hover:text-ink flex cursor-pointer items-start gap-2 text-xs leading-snug motion-safe:transition-colors"
           >
             <input
               type="checkbox"
               checked={resolved === null || resolved.has(course.id)}
               onChange={() => toggle(course.id)}
-              className="accent-accent mt-px h-3.5 w-3.5 shrink-0"
+              className="accent-accent mt-px h-3.5 w-3.5 shrink-0 cursor-pointer"
             />
             <span>{course.name}</span>
           </label>
@@ -178,7 +178,7 @@ export function EarliestStartControl({
         onChange={(event) =>
           onFilterChange({ from: EARLIEST_START_STOPS[Number(event.target.value)] })
         }
-        className="accent-accent w-full"
+        className="accent-accent w-full cursor-pointer"
       />
       <div className="text-ink-3 mt-1.5 flex justify-between text-[10px]">
         <span>5 AM</span>
@@ -203,7 +203,9 @@ export function GroupByCourseSwitch({
         aria-checked={on}
         aria-label="Group by course"
         onClick={() => onFilterChange({ group: !on })}
-        className={`relative h-[22px] w-[38px] rounded-full ${on ? 'bg-accent' : 'bg-line'}`}
+        className={`relative h-[22px] w-[38px] cursor-pointer rounded-full motion-safe:transition-colors ${
+          on ? 'bg-accent hover:bg-accent-dark' : 'bg-line hover:bg-line-3'
+        }`}
       >
         <span
           className={`absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.22)] motion-safe:transition-all ${
@@ -253,7 +255,7 @@ function Calendar({ selected, today, onSelect }: CalendarProps) {
           type="button"
           onClick={() => stepMonth(-1)}
           aria-label="Previous month"
-          className="border-line text-ink-2 flex h-6 w-6 items-center justify-center rounded-sm border"
+          className="border-line text-ink-2 hover:bg-line-2 hover:text-ink flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm border motion-safe:transition-colors"
         >
           ‹
         </button>
@@ -264,7 +266,7 @@ function Calendar({ selected, today, onSelect }: CalendarProps) {
           type="button"
           onClick={() => stepMonth(1)}
           aria-label="Next month"
-          className="border-line text-ink-2 flex h-6 w-6 items-center justify-center rounded-sm border"
+          className="border-line text-ink-2 hover:bg-line-2 hover:text-ink flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm border motion-safe:transition-colors"
         >
           ›
         </button>
@@ -291,11 +293,11 @@ function Calendar({ selected, today, onSelect }: CalendarProps) {
               aria-disabled={!navigable}
               aria-current={date === today ? 'date' : undefined}
               onClick={() => navigable && onSelect(date)}
-              className={`h-7 rounded-sm text-xs ${
+              className={`h-7 rounded-sm text-xs motion-safe:transition-colors ${
                 isSelected
-                  ? 'bg-accent font-bold text-white'
+                  ? 'bg-accent hover:bg-accent-dark cursor-pointer font-bold text-white'
                   : navigable
-                    ? 'text-ink hover:bg-line-2'
+                    ? 'text-ink hover:bg-line-2 cursor-pointer'
                     : 'text-line cursor-default'
               }`}
             >
@@ -361,7 +363,7 @@ export function DateSection({
             onClick={() => setOpen((value) => !value)}
             aria-haspopup="dialog"
             aria-expanded={open}
-            className="text-ink hover:bg-line-2 flex-1 rounded-md px-1.5 py-1 text-center text-[14px] font-semibold"
+            className="text-ink hover:bg-line-2 flex-1 cursor-pointer rounded-md px-1.5 py-1 text-center text-[14px] font-semibold motion-safe:transition-colors"
           >
             {formatDateChip(viewState.date)}
           </button>

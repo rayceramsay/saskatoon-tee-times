@@ -82,7 +82,7 @@ export function EmptyState({ onReset }: EmptyStateProps) {
       <button
         type="button"
         onClick={onReset}
-        className="text-ink-2 mt-4 text-[13px] underline underline-offset-2"
+        className="text-ink-2 hover:text-ink mt-4 cursor-pointer text-[13px] underline underline-offset-2 motion-safe:transition-colors"
       >
         Reset filters
       </button>
@@ -105,7 +105,7 @@ export function ErrorState({ onRetry }: ErrorStateProps) {
       <button
         type="button"
         onClick={onRetry}
-        className="bg-accent hover:bg-accent-dark mx-auto mt-4 flex min-h-[36px] items-center justify-center rounded-md px-4 text-[13px] font-semibold text-white"
+        className="bg-accent hover:bg-accent-dark mx-auto mt-4 flex min-h-[36px] cursor-pointer items-center justify-center rounded-md px-4 text-[13px] font-semibold text-white motion-safe:transition-colors"
       >
         Try again
       </button>

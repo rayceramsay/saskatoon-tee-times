@@ -33,7 +33,7 @@ export function BookingAction({ slot, players, variant }: BookingActionProps) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className={`bg-accent hover:bg-accent-dark focus-visible:outline-accent flex w-full items-center justify-center font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 ${sizing}`}
+      className={`bg-accent hover:bg-accent-dark focus-visible:outline-accent flex w-full items-center justify-center font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 motion-safe:transition-colors ${sizing}`}
     >
       Book for {bookingSize}
     </a>
