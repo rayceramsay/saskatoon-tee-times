@@ -1,5 +1,5 @@
 import { startLocalTime } from '../lib/course-local-time.util';
-import { bookingUrlFor } from '../lib/derived.util';
+import { bookingUrlFor, slotMaxGroupSize } from '../lib/derived.util';
 import { format12Hour } from '../lib/format.util';
 import type { TeeTime } from '../lib/tee-time-response.schema';
 
@@ -10,8 +10,8 @@ interface BookingActionProps {
 }
 
 /**
- * The row's booking affordance: a "Book" link that opens the course portal in a
- * new tab, or a non-interactive "Call to book" label for phone-only slots.
+ * The row's booking affordance: a "Book for N" link that opens the course portal
+ * in a new tab, or a non-interactive "Call to book" label for phone-only slots.
  */
 export function BookingAction({ slot, players, variant }: BookingActionProps) {
   const href = bookingUrlFor(slot, players);
@@ -20,10 +20,11 @@ export function BookingAction({ slot, players, variant }: BookingActionProps) {
     return <span className="text-meta text-ink-2 whitespace-nowrap">Call to book</span>;
   }
 
-  const label = `Book ${format12Hour(startLocalTime(slot.startInstant))} at ${slot.courseName}`;
+  const bookingSize = players ?? slotMaxGroupSize(slot);
+  const label = `Book for ${bookingSize} players at ${format12Hour(startLocalTime(slot.startInstant))} at ${slot.courseName}`;
   const sizing =
     variant === 'mobile'
-      ? 'min-h-[44px] rounded-lg text-[13px]'
+      ? 'min-h-[44px] rounded-lg text-[11px]'
       : 'min-h-[30px] rounded-md text-xs';
 
   return (
@@ -34,7 +35,7 @@ export function BookingAction({ slot, players, variant }: BookingActionProps) {
       aria-label={label}
       className={`bg-accent hover:bg-accent-dark focus-visible:outline-accent flex w-full items-center justify-center font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 ${sizing}`}
     >
-      Book
+      Book for {bookingSize}
     </a>
   );
 }

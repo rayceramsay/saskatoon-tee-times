@@ -15,7 +15,7 @@ export function MobileTeeTimeRow({ slot, players }: MobileTeeTimeRowProps) {
   const price = slot.pricePerPlayer !== null ? formatPrice(slot.pricePerPlayer) : null;
 
   return (
-    <div className="border-line-2 bg-panel grid grid-cols-[46px_1fr_58px] items-center gap-3 border-b px-4 py-3">
+    <div className="border-line-2 bg-panel grid grid-cols-[46px_1fr_70px] items-center gap-3 border-b px-3 py-3">
       <div>
         <span className="text-display-time text-ink">{time}</span>
         <span className="text-ink-2 mt-[3px] block text-[10px] font-semibold">
