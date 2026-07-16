@@ -84,7 +84,7 @@ No account, login, or prior relationship with the product required. Anyone who c
 
 **NFR-3 — Rate limit handling:** When the scraper receives HTTP 429 or 503, it shall back off and retry that request within the same run. All other error types are not retried in-run.
 
-**NFR-4 — Infrastructure cost:** The system shall operate within AWS Always Free Tier limits, targeting effectively $0/month at v1 usage levels.
+**NFR-4 — Infrastructure cost:** The system shall operate under $1/month at v1 usage levels, excluding domain registration. Compute and storage shall stay within AWS Always Free Tier limits; the Route 53 hosted zone (~$0.50/month) is the one accepted always-billed line item, taken so that DNS and certificate issuance stay fully under IaC (NFR-5).
 
 **NFR-5 — Deployability:** The full system shall be deployable and torn down via IaC (OpenTofu), with infrastructure state managed remotely (S3 backend). Deployments shall be automated via CI/CD (GitHub Actions with OIDC — no long-lived AWS credentials in CI).
 
@@ -116,7 +116,7 @@ No account, login, or prior relationship with the product required. Anyone who c
 | Course coverage     | All 8 in-scope courses returning data successfully                               |
 | Scrape reliability  | 15-minute cadence maintained; failures surface in CloudWatch                     |
 | Personal adoption   | Rayce and group use it as primary tee time finder through golf season            |
-| Infrastructure cost | Effectively $0/month, within AWS Always Free Tier                                |
+| Infrastructure cost | Under $1/month excluding domain; compute and storage within AWS Always Free Tier |
 | Code quality        | Codebase is readable, structured, and something the author is proud to return to |
 
 **Counter-metric — Acceptable staleness:** A tee time shown as available that has since been booked is an expected and acceptable state. The system communicates this via the freshness indicator (FR-4.1–4.2) and does not attempt to eliminate it in v1.
