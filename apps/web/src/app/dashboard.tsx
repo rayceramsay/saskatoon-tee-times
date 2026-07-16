@@ -1,7 +1,14 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useOptimistic, useState, useTransition } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useOptimistic,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import { applyView } from '../lib/apply-view.util';
 import { todayInCourseTz } from '../lib/course-local-time.util';
 import { ALL_COURSES } from '../lib/courses';
@@ -64,6 +71,7 @@ export function Dashboard() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const mobileWrapperRef = useRef<HTMLDivElement>(null);
   const now = useNow();
   const today = todayInCourseTz(now);
 
@@ -156,8 +164,8 @@ export function Dashboard() {
       <div className="hidden md:block">
         <DesktopLayout {...layoutProps} />
       </div>
-      <div className="md:hidden">
-        <MobileLayout {...layoutProps} />
+      <div className="md:hidden" ref={mobileWrapperRef}>
+        <MobileLayout {...layoutProps} portalContainer={mobileWrapperRef} />
       </div>
     </>
   );

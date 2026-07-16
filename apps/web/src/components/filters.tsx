@@ -175,6 +175,7 @@ export function EarliestStartControl({
         step={1}
         value={index}
         aria-label="Earliest start"
+        data-base-ui-swipe-ignore
         onChange={(event) =>
           onFilterChange({ from: EARLIEST_START_STOPS[Number(event.target.value)] })
         }

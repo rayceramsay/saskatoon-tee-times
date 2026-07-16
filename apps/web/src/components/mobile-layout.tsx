@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { Drawer } from '@base-ui/react/drawer';
+import type { RefObject } from 'react';
 import type { CourseGroup } from '../lib/apply-view.util';
 import { activeFilterCount, freshnessState, teeTimeKey } from '../lib/derived.util';
 import { courseSummary, formatDateChip } from '../lib/format.util';
@@ -29,8 +30,14 @@ function GroupHeader({ group, now }: { group: CourseGroup; now: Date }) {
   );
 }
 
+/** Detached handle shared by both bottom-bar triggers and the filter drawer. */
+const filterDrawerHandle = Drawer.createHandle();
+
 /** The mobile dashboard: full-screen list, sticky topbar, bottom-sheet filters. */
-export function MobileLayout(props: LayoutProps) {
+export function MobileLayout({
+  portalContainer,
+  ...props
+}: LayoutProps & { portalContainer: RefObject<HTMLDivElement | null> }) {
   const {
     viewState,
     displayedDate,
@@ -43,7 +50,6 @@ export function MobileLayout(props: LayoutProps) {
     freshnessLoading,
     now,
   } = props;
-  const [sheetOpen, setSheetOpen] = useState(false);
 
   const showPending = status === 'ready' && listingPending;
   const count = result.teeTimes.length;
@@ -101,17 +107,15 @@ export function MobileLayout(props: LayoutProps) {
       </main>
 
       <div className="border-line bg-panel absolute inset-x-0 bottom-0 z-10 flex items-center gap-2.5 border-t px-4 pt-2.5 pb-4">
-        <button
-          type="button"
-          onClick={() => setSheetOpen(true)}
+        <Drawer.Trigger
+          handle={filterDrawerHandle}
           className="border-line bg-bg text-ink hover:bg-line-2 flex flex-1 cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-[14px] font-semibold motion-safe:transition-colors"
         >
           <span aria-hidden>📅</span>
           {formatDateChip(viewState.date)}
-        </button>
-        <button
-          type="button"
-          onClick={() => setSheetOpen(true)}
+        </Drawer.Trigger>
+        <Drawer.Trigger
+          handle={filterDrawerHandle}
           className="border-line bg-bg text-ink hover:bg-line-2 flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 text-[13px] font-semibold motion-safe:transition-colors"
         >
           Filters
@@ -120,26 +124,27 @@ export function MobileLayout(props: LayoutProps) {
               {badge}
             </span>
           )}
-        </button>
+        </Drawer.Trigger>
       </div>
 
-      {sheetOpen && (
-        <>
-          <button
-            type="button"
-            aria-label="Close filters"
-            onClick={() => setSheetOpen(false)}
-            className="absolute inset-0 z-20 bg-black/35"
-          />
-          <div className="bg-panel absolute inset-x-0 bottom-0 z-30 max-h-[88%] overflow-y-auto rounded-t-2xl pb-8">
-            <div className="bg-line mx-auto mt-2.5 h-1 w-9 rounded-full" />
-            <div className="px-4 pt-3.5 text-[16px] font-bold">Filters</div>
-            <div className="px-4 pt-4">
-              <FilterSections {...props} calendarMode="inline" />
-            </div>
-          </div>
-        </>
-      )}
+      <Drawer.Root handle={filterDrawerHandle} swipeDirection="down" modal>
+        <Drawer.Portal container={portalContainer}>
+          <Drawer.Backdrop className="fixed inset-0 z-20 bg-black/35 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion-safe:transition-opacity motion-safe:duration-300" />
+          <Drawer.Viewport className="fixed inset-x-0 bottom-0 z-30">
+            <Drawer.Popup className="bg-panel flex max-h-[88vh] flex-col rounded-t-2xl data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full motion-safe:transition-transform motion-safe:duration-300">
+              <div className="shrink-0">
+                <div className="bg-line mx-auto mt-2.5 h-1 w-9 rounded-full" />
+                <Drawer.Title className="px-4 pt-3.5 text-[16px] font-bold">
+                  Filters
+                </Drawer.Title>
+              </div>
+              <Drawer.Content className="min-h-0 overflow-y-auto px-4 pt-4 pb-8">
+                <FilterSections {...props} calendarMode="inline" />
+              </Drawer.Content>
+            </Drawer.Popup>
+          </Drawer.Viewport>
+        </Drawer.Portal>
+      </Drawer.Root>
     </div>
   );
 }
