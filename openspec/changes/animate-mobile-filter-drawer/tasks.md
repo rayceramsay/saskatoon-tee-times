@@ -1,7 +1,7 @@
 ## 1. Dependency
 
-- [ ] 1.1 Add `@base-ui/react` (^1.6.0) to `apps/web` dependencies and install via pnpm at the workspace root
-- [ ] 1.2 Confirm the build has no new stylesheet import requirement and that `date-fns`/`@date-fns/tz` optional peers are not pulled in (`pnpm --filter web build`)
+- [x] 1.1 Add `@base-ui/react` (^1.6.0) to `apps/web` dependencies and install via pnpm at the workspace root
+- [x] 1.2 Confirm the build has no new stylesheet import requirement and that `date-fns`/`@date-fns/tz` optional peers are not pulled in (`pnpm --filter web build`)
 
 ## 2. Restructure the mobile sheet into Base UI Drawer parts
 
