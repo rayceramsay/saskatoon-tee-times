@@ -1,4 +1,4 @@
-import { chromium, type Browser, type BrowserContext } from 'playwright-core';
+import type { PlaywrightBrowserSession } from './playwright-browser-session.js';
 import type { JsonFetcher } from './json-fetcher.port.js';
 import { TransportError } from './transport-error.js';
 
@@ -11,16 +11,14 @@ import { TransportError } from './transport-error.js';
  * the request carries the browser's network fingerprint, then reads the body and
  * backoff signal from the navigation response.
  *
- * The browser and a single context are launched lazily and shared across calls;
- * call {@link close} when finished to release them.
+ * The browser session is injected and owned externally; this adapter only borrows
+ * a page per fetch and closes it.
  */
 export class PlaywrightJsonFetcher implements JsonFetcher {
-  private browserPromise?: Promise<Browser>;
-  private contextPromise?: Promise<BrowserContext>;
+  constructor(private readonly session: PlaywrightBrowserSession) {}
 
   async fetchJson(url: string): Promise<unknown> {
-    const context = await this.context();
-    const page = await context.newPage();
+    const page = await this.session.newPage();
     try {
       const response = await page.goto(url, { waitUntil: 'domcontentloaded' });
       if (response === null) {
@@ -40,28 +38,6 @@ export class PlaywrightJsonFetcher implements JsonFetcher {
     } finally {
       await page.close();
     }
-  }
-
-  /** Close the shared browser and context, if they were started. */
-  async close(): Promise<void> {
-    if (this.contextPromise) {
-      await (await this.contextPromise).close();
-      this.contextPromise = undefined;
-    }
-    if (this.browserPromise) {
-      await (await this.browserPromise).close();
-      this.browserPromise = undefined;
-    }
-  }
-
-  private context(): Promise<BrowserContext> {
-    this.contextPromise ??= this.browser().then((browser) => browser.newContext());
-    return this.contextPromise;
-  }
-
-  private browser(): Promise<Browser> {
-    this.browserPromise ??= chromium.launch({ headless: true });
-    return this.browserPromise;
   }
 }
 

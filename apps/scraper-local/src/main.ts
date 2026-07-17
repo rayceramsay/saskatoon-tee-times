@@ -38,6 +38,7 @@ import {
   theLegendsConfig,
   theLegendsPricingConfig,
 } from '@stt/scraper-core/platforms/teeon/courses/the-legends';
+import { PlaywrightBrowserSession } from '@stt/scraper-core/transport/playwright-browser-session';
 import { PlaywrightJsonFetcher } from '@stt/scraper-core/transport/playwright-json-fetcher';
 import { HostLimitedJsonFetcher } from '@stt/scraper-core/transport/host-limited-json-fetcher';
 import { PlaywrightCapturedJsonFetcher } from '@stt/scraper-core/transport/playwright-captured-json-fetcher';
@@ -87,8 +88,13 @@ async function main(): Promise<void> {
   // browser-driven scraper. Per-host caps stay independent by hostname within it.
   const browserLimiter = new BottleneckRequestLimiter(limiterConfig);
 
-  const fetcher = new PlaywrightJsonFetcher();
-  const limitedFetcher = new HostLimitedJsonFetcher(fetcher, browserLimiter);
+  // One browser for every browser-driven scraper, bounded by this process.
+  const browserSession = await PlaywrightBrowserSession.launch();
+
+  const limitedFetcher = new HostLimitedJsonFetcher(
+    new PlaywrightJsonFetcher(browserSession),
+    browserLimiter
+  );
   const chronogolfScraper = new ChronogolfV1Scraper(
     [greenbryreConfig, dakotaDunesConfig],
     limitedFetcher
@@ -98,9 +104,8 @@ async function main(): Promise<void> {
     limitedFetcher
   );
 
-  const capturedFetcher = new PlaywrightCapturedJsonFetcher();
   const limitedCapturedFetcher = new HostLimitedCapturedJsonFetcher(
-    capturedFetcher,
+    new PlaywrightCapturedJsonFetcher(browserSession),
     browserLimiter
   );
   const teeOnScraper = new TeeOnScraper([theLegendsConfig], limitedCapturedFetcher);
@@ -144,8 +149,7 @@ async function main(): Promise<void> {
     config,
     pipeline,
     logger,
-    fetcher,
-    capturedFetcher,
+    browserSession,
     client
   );
 }
@@ -154,8 +158,7 @@ function setupAndStartIngestionPipelineCronSchedule(
   config: ScraperLocalConfig,
   pipeline: IngestionPipeline,
   logger: Logger,
-  fetcher: PlaywrightJsonFetcher,
-  capturedFetcher: PlaywrightCapturedJsonFetcher,
+  browserSession: PlaywrightBrowserSession,
   client: DynamoDBClient
 ) {
   const task = cron.schedule(config.SCRAPE_CRON, () => pipeline.run(new Date()), {
@@ -171,7 +174,7 @@ function setupAndStartIngestionPipelineCronSchedule(
 
   const shutdown = async (): Promise<void> => {
     await task.destroy();
-    await Promise.all([fetcher.close(), capturedFetcher.close()]);
+    await browserSession.close();
     client.destroy();
   };
   process.once('SIGINT', () => void shutdown().finally(() => process.exit(0)));

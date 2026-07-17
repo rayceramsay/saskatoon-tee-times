@@ -1,30 +1,25 @@
-import { chromium } from 'playwright-core';
-import type { Browser, BrowserContext, Page, Response } from 'playwright-core';
+import type { Page, Response } from 'playwright-core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { PlaywrightBrowserSession } from './playwright-browser-session.js';
 import { PlaywrightJsonFetcher } from './playwright-json-fetcher.adapter.js';
 import { TransportError } from './transport-error.js';
 
-vi.mock('playwright-core', () => ({
-  chromium: { launch: vi.fn() },
-}));
-
 const url = 'https://www.chronogolf.ca/marketplace/tee_times?id=5';
 
-// Wire chromium.launch → browser → context → page so `fetchJson` reaches the
-// given navigation response (or `null`) from `page.goto`.
-function stubBrowser(response: Response | null): { page: Page } {
+// A session handing out one stub page whose `goto` resolves to the given
+// navigation response (or `null`).
+function stubSession(response: Response | null): {
+  session: PlaywrightBrowserSession;
+  page: Page;
+} {
   const page = {
     goto: vi.fn().mockResolvedValue(response),
     close: vi.fn().mockResolvedValue(undefined),
   } as unknown as Page;
-  const context = {
+  const session = {
     newPage: vi.fn().mockResolvedValue(page),
-  } as unknown as BrowserContext;
-  const browser = {
-    newContext: vi.fn().mockResolvedValue(context),
-  } as unknown as Browser;
-  vi.mocked(chromium.launch).mockResolvedValue(browser);
-  return { page };
+  } as unknown as PlaywrightBrowserSession;
+  return { session, page };
 }
 
 function okResponse(body: unknown): Response {
@@ -54,8 +49,8 @@ describe('PlaywrightJsonFetcher', () => {
 
   it('navigates directly to the url and returns the parsed JSON body', async () => {
     const payload = { teeTimes: [{ time: '08:00', spots: 4 }] };
-    const { page } = stubBrowser(okResponse(payload));
-    const fetcher = new PlaywrightJsonFetcher();
+    const { session, page } = stubSession(okResponse(payload));
+    const fetcher = new PlaywrightJsonFetcher(session);
 
     const result = await fetcher.fetchJson(url);
 
@@ -67,8 +62,8 @@ describe('PlaywrightJsonFetcher', () => {
     const payload = { teeTimes: [] };
     const response = okResponse(payload);
     vi.mocked(response.json).mockRejectedValue(new Error('not json'));
-    stubBrowser(response);
-    const fetcher = new PlaywrightJsonFetcher();
+    const { session } = stubSession(response);
+    const fetcher = new PlaywrightJsonFetcher(session);
 
     const result = await fetcher.fetchJson(url);
 
@@ -76,8 +71,8 @@ describe('PlaywrightJsonFetcher', () => {
   });
 
   it('rejects with a TransportError exposing status and retryAfterSeconds', async () => {
-    stubBrowser(failedResponse(429, { 'retry-after': '60' }));
-    const fetcher = new PlaywrightJsonFetcher();
+    const { session } = stubSession(failedResponse(429, { 'retry-after': '60' }));
+    const fetcher = new PlaywrightJsonFetcher(session);
 
     const error = await fetcher.fetchJson(url).catch((e: unknown) => e);
 
@@ -86,8 +81,8 @@ describe('PlaywrightJsonFetcher', () => {
   });
 
   it('rejects with a TransportError carrying status but no retryAfterSeconds when the header is absent', async () => {
-    stubBrowser(failedResponse(503, {}));
-    const fetcher = new PlaywrightJsonFetcher();
+    const { session } = stubSession(failedResponse(503, {}));
+    const fetcher = new PlaywrightJsonFetcher(session);
 
     const error = await fetcher.fetchJson(url).catch((e: unknown) => e);
 
@@ -97,9 +92,28 @@ describe('PlaywrightJsonFetcher', () => {
   });
 
   it('treats a missing navigation response as a transport failure', async () => {
-    stubBrowser(null);
-    const fetcher = new PlaywrightJsonFetcher();
+    const { session } = stubSession(null);
+    const fetcher = new PlaywrightJsonFetcher(session);
 
     await expect(fetcher.fetchJson(url)).rejects.toBeInstanceOf(TransportError);
+  });
+
+  it('takes its page from the session and closes it after a successful fetch', async () => {
+    const { session, page } = stubSession(okResponse({}));
+    const fetcher = new PlaywrightJsonFetcher(session);
+
+    await fetcher.fetchJson(url);
+
+    expect(session.newPage).toHaveBeenCalledTimes(1);
+    expect(page.close).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes its page when the fetch throws', async () => {
+    const { session, page } = stubSession(failedResponse(503, {}));
+    const fetcher = new PlaywrightJsonFetcher(session);
+
+    await fetcher.fetchJson(url).catch(() => {});
+
+    expect(page.close).toHaveBeenCalledTimes(1);
   });
 });
