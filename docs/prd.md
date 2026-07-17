@@ -97,7 +97,7 @@ No account, login, or prior relationship with the product required. Anyone who c
 - 8 public Saskatoon-area courses: Holiday Park Championship 18, Holiday Park Executive 9, Wildwood, Silverwood, The Willows, Greenbryre, Dakota Dunes, The Legends (Warman)
 - Booking platforms: Webtrac (City of Saskatoon courses), Chronogolf V1 (Greenbryre, Dakota Dunes), Chronogolf V2 (The Willows), TeeOn (The Legends)
 - Web dashboard at `saskatoonteetimes.ca`
-- AWS serverless deployment: Lambda, DynamoDB, CloudFront, S3, EventBridge Scheduler, CloudWatch
+- AWS serverless deployment: Lambda, DynamoDB, CloudFront, S3, EventBridge Scheduler, CloudWatch, Route 53
 - IaC via OpenTofu; CI/CD via GitHub Actions (public repo) with OIDC
 
 ### Out of Scope — v1
@@ -152,6 +152,7 @@ Note: the following technologies do not have to strictly be everything that is i
 | CI/CD              | GitHub Actions (public repo) with OIDC — no long-lived AWS credentials |
 | Observability      | AWS CloudWatch                                                         |
 | Domain registrar   | Namecheap (`saskatoonteetimes.ca`)                                     |
+| DNS                | Route 53                                                               |
 
 ### Scraper Architecture: Platform Abstraction
 
