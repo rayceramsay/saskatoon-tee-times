@@ -8,7 +8,7 @@ Finalizing a scraped tee time's price into the canonical `TeeTime` via a shared 
 
 ### Requirement: Pricing engine finalizes the scraped price into the canonical tee time
 
-The system SHALL provide a `PricingEngine` whose `enrich(ScrapedTeeTime) → TeeTime` is the single authority for price finalization. It SHALL resolve `pricePerPlayer` in priority order (FR-1.7): (1) the scraped dynamic price, tax-normalized to after-tax CAD; (2) a statically configured price for the slot; (3) `null`. The raw `dynamicPrice` field SHALL NOT appear on the produced `TeeTime`; every other field — including `onlineBookable` — SHALL pass through unchanged.
+The system SHALL provide a `PricingEngine` whose `enrich(ScrapedTeeTime) → TeeTime` is the single authority for price finalization. It SHALL resolve `pricePerPlayer` in priority order (FR-1.7): (1) the scraped dynamic price, tax-normalized to after-tax CAD; (2) a statically configured price for the slot; (3) `null`. The raw `dynamicPrice` field SHALL NOT appear on the produced `TeeTime`; every other field — including the `booking` union — SHALL pass through unchanged. Pricing SHALL NOT read, narrow, or reconstruct `booking`: how a slot is booked is a fact established at scrape time and is not pricing's to revise.
 
 #### Scenario: Dynamic price is tax-normalized and preferred
 
@@ -23,8 +23,14 @@ The system SHALL provide a `PricingEngine` whose `enrich(ScrapedTeeTime) → Tee
 
 #### Scenario: Bookability passes through pricing unchanged
 
-- **WHEN** a scraped tee time with a given `onlineBookable` value is enriched
-- **THEN** the produced `TeeTime` carries the same `onlineBookable` value
+- **WHEN** a scraped tee time with a given `booking` union is enriched
+- **THEN** the produced `TeeTime` carries the same `booking` value, with the same `kind` and the same arm payload
+
+#### Scenario: Every booking kind survives enrichment
+
+- **WHEN** scraped tee times carrying the `reservation`, `portal`, and `phone` arms are each enriched
+- **THEN** each produced `TeeTime` carries its original arm unchanged
+- **AND** a priced `phone` slot is still a `phone` slot — having a price does not make it online-bookable
 
 ### Requirement: Per-course pricing configuration
 

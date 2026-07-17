@@ -12,7 +12,13 @@ The system SHALL define a canonical `TeeTime` schema — the public, persisted r
 
 - **WHEN** a `ScrapedTeeTime` with `dynamicPrice` is mapped to a `TeeTime`
 - **THEN** the resulting `TeeTime.pricePerPlayer` equals the scraped `dynamicPrice` (including null when it was null)
-- **AND** the `TeeTime` carries all shared fields (start, course, holes, routing, group sizes, booking URLs) unchanged
+- **AND** the `TeeTime` carries all shared fields (start, course, holes, routing, group sizes, and the `booking` union) unchanged
+
+#### Scenario: The booking union round-trips through the store
+
+- **WHEN** tee times carrying the `reservation`, `portal`, and `phone` arms are written and read back
+- **THEN** each record's `booking` returns with the same `kind` and arm payload it was written with
+- **AND** no arm is flattened, defaulted, or coerced into another by the store's marshalling
 
 ### Requirement: Tee-time writer port
 

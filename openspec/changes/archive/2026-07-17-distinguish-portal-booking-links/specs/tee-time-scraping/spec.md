@@ -77,6 +77,26 @@ Each Chronogolf V1 scraped tee time SHALL carry `booking` with `kind: 'reservati
 - **THEN** the emitted booking URLs use the configured `bookingTld` host
 - **AND** the scrape `tld` never appears in any booking URL
 
+### Requirement: Chronogolf V2 availability and pricing
+
+Every Chronogolf V2 scraped record SHALL carry `booking` with `kind: 'reservation'` — Chronogolf V2 is an online booking marketplace with no phone-only state, and it exposes a per-slot deep link for every record. Bookability SHALL be stated through the `booking` union's discriminant alone; this requirement SHALL NOT restate it as a separate flag, which the schema no longer affords. A record's `dynamicPrice` SHALL be the raw per-player green fee from `default_price` only when `default_price.bookable_holes` equals the record's hole count; otherwise it SHALL be `null`. Because the V2 feed prices only the 9-hole round, the 18-hole record of a fanned-out start SHALL carry `dynamicPrice: null`. No tax normalization SHALL be applied by the scraper.
+
+#### Scenario: Every record is directly bookable
+
+- **WHEN** a Chronogolf V2 tee time is parsed
+- **THEN** its `booking.kind` is `reservation`
+- **AND** no `phone` or `portal` record is ever produced by this platform
+
+#### Scenario: The priced hole count carries the raw fee
+
+- **WHEN** a tee time's `default_price` reports a green fee scoped to `bookable_holes` 9
+- **THEN** its 9-hole record's `dynamicPrice` is that raw per-player number with no tax applied
+
+#### Scenario: The unpriced hole count carries a null price
+
+- **WHEN** the same tee time also yields an 18-hole record
+- **THEN** that 18-hole record's `dynamicPrice` is `null`
+
 ### Requirement: Chronogolf V2 booking URL per group size
 
 Each Chronogolf V2 scraped tee time SHALL carry `booking` with `kind: 'reservation'`, whose `urls` map holds, for each valid group size, a rung-1 reservation-review deep link that targets that exact slot and player count. The deep link SHALL be built inside the scraper from the tee-time `id` already present in the parsed response (zero extra requests), the record's hole count (`nb_holes`), the course config's `slug`, and `engine=2`, repeating `affiliation_type_ids` once per player for the group size. The deep link's host SHALL be the course config's canonical `bookingTld`, never the scrape `tld` mirror, so mirror choices made for rate-limiting never reach user-facing links. The deep link SHALL be used directly: Chronogolf V2 always yields one, so the scraper SHALL NOT route it through a portal-fallback selection step.
