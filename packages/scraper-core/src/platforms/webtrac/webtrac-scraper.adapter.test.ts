@@ -51,6 +51,7 @@ function makeConfig(overrides: Partial<WebtracCourseConfig> = {}): WebtracCourse
     bookingPortalUrl: 'https://leisure.saskatoon.ca/webtrac/web/search.html',
     maxAdvanceDays: 7,
     releaseTime: '06:00',
+    pricing: { rules: [] },
     secondaryCode: 1,
     holes: [18, 9],
     ...overrides,

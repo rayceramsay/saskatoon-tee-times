@@ -41,7 +41,7 @@ export function loadConfig(): ScraperLocalConfig {
   const result = environmentSchema.safeParse(process.env);
   if (!result.success) {
     throw new Error(
-      `Invalid scraper-local configuration:\n${z.prettifyError(result.error)}`
+      `Invalid local scraper configuration:\n${z.prettifyError(result.error)}`
     );
   }
   return result.data;

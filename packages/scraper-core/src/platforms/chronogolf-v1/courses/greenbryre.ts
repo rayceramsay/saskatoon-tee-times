@@ -1,4 +1,3 @@
-import type { CoursePricingConfig } from '../../../domain/pricing-engine.js';
 import type { ChronogolfV1CourseConfig } from '../chronogolf-v1-course-config.js';
 
 /**
@@ -14,6 +13,10 @@ export const greenbryreConfig: ChronogolfV1CourseConfig = {
   bookingPortalUrl: 'https://greenbryre.com/book-a-tee-time/',
   maxAdvanceDays: 7,
   releaseTime: '06:00',
+  pricing: {
+    tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
+    rules: [],
+  },
   tld: 'es',
   bookingTld: 'ca',
   slug: 'greenbryre-country-club-closed-until-2013-season',
@@ -24,15 +27,4 @@ export const greenbryreConfig: ChronogolfV1CourseConfig = {
     { chronogolfCourseId: 2020, nbHoles: 6, routing: [] },
     { chronogolfCourseId: 26895, nbHoles: 6, routing: ['North'] },
   ],
-};
-
-/**
- * Pricing configuration for Greenbryre.
- *
- * Greenbryre's scraped green fee is pre-tax, so the engine grosses it up by the
- * course's tax rate; no static rules are configured (it is dynamic-priced).
- */
-export const greenbryrePricingConfig: CoursePricingConfig = {
-  tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
-  rules: [],
 };

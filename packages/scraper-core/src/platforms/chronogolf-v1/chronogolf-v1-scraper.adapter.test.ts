@@ -45,6 +45,7 @@ const testConfig: ChronogolfV1CourseConfig = {
   bookingPortalUrl: 'https://greenbryre.com/book-a-tee-time/',
   maxAdvanceDays: 7,
   releaseTime: '06:00',
+  pricing: { rules: [] },
   tld: 'com',
   bookingTld: 'ca',
   slug: 'greenbryre-country-club-closed-until-2013-season',

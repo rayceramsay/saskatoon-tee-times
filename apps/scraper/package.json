@@ -1,11 +1,11 @@
 {
-  "name": "scraper-local",
+  "name": "scraper",
   "version": "0.1.0",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "tsx watch --env-file-if-exists=.env src/main.ts",
-    "start": "tsx --env-file-if-exists=.env src/main.ts",
+    "dev": "tsx watch --env-file-if-exists=.env src/main.local.ts",
+    "start": "tsx --env-file-if-exists=.env src/main.local.ts",
     "test": "vitest run",
     "check-types": "tsc --noEmit",
     "lint": "eslint"

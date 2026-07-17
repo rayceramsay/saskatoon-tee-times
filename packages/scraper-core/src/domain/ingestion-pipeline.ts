@@ -76,6 +76,7 @@ export class IngestionPipeline {
     await this.persistGroups(teeTimeGroups);
 
     const unitsOk = unitOutcomes.filter((outcome) => outcome.status === 'ok').length;
+
     this.logger.info('Ingestion run finished', {
       durationMs: Math.round(performance.now() - startedAt),
       unitsOk,
@@ -89,9 +90,11 @@ export class IngestionPipeline {
     this.logger.debug('Persisting tee time groups', {
       groupCount: teeTimeGroups.length,
     });
+
     await Promise.all(
       teeTimeGroups.map(async (group) => {
         await this.writer.replaceUnitTeeTimes(group.unitKey, group.teeTimes);
+
         this.logger.debug('Wrote tee time group', {
           courseId: group.unitKey.courseId,
           date: group.unitKey.date,
@@ -99,6 +102,7 @@ export class IngestionPipeline {
         });
       })
     );
+
     this.logger.debug('Persist stage finished');
   }
 

@@ -1,4 +1,3 @@
-import type { CoursePricingConfig } from '../../../domain/pricing-engine.js';
 import type { ChronogolfV2CourseConfig } from '../chronogolf-v2-course-config.js';
 
 /**
@@ -17,6 +16,11 @@ export const theWillowsConfig: ChronogolfV2CourseConfig = {
     'https://www.chronogolf.ca/club/the-willows-golf-country-club-saskatchewan-saskatoon/booking',
   maxAdvanceDays: 5,
   releaseTime: '07:00',
+  // Note: The 18-hole record carries no scraped price and resolves to `pricePerPlayer: null`.
+  pricing: {
+    tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
+    rules: [],
+  },
   courseIds: [
     '25664982-9496-4843-8b9d-581b981d698c',
     '5fdf8123-a394-4533-aa03-ae11d9d60650',
@@ -27,16 +31,4 @@ export const theWillowsConfig: ChronogolfV2CourseConfig = {
   affiliationTypeId: 110161,
   tld: 'de',
   bookingTld: 'com',
-};
-
-/**
- * Pricing configuration for The Willows.
- *
- * The V2 feed's scraped green fee is pre-tax, so the engine grosses it up by the
- * course's tax rate; no static rules are configured (it is dynamic-priced). The
- * 18-hole record carries no scraped price and resolves to `pricePerPlayer: null`.
- */
-export const theWillowsPricingConfig: CoursePricingConfig = {
-  tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
-  rules: [],
 };

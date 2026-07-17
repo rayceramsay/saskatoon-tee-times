@@ -45,6 +45,7 @@ const testConfig: ChronogolfV2CourseConfig = {
   bookingPortalUrl: 'https://thewillowsgolf.com/tee-times/',
   maxAdvanceDays: 5,
   releaseTime: '07:00',
+  pricing: { rules: [] },
   courseIds: [
     '25664982-9496-4843-8b9d-581b981d698c',
     '5fdf8123-a394-4533-aa03-ae11d9d60650',

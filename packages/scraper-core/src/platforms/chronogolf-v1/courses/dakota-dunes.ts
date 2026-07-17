@@ -1,4 +1,3 @@
-import type { CoursePricingConfig } from '../../../domain/pricing-engine.js';
 import type { ChronogolfV1CourseConfig } from '../chronogolf-v1-course-config.js';
 
 /**
@@ -14,6 +13,10 @@ export const dakotaDunesConfig: ChronogolfV1CourseConfig = {
   bookingPortalUrl: 'https://golf.dakotadunesresort.com/book-tee-time/',
   maxAdvanceDays: 7,
   releaseTime: '00:00',
+  pricing: {
+    tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
+    rules: [],
+  },
   tld: 'ie',
   bookingTld: 'ca',
   slug: 'dakota-dunes-golf-links',
@@ -23,15 +26,4 @@ export const dakotaDunesConfig: ChronogolfV1CourseConfig = {
     { chronogolfCourseId: 27975, nbHoles: 18, routing: [] },
     { chronogolfCourseId: 27975, nbHoles: 9, routing: [] },
   ],
-};
-
-/**
- * Pricing configuration for Dakota Dunes.
- *
- * Dakota Dunes' scraped green fee is pre-tax, so the engine grosses it up by the
- * course's tax rate; no static rules are configured (it is dynamic-priced).
- */
-export const dakotaDunesPricingConfig: CoursePricingConfig = {
-  tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
-  rules: [],
 };

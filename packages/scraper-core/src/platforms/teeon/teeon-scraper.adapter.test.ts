@@ -35,6 +35,7 @@ const testConfig: TeeOnCourseConfig = {
   bookingPortalUrl: PORTAL_URL,
   maxAdvanceDays: 5,
   releaseTime: '06:00',
+  pricing: { rules: [] },
   facilityId: 477,
 };
 

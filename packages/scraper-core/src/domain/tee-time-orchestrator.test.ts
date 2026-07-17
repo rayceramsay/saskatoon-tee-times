@@ -17,6 +17,7 @@ function course(courseId: string): CourseConfig {
     bookingPortalUrl: 'https://example.com',
     maxAdvanceDays: 1,
     releaseTime: '06:00',
+    pricing: { rules: [] },
   };
 }
 

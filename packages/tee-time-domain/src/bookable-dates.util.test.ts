@@ -10,6 +10,7 @@ const reginaCourse: CourseConfig = {
   bookingPortalUrl: 'https://greenbryre.com/book-a-tee-time/',
   maxAdvanceDays: 7,
   releaseTime: '06:00',
+  pricing: { rules: [] },
 };
 
 describe('bookableDates', () => {

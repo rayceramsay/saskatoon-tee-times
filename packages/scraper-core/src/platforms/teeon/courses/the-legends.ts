@@ -1,4 +1,3 @@
-import type { CoursePricingConfig } from '../../../domain/pricing-engine.js';
 import type { TeeOnCourseConfig } from '../teeon-course-config.js';
 
 /**
@@ -15,16 +14,10 @@ export const theLegendsConfig: TeeOnCourseConfig = {
     'https://admin.teeon.com/portal/thelegendsgolfclub/teetimes/thelegendsgolfclub',
   maxAdvanceDays: 5,
   releaseTime: '06:00',
+  // Intentionally empty: TeeOn's guest feed carries no price and the per-slot
+  // variant resolution is unsolved, so pricing is deferred to a follow-up change.
+  pricing: {
+    rules: [],
+  },
   facilityId: 477,
-};
-
-/**
- * Pricing configuration for The Legends.
- *
- * Intentionally empty: TeeOn's guest feed carries no price and the per-slot
- * variant resolution is unsolved, so pricing is deferred to a follow-up
- * change.
- */
-export const theLegendsPricingConfig: CoursePricingConfig = {
-  rules: [],
 };

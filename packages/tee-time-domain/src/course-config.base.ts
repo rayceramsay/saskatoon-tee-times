@@ -1,3 +1,4 @@
+import type { CoursePricingConfig } from './course-pricing-config.js';
 import type { CourseId } from './primitives.schema.js';
 
 /**
@@ -19,4 +20,6 @@ export interface CourseConfig {
   maxAdvanceDays: number;
   // Local HH:MM wall-clock time at which the furthest-out date becomes bookable.
   releaseTime: string;
+  // How the course's tee times are priced; every course produces tee times that must be priced.
+  pricing: CoursePricingConfig;
 }

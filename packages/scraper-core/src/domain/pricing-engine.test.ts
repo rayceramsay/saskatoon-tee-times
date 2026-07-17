@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { greenbryrePricingConfig } from '../platforms/chronogolf-v1/courses/greenbryre.js';
-import {
-  applyTax,
-  PricingEngine,
-  resolveStatic,
-  type CoursePricingConfig,
-} from './pricing-engine.js';
+import { greenbryreConfig } from '../platforms/chronogolf-v1/courses/greenbryre.js';
+import { applyTax, PricingEngine, resolveStatic } from './pricing-engine.js';
+import type { CoursePricingConfig } from '@stt/tee-time-domain/course-pricing-config';
 import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
 
 const scraped: ScrapedTeeTime = {
@@ -145,7 +141,7 @@ describe('PricingEngine with the real Greenbryre config', () => {
   // Greenbryre fixtures encode the raw green fee as pre-tax; the engine must
   // gross it up so pricePerPlayer is the after-tax value users see.
   it('grosses up the pre-tax green fee to after-tax CAD', () => {
-    const engine = engineFor(greenbryrePricingConfig);
+    const engine = engineFor(greenbryreConfig.pricing);
 
     const teeTime = engine.enrich({ ...scraped, dynamicPrice: 52.7 });
 

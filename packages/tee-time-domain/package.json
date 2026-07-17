@@ -7,6 +7,7 @@
     "./tee-time-schema": "./src/tee-time.schema.ts",
     "./primitives-schema": "./src/primitives.schema.ts",
     "./course-config": "./src/course-config.base.ts",
+    "./course-pricing-config": "./src/course-pricing-config.ts",
     "./logger": "./src/logger.port.ts",
     "./tee-time-writer": "./src/tee-time-writer.port.ts",
     "./tee-time-reader": "./src/tee-time-reader.port.ts",
