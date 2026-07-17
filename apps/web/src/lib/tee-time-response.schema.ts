@@ -52,7 +52,7 @@ export const TeeTime = z.object({
 });
 export type TeeTime = z.infer<typeof TeeTime>;
 
-/** The `GET /tee-times?date=` response, validated at the fetch boundary. */
+/** The `GET /api/tee-times?date=` response, validated at the fetch boundary. */
 export const TeeTimeResponse = z.object({
   date: z.iso.date(),
   teeTimes: z.array(TeeTime),

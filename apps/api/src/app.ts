@@ -28,7 +28,7 @@ const teeTimesQuerySchema = z.object({
  * ```
  */
 export function createApp({ reader, corsOrigin, exposeErrorDetails }: AppDeps): Hono {
-  const app = new Hono();
+  const app = new Hono().basePath('/api');
 
   if (corsOrigin) {
     app.use('*', cors({ origin: corsOrigin }));

@@ -49,7 +49,7 @@ describe('createApp GET /tee-times', () => {
     ];
     const app = createApp(appDeps({ reader: fakeReader(teeTimes) }));
 
-    const response = await app.request('/tee-times?date=2026-07-15');
+    const response = await app.request('/api/tee-times?date=2026-07-15');
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
@@ -62,7 +62,7 @@ describe('createApp GET /tee-times', () => {
   it('returns a null lastUpdatedAt for an empty result', async () => {
     const app = createApp(appDeps());
 
-    const response = await app.request('/tee-times?date=2026-07-15');
+    const response = await app.request('/api/tee-times?date=2026-07-15');
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
@@ -75,7 +75,7 @@ describe('createApp GET /tee-times', () => {
   it('returns a 400 when the date parameter is missing', async () => {
     const app = createApp(appDeps());
 
-    const response = await app.request('/tee-times');
+    const response = await app.request('/api/tee-times');
 
     expect(response.status).toBe(400);
   });
@@ -83,7 +83,7 @@ describe('createApp GET /tee-times', () => {
   it('returns a 400 when the date parameter is not a real calendar date', async () => {
     const app = createApp(appDeps());
 
-    const response = await app.request('/tee-times?date=2026-13-40');
+    const response = await app.request('/api/tee-times?date=2026-13-40');
 
     expect(response.status).toBe(400);
   });
@@ -96,7 +96,7 @@ describe('createApp error handling', () => {
       appDeps({ reader: rejectingReader(new Error('reader exploded')) })
     );
 
-    const response = await app.request('/tee-times?date=2026-07-15');
+    const response = await app.request('/api/tee-times?date=2026-07-15');
 
     expect(response.status).toBe(500);
     expect(await response.json()).toEqual({ error: 'Unexpected error' });
@@ -111,7 +111,7 @@ describe('createApp error handling', () => {
       appDeps({ reader: rejectingReader(error), exposeErrorDetails: true })
     );
 
-    const response = await app.request('/tee-times?date=2026-07-15');
+    const response = await app.request('/api/tee-times?date=2026-07-15');
 
     expect(response.status).toBe(500);
     expect(await response.json()).toEqual({
@@ -130,7 +130,7 @@ describe('createApp error handling', () => {
       })
     );
 
-    const response = await app.request('/tee-times');
+    const response = await app.request('/api/tee-times');
 
     expect(response.status).toBe(400);
   });
@@ -142,7 +142,7 @@ describe('createApp error handling', () => {
       })
     );
 
-    const response = await app.request('/tee-times?date=2026-07-15');
+    const response = await app.request('/api/tee-times?date=2026-07-15');
 
     expect(response.status).toBe(404);
   });
@@ -152,7 +152,7 @@ describe('createApp CORS', () => {
   it('allows the configured origin', async () => {
     const app = createApp(appDeps({ corsOrigin: 'https://saskatoonteetimes.ca' }));
 
-    const response = await app.request('/tee-times?date=2026-07-15', {
+    const response = await app.request('/api/tee-times?date=2026-07-15', {
       headers: { Origin: 'https://saskatoonteetimes.ca' },
     });
 
@@ -164,7 +164,7 @@ describe('createApp CORS', () => {
   it('does not allow an origin other than the configured one', async () => {
     const app = createApp(appDeps({ corsOrigin: 'https://saskatoonteetimes.ca' }));
 
-    const response = await app.request('/tee-times?date=2026-07-15', {
+    const response = await app.request('/api/tee-times?date=2026-07-15', {
       headers: { Origin: 'https://evil.example.com' },
     });
 
@@ -174,7 +174,7 @@ describe('createApp CORS', () => {
   it('sends no CORS headers when no origin is configured', async () => {
     const app = createApp(appDeps({ corsOrigin: null }));
 
-    const response = await app.request('/tee-times?date=2026-07-15', {
+    const response = await app.request('/api/tee-times?date=2026-07-15', {
       headers: { Origin: 'https://saskatoonteetimes.ca' },
     });
 

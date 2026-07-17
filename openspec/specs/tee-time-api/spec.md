@@ -5,17 +5,17 @@ TBD - created by archiving change add-local-tee-time-api. Update Purpose after a
 ## Requirements
 ### Requirement: Read tee times for a required date
 
-The API SHALL expose `GET /tee-times` accepting a single `date` query parameter that identifies the local calendar date, formatted `YYYY-MM-DD`. The `date` parameter SHALL be required and SHALL be validated as a real calendar date. The endpoint SHALL respond with the tee times persisted for that date and SHALL NOT apply any further filtering (course, holes, group size, start time) — such filtering is the frontend's responsibility.
+The API SHALL expose `GET /api/tee-times` accepting a single `date` query parameter that identifies the local calendar date, formatted `YYYY-MM-DD`. The `date` parameter SHALL be required and SHALL be validated as a real calendar date. The endpoint SHALL respond with the tee times persisted for that date and SHALL NOT apply any further filtering (course, holes, group size, start time) — such filtering is the frontend's responsibility.
 
 #### Scenario: Returns the date's tee times
 
-- **WHEN** a client requests `GET /tee-times?date=2026-07-15` and tee times exist for that date
+- **WHEN** a client requests `GET /api/tee-times?date=2026-07-15` and tee times exist for that date
 - **THEN** the response status is `200`
 - **AND** the body contains every persisted tee time for `2026-07-15` with no filtering applied
 
 #### Scenario: Empty result for a date with no tee times
 
-- **WHEN** a client requests `GET /tee-times?date=2026-07-15` and no tee times are persisted for that date
+- **WHEN** a client requests `GET /api/tee-times?date=2026-07-15` and no tee times are persisted for that date
 - **THEN** the response status is `200`
 - **AND** the body's tee time set is empty
 
@@ -25,13 +25,13 @@ The API SHALL respond with `400 Bad Request` when the `date` parameter is absent
 
 #### Scenario: Missing date parameter
 
-- **WHEN** a client requests `GET /tee-times` with no `date` parameter
+- **WHEN** a client requests `GET /api/tee-times` with no `date` parameter
 - **THEN** the response status is `400`
 - **AND** the body describes that `date` is required
 
 #### Scenario: Malformed date value
 
-- **WHEN** a client requests `GET /tee-times?date=2026-13-40`
+- **WHEN** a client requests `GET /api/tee-times?date=2026-13-40`
 - **THEN** the response status is `400`
 - **AND** the body describes that `date` is invalid
 
@@ -41,7 +41,7 @@ A successful response SHALL be a JSON envelope containing the queried `date`, th
 
 #### Scenario: Envelope echoes the queried date
 
-- **WHEN** a client requests `GET /tee-times?date=2026-07-15`
+- **WHEN** a client requests `GET /api/tee-times?date=2026-07-15`
 - **THEN** the response envelope's `date` field is `2026-07-15`
 
 #### Scenario: Freshness reflects the newest scrape
@@ -61,11 +61,11 @@ The API SHALL be runnable on a local machine, served over HTTP against the local
 #### Scenario: Local server serves the endpoint
 
 - **WHEN** the local entrypoint is started against a reachable local DynamoDB
-- **THEN** `GET /tee-times?date=<date>` is served over HTTP and returns persisted tee times for that date
+- **THEN** `GET /api/tee-times?date=<date>` is served over HTTP and returns persisted tee times for that date
 
 #### Scenario: Cross-origin request from local frontend
 
-- **WHEN** a browser on a different local origin issues `GET /tee-times`
+- **WHEN** a browser on a different local origin issues `GET /api/tee-times`
 - **THEN** the response carries the CORS headers permitting that origin
 
 ### Requirement: Generic 500 for unexpected errors
@@ -80,7 +80,7 @@ The API SHALL catch any uncaught error or rejected promise raised while handling
 
 #### Scenario: Validation errors are unaffected
 
-- **WHEN** a client requests `GET /tee-times` with a missing or malformed `date`
+- **WHEN** a client requests `GET /api/tee-times` with a missing or malformed `date`
 - **THEN** the response status is `400` as before
 - **AND** the unexpected-error handler does not run
 

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const environmentSchema = z.object({
   // Base URL the browser calls for the read API. Prod: the same-origin `/api` CloudFront
-  // origin; local dev: the local API server's origin (e.g. http://localhost:8787).
+  // origin; local dev: the local API server's origin with `/api` path (e.g. http://localhost:8787/api).
   NEXT_PUBLIC_API_BASE_URL: z.string().min(1),
 });
 
