@@ -15,8 +15,7 @@ const scraped: ScrapedTeeTime = {
   holes: 12,
   routing: [],
   groupSizes: [2, 3, 4],
-  bookingUrls: { 2: 'https://example.com' },
-  onlineBookable: true,
+  booking: { kind: 'reservation', urls: { 2: 'https://example.com' } },
   scrapedAt: '2026-07-10T18:00:00Z',
   dynamicPrice: 52.7,
 };
@@ -79,24 +78,38 @@ describe('PricingEngine', () => {
       holes: scraped.holes,
       routing: scraped.routing,
       groupSizes: scraped.groupSizes,
-      bookingUrls: scraped.bookingUrls,
-      onlineBookable: scraped.onlineBookable,
+      booking: scraped.booking,
       scrapedAt: scraped.scrapedAt,
       pricePerPlayer: 58.5,
     });
   });
 
-  it('passes onlineBookable through unchanged', () => {
+  it('carries every booking arm through enrichment unchanged', () => {
+    const engine = engineFor({
+      tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
+      rules: [],
+    });
+    const arms = [
+      { kind: 'reservation', urls: { 2: 'https://example.com/book/2' } },
+      { kind: 'portal', url: 'https://example.com/portal?date=2026-07-11' },
+      { kind: 'phone' },
+    ] as const;
+
+    for (const booking of arms) {
+      expect(engine.enrich({ ...scraped, booking }).booking).toEqual(booking);
+    }
+  });
+
+  it('leaves a priced phone slot on the phone arm', () => {
     const engine = engineFor({
       tax: { scrapedPriceIncludesTax: false, taxRate: 0.11 },
       rules: [],
     });
 
-    const bookable = engine.enrich({ ...scraped, onlineBookable: true });
-    const phoneOnly = engine.enrich({ ...scraped, onlineBookable: false });
+    const teeTime = engine.enrich({ ...scraped, booking: { kind: 'phone' } });
 
-    expect(bookable.onlineBookable).toBe(true);
-    expect(phoneOnly.onlineBookable).toBe(false);
+    expect(teeTime.pricePerPlayer).toBe(58.5);
+    expect(teeTime.booking).toEqual({ kind: 'phone' });
   });
 
   it('throws naming the course when a dynamic price has no tax rule', () => {

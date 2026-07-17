@@ -20,6 +20,24 @@ export const GroupSize = z.union([
 ]);
 export type GroupSize = z.infer<typeof GroupSize>;
 
+/**
+ * How a slot can be booked (mirrors the domain `Booking`).
+ *
+ * The arms are exhaustive along one axis: how much work the golfer does to reach
+ * this specific slot. A deep link lands on it (`reservation`), a portal link
+ * leaves them to find it themselves (`portal`), or it is not online-bookable at
+ * all (`phone`).
+ */
+export const Booking = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('reservation'),
+    urls: z.partialRecord(GroupSize, z.string()),
+  }),
+  z.object({ kind: z.literal('portal'), url: z.string() }),
+  z.object({ kind: z.literal('phone') }),
+]);
+export type Booking = z.infer<typeof Booking>;
+
 /** A canonical public tee time (mirrors the domain `TeeTime`). */
 export const TeeTime = z.object({
   startInstant: z.iso.datetime({ offset: true }),
@@ -28,8 +46,7 @@ export const TeeTime = z.object({
   holes: z.number().int().positive(),
   routing: z.array(z.string()),
   groupSizes: z.array(GroupSize),
-  bookingUrls: z.partialRecord(GroupSize, z.string()),
-  onlineBookable: z.boolean(),
+  booking: Booking,
   scrapedAt: z.iso.datetime(),
   pricePerPlayer: z.number().nullable(),
 });

@@ -2,7 +2,6 @@ import { z } from 'zod';
 import type { BookingPlatformScraper } from '../../domain/booking-platform-scraper.port.js';
 import type { CourseId, GroupSize } from '@stt/tee-time-domain/primitives-schema';
 import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
-import { bestBookingUrl } from '@stt/tee-time-domain/best-booking-url';
 import { buildLocalStartInstant } from '@stt/tee-time-domain/local-start-instant';
 import type { JsonFetcher } from '../../transport/json-fetcher.port.js';
 import type { ChronogolfV2CourseConfig } from './chronogolf-v2-course-config.js';
@@ -212,15 +211,14 @@ function buildRecords(
   );
 
   return rawTeeTime.course.bookable_holes.map((holes) => {
-    const bookingUrls: Partial<Record<GroupSize, string>> = {};
+    const urls: Partial<Record<GroupSize, string>> = {};
     for (const groupSize of groupSizes) {
-      const deepLink = buildReservationDeepLink(
+      urls[groupSize] = buildReservationDeepLink(
         config,
         rawTeeTime.id,
         holes,
         groupSize
       );
-      bookingUrls[groupSize] = bestBookingUrl(deepLink, config.bookingPortalUrl);
     }
 
     const dynamicPrice =
@@ -235,8 +233,7 @@ function buildRecords(
       holes,
       routing: [rawTeeTime.course.name],
       groupSizes,
-      bookingUrls,
-      onlineBookable: true,
+      booking: { kind: 'reservation', urls },
       scrapedAt,
       dynamicPrice,
     };

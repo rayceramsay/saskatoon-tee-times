@@ -11,7 +11,9 @@ export interface CourseConfig {
   courseName: string;
   // IANA time zone id (e.g. "America/Regina") the course's geographical region is in.
   timeZone: string;
-  // General booking portal URL for the course.
+  // Where a golfer goes to book this course — which may be the course's own site
+  // rather than the booking platform's (the platform is invisible to the golfer).
+  // Holds the bare URL; adapters apply any date parameterization themselves.
   bookingPortalUrl: string;
   // Days ahead of today, inclusive, that are bookable (e.g. 7 means today through today + 7).
   maxAdvanceDays: number;

@@ -11,8 +11,7 @@
     "./tee-time-writer": "./src/tee-time-writer.port.ts",
     "./tee-time-reader": "./src/tee-time-reader.port.ts",
     "./bookable-dates": "./src/bookable-dates.util.ts",
-    "./local-start-instant": "./src/local-start-instant.util.ts",
-    "./best-booking-url": "./src/best-booking-url.util.ts"
+    "./local-start-instant": "./src/local-start-instant.util.ts"
   },
   "scripts": {
     "test": "vitest run",

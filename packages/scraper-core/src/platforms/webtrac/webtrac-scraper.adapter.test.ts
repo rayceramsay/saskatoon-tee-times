@@ -1,11 +1,20 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import type { GroupSize } from '@stt/tee-time-domain/primitives-schema';
 import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
 import type { TextFetcher } from '../../transport/text-fetcher.port.js';
 import { WebtracScraper } from './webtrac-scraper.adapter.js';
 import type { WebtracCourseConfig } from './webtrac-course-config.js';
 
 const fixturesDir = new URL('./__fixtures__/', import.meta.url);
+
+function reservationUrls(
+  teeTime: ScrapedTeeTime | undefined
+): Partial<Record<GroupSize, string>> {
+  expect(teeTime?.booking.kind).toBe('reservation');
+  if (teeTime?.booking.kind !== 'reservation') throw new Error('unreachable');
+  return teeTime.booking.urls;
+}
 
 // Maps the `secondarycode` search param back to the fixture's course slug.
 const SLUG_BY_SECONDARY_CODE: Record<string, string> = {
@@ -135,12 +144,11 @@ describe('WebtracScraper online-bookable rows', () => {
 
     expect(teeTimes.length).toBeGreaterThan(0);
     for (const teeTime of teeTimes) {
-      expect(teeTime.onlineBookable).toBe(true);
       const ascending = [...teeTime.groupSizes].sort((a, b) => a - b);
       expect(teeTime.groupSizes).toEqual(ascending);
       expect(teeTime.groupSizes[0]).toBe(1);
       expect(
-        Object.keys(teeTime.bookingUrls)
+        Object.keys(reservationUrls(teeTime))
           .map(Number)
           .sort((a, b) => a - b)
       ).toEqual(teeTime.groupSizes);
@@ -158,8 +166,9 @@ describe('WebtracScraper online-bookable rows', () => {
     const [teeTime] = await scraper.scrape('holiday-park-championship', '2026-07-15');
 
     expect(teeTime?.groupSizes).toEqual([1, 2, 3]);
+    const urls = reservationUrls(teeTime);
     for (const groupSize of teeTime?.groupSizes ?? []) {
-      const url = new URL(teeTime?.bookingUrls[groupSize] ?? '');
+      const url = new URL(urls[groupSize] ?? '');
       expect(url.searchParams.get('GlobalSalesArea_GRNumSlots')).toBe(
         String(groupSize)
       );
@@ -181,17 +190,30 @@ describe('WebtracScraper online-bookable rows', () => {
 });
 
 describe('WebtracScraper phone-only rows', () => {
-  it('keeps same-day phone-only rows with no booking URLs', async () => {
+  it('keeps same-day phone-only rows on the phone arm, which carries no URL', async () => {
     const scraper = new WebtracScraper([makeConfig({ holes: [18] })], fixtureFetcher);
 
     const teeTimes = await scraper.scrape('holiday-park-championship', '2026-07-11');
 
     expect(teeTimes.length).toBeGreaterThan(0);
     for (const teeTime of teeTimes) {
-      expect(teeTime.onlineBookable).toBe(false);
-      expect(teeTime.bookingUrls).toEqual({});
+      expect(teeTime.booking).toEqual({ kind: 'phone' });
       expect(teeTime.groupSizes.length).toBeGreaterThan(0);
     }
+  });
+
+  it('gives a phone-only row the same group sizes a bookable row would get', async () => {
+    const scraper = new WebtracScraper(
+      [makeConfig({ holes: [18] })],
+      staticFetcher(
+        tablePage(craftRow({ cart: 'phone-only', openSlots: 3, holes: '18 (Front)' }))
+      )
+    );
+
+    const [teeTime] = await scraper.scrape('holiday-park-championship', '2026-07-15');
+
+    expect(teeTime?.booking.kind).toBe('phone');
+    expect(teeTime?.groupSizes).toEqual([1, 2, 3]);
   });
 });
 
@@ -213,7 +235,7 @@ describe('WebtracScraper dropped rows', () => {
 
     // The 18h fixture mixes 22 online-bookable rows with 13 non-phone-only error rows.
     expect(teeTimes).toHaveLength(22);
-    expect(teeTimes.every((t) => t.onlineBookable)).toBe(true);
+    expect(teeTimes.every((t) => t.booking.kind === 'reservation')).toBe(true);
   });
 
   it('drops rows reporting zero open slots', async () => {

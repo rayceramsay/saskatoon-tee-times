@@ -249,14 +249,15 @@ Responses should return a `lastUpdated` field indicating maximum `scrapedAt` val
   "routing": ["Front", "Back"],
   "groupSizes": [2, 3, 4],
   "pricePerPlayer": 47.0,
-  "bookingUrls": {
-    "2": "https://...",
-    "3": "https://...",
-    "4": "https://..."
+  "booking": {
+    "kind": "portal",
+    "url": "https://..."
   },
   "scrapedAt": "2026-07-01T12:45:00Z"
 }
 ```
+
+_`booking` states how the slot can be booked, discriminated on `kind`: `reservation` carries `urls`, a deep link per group size landing on the slot; `portal` carries a single `url` to the course's booking site, where the golfer finds the slot themselves; `phone` carries no URL._
 
 _startDatetime is explicitly in ISO 8601 date and time format with time zone offset; calendar date and time should always be local to the course (never UTC); although all the courses are in America/Regina timezone, we should not assume this timezone as future courses might be in a different one_
 

@@ -57,30 +57,23 @@ describe('freshnessState', () => {
 });
 
 describe('bookingUrlFor', () => {
-  it('targets the selected player count', () => {
-    const slot = makeTeeTime({
-      groupSizes: [1, 2, 3, 4],
-      bookingUrls: { 2: 'https://book/2', 4: 'https://book/4' },
-    });
+  const urls = { 2: 'https://book/2', 4: 'https://book/4' };
 
-    expect(bookingUrlFor(slot, 2)).toBe('https://book/2');
+  it('targets the selected player count', () => {
+    const slot = makeTeeTime({ groupSizes: [1, 2, 3, 4] });
+
+    expect(bookingUrlFor(slot, urls, 2)).toBe('https://book/2');
   });
 
   it('targets the maximum group size when Players is Any', () => {
-    const slot = makeTeeTime({
-      groupSizes: [1, 2, 3, 4],
-      bookingUrls: { 2: 'https://book/2', 4: 'https://book/4' },
-    });
+    const slot = makeTeeTime({ groupSizes: [1, 2, 3, 4] });
 
-    expect(bookingUrlFor(slot, null)).toBe('https://book/4');
+    expect(bookingUrlFor(slot, urls, null)).toBe('https://book/4');
   });
 
   it('falls back to the maximum size when the selected size has no URL', () => {
-    const slot = makeTeeTime({
-      groupSizes: [2, 3, 4],
-      bookingUrls: { 4: 'https://book/4' },
-    });
+    const slot = makeTeeTime({ groupSizes: [2, 3, 4] });
 
-    expect(bookingUrlFor(slot, 2)).toBe('https://book/4');
+    expect(bookingUrlFor(slot, { 4: 'https://book/4' }, 2)).toBe('https://book/4');
   });
 });

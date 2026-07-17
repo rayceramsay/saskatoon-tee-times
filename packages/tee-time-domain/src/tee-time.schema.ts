@@ -2,6 +2,27 @@ import { z } from 'zod';
 import { CourseId, GroupSize } from './primitives.schema.js';
 
 /**
+ * How a golfer can act on a tee time, discriminated on `kind`.
+ *
+ * The arms are exhaustive along one axis: how much work the golfer does to reach
+ * this specific slot. A deep link lands on it (`reservation`), a portal link
+ * leaves them to find it themselves (`portal`), or it is not online-bookable at
+ * all (`phone`).
+ */
+export const Booking = z.discriminatedUnion('kind', [
+  // Deep link per valid group size, each landing on this slot for that party size.
+  z.object({
+    kind: z.literal('reservation'),
+    urls: z.partialRecord(GroupSize, z.string()),
+  }),
+  // One link to the course's booking portal; the destination does not vary by party size.
+  z.object({ kind: z.literal('portal'), url: z.string() }),
+  z.object({ kind: z.literal('phone') }),
+]);
+
+export type Booking = z.infer<typeof Booking>;
+
+/**
  * Fields common to a tee time at any stage of the ingestion pipeline.
  *
  * Captures the course, timing, routing, and booking metadata shared by every
@@ -21,10 +42,8 @@ export const BaseTeeTime = z.object({
   routing: z.array(z.string()),
   // Explicit valid party sizes, NOT assumed contiguous — e.g. [2, 3, 4].
   groupSizes: z.array(GroupSize),
-  // Best booking URL per valid group size.
-  bookingUrls: z.partialRecord(GroupSize, z.string()),
-  // Whether the slot can be booked online; false means it is available but phone-only.
-  onlineBookable: z.boolean(),
+  // How the slot can be booked; the sole statement of bookability.
+  booking: Booking,
   // ISO 8601 UTC instant of the scrape.
   scrapedAt: z.iso.datetime(),
 });

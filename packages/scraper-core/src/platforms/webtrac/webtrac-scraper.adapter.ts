@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio';
 import type { BookingPlatformScraper } from '../../domain/booking-platform-scraper.port.js';
 import type { CourseId, GroupSize } from '@stt/tee-time-domain/primitives-schema';
-import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
+import type { Booking, ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
 import { buildLocalStartInstant } from '@stt/tee-time-domain/local-start-instant';
 import type { TextFetcher } from '../../transport/text-fetcher.port.js';
 import type { WebtracCourseConfig } from './webtrac-course-config.js';
@@ -139,13 +139,6 @@ function parsePage(
     const startTime = normalizeTime(cell('Time'));
     const groupSizes = buildGroupSizes(openSlots);
 
-    const bookingUrls: Partial<Record<GroupSize, string>> = {};
-    if (classification.onlineBookable) {
-      for (const groupSize of groupSizes) {
-        bookingUrls[groupSize] = withGroupSize(classification.cartUrl, groupSize);
-      }
-    }
-
     teeTimes.push({
       startInstant: buildLocalStartInstant(localDate, startTime, config.timeZone),
       courseId: config.courseId,
@@ -153,8 +146,7 @@ function parsePage(
       holes,
       routing: buildRouting(holes, startSet),
       groupSizes,
-      bookingUrls,
-      onlineBookable: classification.onlineBookable,
+      booking: buildBooking(classification, groupSizes),
       scrapedAt,
       dynamicPrice: null,
     });
@@ -166,10 +158,10 @@ function parsePage(
 /**
  * Availability derived from a row's add-to-cart button, or `null` to drop it.
  *
- * Online-bookable carries the real cart URL; phone-only-available carries none.
+ * Mirrors the booking arms the row can yield: a real cart URL is reservable,
+ * phone-only-available carries none.
  */
-type CartClassification =
-  { onlineBookable: true; cartUrl: string } | { onlineBookable: false };
+type CartClassification = { kind: 'reservation'; cartUrl: string } | { kind: 'phone' };
 
 /**
  * Classify a row's add-to-cart button into its availability.
@@ -187,12 +179,32 @@ function classifyCart(
 ): CartClassification | null {
   if (isSuccess) {
     if (!href || href === '#') return null;
-    return { onlineBookable: true, cartUrl: href };
+    return { kind: 'reservation', cartUrl: href };
   }
   if (isError && tooltip.includes(PHONE_ONLY_TOOLTIP)) {
-    return { onlineBookable: false };
+    return { kind: 'phone' };
   }
   return null;
+}
+
+/**
+ * Build a row's booking arm from its cart classification.
+ *
+ * @param classification - The row's classified add-to-cart button.
+ * @param groupSizes - The row's valid party sizes.
+ * @returns The reservation arm with a cart URL per size, or the phone arm.
+ */
+function buildBooking(
+  classification: CartClassification,
+  groupSizes: readonly GroupSize[]
+): Booking {
+  if (classification.kind === 'phone') return { kind: 'phone' };
+
+  const urls: Partial<Record<GroupSize, string>> = {};
+  for (const groupSize of groupSizes) {
+    urls[groupSize] = withGroupSize(classification.cartUrl, groupSize);
+  }
+  return { kind: 'reservation', urls };
 }
 
 const HOLES_CELL = /^(\d+)(?:\s*\(([^)]+)\))?/;

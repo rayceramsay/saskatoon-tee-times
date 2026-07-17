@@ -28,8 +28,7 @@ function record(courseId: string, date: string): ScrapedTeeTime {
     holes: 18,
     routing: [],
     groupSizes: [1],
-    bookingUrls: { 1: 'https://example.com' },
-    onlineBookable: true,
+    booking: { kind: 'reservation', urls: { 1: 'https://example.com' } },
     scrapedAt: '2026-07-07T18:00:00Z',
     dynamicPrice: null,
   };

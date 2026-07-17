@@ -51,22 +51,24 @@ export function teeTimeKey(teeTime: TeeTime): string {
 }
 
 /**
- * The booking URL to open for a slot given the active Players value.
+ * The reservation deep link to open for a slot given the active Players value.
  *
  * Targets the selected party size, falling back to the slot's maximum size when
  * Players is Any or the selected size has no dedicated URL.
  *
  * @param slot - The slot to book.
+ * @param urls - The slot's reservation-arm deep links, keyed by party size.
  * @param players - The active Players value, or null for Any.
- * @returns The best matching booking URL, or undefined when the slot has none.
+ * @returns The best matching deep link, or undefined when none matches.
  */
 export function bookingUrlFor(
   slot: TeeTime,
+  urls: Partial<Record<GroupSize, string>>,
   players: number | null
 ): string | undefined {
   const maxSize = slotMaxGroupSize(slot) as GroupSize;
   const size = (players ?? maxSize) as GroupSize;
-  return slot.bookingUrls[size] ?? slot.bookingUrls[maxSize];
+  return urls[size] ?? urls[maxSize];
 }
 
 /** Freshness age buckets keyed off `lastUpdatedAt`. */

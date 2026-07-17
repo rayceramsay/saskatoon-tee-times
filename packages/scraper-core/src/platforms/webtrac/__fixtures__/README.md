@@ -31,8 +31,8 @@ tee time does not have enough slots available…" — an error state that is *no
 Every row is `button error` with `href="#"` and a `data-tooltip` containing
 **"Individual Allowance Rules"** with `Open Slots > 0`. WebTrac opens online
 booking 7 days ahead **excluding the current day**, so same-day slots are
-genuinely available but phone-only: parsed as `onlineBookable: false` with empty
-`bookingUrls`.
+genuinely available but phone-only: parsed as `booking: { kind: 'phone' }`, which
+affords no URL.
 
 ## Re-capturing
 

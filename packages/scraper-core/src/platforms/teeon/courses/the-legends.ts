@@ -4,7 +4,7 @@ import type { TeeOnCourseConfig } from '../teeon-course-config.js';
 /**
  * TeeOn booking configuration for The Legends Golf Club (Warman).
  *
- * A single scrape drives this portal URL for the target date and captures the
+ * A single scrape drives `bookingPortalUrl` for the target date and captures the
  * session-gated guest feed for `facilityId` 477.
  */
 export const theLegendsConfig: TeeOnCourseConfig = {
@@ -16,8 +16,6 @@ export const theLegendsConfig: TeeOnCourseConfig = {
   maxAdvanceDays: 5,
   releaseTime: '06:00',
   facilityId: 477,
-  portalUrl:
-    'https://admin.teeon.com/portal/thelegendsgolfclub/teetimes/thelegendsgolfclub',
 };
 
 /**

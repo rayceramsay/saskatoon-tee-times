@@ -36,7 +36,6 @@ const testConfig: TeeOnCourseConfig = {
   maxAdvanceDays: 5,
   releaseTime: '06:00',
   facilityId: 477,
-  portalUrl: PORTAL_URL,
 };
 
 // A minimal raw guest row carrying only the consumed fields; the schema strips
@@ -188,23 +187,17 @@ describe('TeeOnScraper fan-out (through scrape)', () => {
     expect(joinableSingle?.groupSizes).toEqual([1]);
   });
 
-  it('is always online-bookable with no scraped price', () => {
+  it('is always on the portal arm with no scraped price', () => {
     for (const teeTime of teeTimes) {
-      expect(teeTime.onlineBookable).toBe(true);
+      expect(teeTime.booking.kind).toBe('portal');
       expect(teeTime.dynamicPrice).toBeNull();
     }
   });
 
-  it('maps every group size to the shared portal-with-date booking URL', () => {
+  it('carries one portal-with-date link rather than one per group size', () => {
     for (const teeTime of teeTimes) {
-      const urlSizes = Object.keys(teeTime.bookingUrls)
-        .map(Number)
-        .sort((a, b) => a - b);
-      expect(urlSizes).toEqual(teeTime.groupSizes);
-
-      for (const url of Object.values(teeTime.bookingUrls)) {
-        expect(url).toBe(PORTAL_WITH_DATE);
-      }
+      expect(teeTime.booking).toEqual({ kind: 'portal', url: PORTAL_WITH_DATE });
+      expect(teeTime.groupSizes.length).toBeGreaterThan(0);
     }
   });
 });

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { beforeAll, describe, expect, it } from 'vitest';
+import type { GroupSize } from '@stt/tee-time-domain/primitives-schema';
 import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
 import type { JsonFetcher } from '../../transport/json-fetcher.port.js';
 import { ChronogolfV2Scraper } from './chronogolf-v2-scraper.adapter.js';
@@ -7,6 +8,14 @@ import type { ChronogolfV2CourseConfig } from './chronogolf-v2-course-config.js'
 
 const DATE = '2026-07-17';
 const fixturesDir = new URL('./__fixtures__/', import.meta.url);
+
+function reservationUrls(
+  teeTime: ScrapedTeeTime | undefined
+): Partial<Record<GroupSize, string>> {
+  expect(teeTime?.booking.kind).toBe('reservation');
+  if (teeTime?.booking.kind !== 'reservation') throw new Error('unreachable');
+  return teeTime.booking.urls;
+}
 
 function loadFixture(name: string): unknown {
   return JSON.parse(readFileSync(new URL(name, fixturesDir), 'utf-8'));
@@ -157,8 +166,10 @@ describe('ChronogolfV2Scraper parsing (through scrape)', () => {
     expect(eighteenHole?.dynamicPrice).toBeNull();
   });
 
-  it('marks every record onlineBookable', () => {
-    expect(teeTimes.every((teeTime) => teeTime.onlineBookable)).toBe(true);
+  it('gives every record the reservation booking arm', () => {
+    expect(teeTimes.every((teeTime) => teeTime.booking.kind === 'reservation')).toBe(
+      true
+    );
   });
 
   it('builds a per-size deep link repeating affiliation_type_ids per player', () => {
@@ -167,13 +178,14 @@ describe('ChronogolfV2Scraper parsing (through scrape)', () => {
     );
     expect(fourPlayer).toBeDefined();
 
-    const urlSizes = Object.keys(fourPlayer?.bookingUrls ?? {})
+    const urls = reservationUrls(fourPlayer);
+    const urlSizes = Object.keys(urls)
       .map(Number)
       .sort((a, b) => a - b);
     expect(urlSizes).toEqual([1, 2, 3, 4]);
 
     for (const groupSize of fourPlayer?.groupSizes ?? []) {
-      const url = fourPlayer?.bookingUrls[groupSize] ?? '';
+      const url = urls[groupSize] ?? '';
       const fragment = url.slice(url.indexOf('#'));
       const params = new URLSearchParams(fragment.slice(fragment.indexOf('?') + 1));
 
@@ -192,7 +204,7 @@ describe('ChronogolfV2Scraper parsing (through scrape)', () => {
 
   it('builds deep links on the canonical booking host, never the scrape mirror', () => {
     for (const teeTime of teeTimes) {
-      for (const url of Object.values(teeTime.bookingUrls)) {
+      for (const url of Object.values(reservationUrls(teeTime))) {
         expect(url).toContain(`https://www.chronogolf.${testConfig.bookingTld}/`);
         expect(url).not.toContain(`chronogolf.${testConfig.tld}`);
       }

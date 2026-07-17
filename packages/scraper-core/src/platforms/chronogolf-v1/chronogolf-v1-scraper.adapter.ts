@@ -2,7 +2,6 @@ import { z } from 'zod';
 import type { BookingPlatformScraper } from '../../domain/booking-platform-scraper.port.js';
 import type { CourseId, GroupSize } from '@stt/tee-time-domain/primitives-schema';
 import type { ScrapedTeeTime } from '@stt/tee-time-domain/tee-time-schema';
-import { bestBookingUrl } from '@stt/tee-time-domain/best-booking-url';
 import { buildLocalStartInstant } from '@stt/tee-time-domain/local-start-instant';
 import type { JsonFetcher } from '../../transport/json-fetcher.port.js';
 import type {
@@ -274,16 +273,15 @@ function mergeListing(
   return [...slotsById.values()].map((slot) => {
     const groupSizes = [...slot.groupSizes].sort((a, b) => a - b);
 
-    const bookingUrls: Partial<Record<GroupSize, string>> = {};
+    const urls: Partial<Record<GroupSize, string>> = {};
     for (const groupSize of groupSizes) {
-      const deepLink = buildReservationDeepLink(config, {
+      urls[groupSize] = buildReservationDeepLink(config, {
         chronogolfCourseId: listing.chronogolfCourseId,
         nbHoles: listing.nbHoles,
         date,
         teeTimeId: slot.representative.id,
         groupSize,
       });
-      bookingUrls[groupSize] = bestBookingUrl(deepLink, config.bookingPortalUrl);
     }
 
     return {
@@ -297,8 +295,7 @@ function mergeListing(
       holes: listing.nbHoles,
       routing: listing.routing,
       groupSizes,
-      bookingUrls,
-      onlineBookable: true,
+      booking: { kind: 'reservation', urls },
       scrapedAt,
       dynamicPrice: slot.dynamicPrice,
     };

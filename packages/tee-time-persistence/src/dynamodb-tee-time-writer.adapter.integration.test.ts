@@ -30,8 +30,7 @@ function teeTime(overrides: Partial<TeeTime> = {}): TeeTime {
     holes: 12,
     routing: [],
     groupSizes: [2, 3, 4],
-    bookingUrls: { 2: 'https://example.com' },
-    onlineBookable: true,
+    booking: { kind: 'reservation', urls: { 2: 'https://example.com' } },
     scrapedAt: '2026-07-07T18:00:00Z',
     pricePerPlayer: 42.5,
     ...overrides,
@@ -120,6 +119,37 @@ describe('DynamoDbTeeTimeWriter (local DynamoDB)', () => {
       'greenbryre#2026-07-10T06:00:00-06:00#12#Back',
       'greenbryre#2026-07-10T06:00:00-06:00#12#Front',
     ]);
+  });
+
+  it('marshals every booking arm without flattening or coercing it', async () => {
+    const reservation = teeTime({
+      startInstant: '2026-07-10T06:00:00-06:00',
+      booking: { kind: 'reservation', urls: { 2: 'https://example.com/book/2' } },
+    });
+    const portal = teeTime({
+      startInstant: '2026-07-10T06:10:00-06:00',
+      booking: { kind: 'portal', url: 'https://example.com/portal?date=2026-07-10' },
+    });
+    const phone = teeTime({
+      startInstant: '2026-07-10T06:20:00-06:00',
+      booking: { kind: 'phone' },
+    });
+
+    await writer.replaceUnitTeeTimes(unit, [reservation, portal, phone]);
+
+    const items = await storedItems();
+    const bookingByStart = new Map(
+      items.map((item) => [item.startInstant as string, item.booking])
+    );
+    expect(bookingByStart.get('2026-07-10T06:00:00-06:00')).toEqual({
+      kind: 'reservation',
+      urls: { 2: 'https://example.com/book/2' },
+    });
+    expect(bookingByStart.get('2026-07-10T06:10:00-06:00')).toEqual({
+      kind: 'portal',
+      url: 'https://example.com/portal?date=2026-07-10',
+    });
+    expect(bookingByStart.get('2026-07-10T06:20:00-06:00')).toEqual({ kind: 'phone' });
   });
 
   it('marshals a numeric TTL equal to the start instant in epoch seconds', async () => {

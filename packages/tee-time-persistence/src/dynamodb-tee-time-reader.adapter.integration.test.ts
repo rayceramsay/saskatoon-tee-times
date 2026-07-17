@@ -28,8 +28,7 @@ function teeTime(overrides: Partial<TeeTime> = {}): TeeTime {
     holes: 18,
     routing: [],
     groupSizes: [2, 3, 4],
-    bookingUrls: { 2: 'https://example.com' },
-    onlineBookable: true,
+    booking: { kind: 'reservation', urls: { 2: 'https://example.com' } },
     scrapedAt: '2026-07-14T18:00:00Z',
     pricePerPlayer: 42.5,
     ...overrides,
@@ -124,6 +123,30 @@ describe('DynamoDbTeeTimeReader (local DynamoDB)', () => {
       expect(value).not.toHaveProperty(TEE_TIME_TABLE_TTL_ATTRIBUTE);
       expect(value).not.toHaveProperty('padding');
     }
+  });
+
+  it('round-trips every booking arm with its kind and payload intact', async () => {
+    const reservation = teeTime({
+      courseId: 'greenbryre',
+      booking: { kind: 'reservation', urls: { 2: 'https://example.com/book/2' } },
+    });
+    const portal = teeTime({
+      courseId: 'the-legends',
+      booking: { kind: 'portal', url: 'https://example.com/portal?date=2026-07-15' },
+    });
+    const phone = teeTime({
+      courseId: 'holiday-park',
+      booking: { kind: 'phone' },
+    });
+    await seed(DATE, reservation);
+    await seed(DATE, portal);
+    await seed(DATE, phone);
+
+    const result = await reader.readTeeTimesForDate(DATE);
+
+    expect(result).toContainEqual(reservation);
+    expect(result).toContainEqual(portal);
+    expect(result).toContainEqual(phone);
   });
 
   it('returns an empty set for a date with no tee times', async () => {

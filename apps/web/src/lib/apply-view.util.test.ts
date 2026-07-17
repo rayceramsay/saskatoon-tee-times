@@ -103,6 +103,32 @@ describe('applyView', () => {
     expect(result.teeTimes).toEqual([]);
   });
 
+  it('filters every booking kind on the same group-size terms', () => {
+    const reservation = makeTeeTime({
+      courseId: 'the-willows',
+      groupSizes: [2, 3, 4],
+      booking: { kind: 'reservation', urls: { 2: 'https://book/2' } },
+    });
+    const portal = makeTeeTime({
+      courseId: 'the-legends',
+      groupSizes: [2, 3, 4],
+      booking: { kind: 'portal', url: 'https://portal?date=2026-07-13' },
+    });
+    const phone = makeTeeTime({
+      courseId: 'holiday-park',
+      groupSizes: [2, 3, 4],
+      booking: { kind: 'phone' },
+    });
+
+    const result = applyView(
+      [reservation, portal, phone],
+      viewState({ players: 2 }),
+      NOW
+    );
+
+    expect(result.teeTimes).toEqual([reservation, portal, phone]);
+  });
+
   it('hides slots starting before the earliest-start floor', () => {
     const early = makeTeeTime({ startInstant: '2026-07-13T07:30:00-06:00' });
     const later = makeTeeTime({ startInstant: '2026-07-13T08:30:00-06:00' });
